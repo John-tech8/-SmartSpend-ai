@@ -69,8 +69,8 @@ document.addEventListener('DOMContentLoaded', () => {
         appendMessage('loading', 'AI is thinking...', loadingId);
 
         try {
-            // 3. Send request to backend API
-            const response = await fetch('http://localhost:3000/api/chat', {
+            // 3. Send request to backend API (using absolute URL to support any frontend port/file execution)
+            const response = await fetch('http://localhost:5000/api/chat', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (response.ok) {
                 appendMessage('ai', data.reply);
             } else {
-                appendMessage('ai', '⚠️ Error: ' + (data.error || 'Failed to fetch response. Make sure the server is running.'));
+                appendMessage('ai', '⚠️ Error: ' + (data.reply || data.error || 'Failed to fetch response. Make sure the server is running.'));
             }
 
         } catch (error) {
@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (loadingBubble) {
                 loadingBubble.remove();
             }
-            appendMessage('ai', '⚠️ Server connection error. Make sure your local Node server is running on port 3000.');
+            appendMessage('ai', '⚠️ Server connection error. Make sure your local Node server is running.');
         }
     });
 });

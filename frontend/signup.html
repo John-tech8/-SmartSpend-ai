@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - SmartSpend AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fb;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-card {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .auth-title {
+            color: #1a202c;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #4a5568;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.2s ease;
+            outline: none;
+            background-color: white;
+        }
+
+        .input-group input:focus,
+        .input-group select:focus {
+            border-color: #2f6df6;
+            box-shadow: 0 0 0 3px rgba(47, 109, 246, 0.1);
+        }
+
+        .phone-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .phone-group select {
+            width: 30%;
+        }
+
+        .phone-group input {
+            width: 70%;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .btn-primary {
+            background: #2f6df6;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1e4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
+        }
+
+        .auth-link {
+            display: block;
+            margin-top: 20px;
+            color: #4a5568;
+            text-decoration: none;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .auth-link a {
+            color: #2f6df6;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .auth-link a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            color: #e53e3e;
+            font-size: 13px;
+            margin-top: 5px;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="auth-card">
+        <h1 class="auth-title">Create Account</h1>
+
+        <form id="signupForm">
+            <div class="input-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" required placeholder="John Doe">
+            </div>
+
+            <div class="input-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" required placeholder="name@example.com">
+            </div>
+
+            <div class="input-group">
+                <label>Phone Number</label>
+                <div class="phone-group">
+                    <select id="countryCode">
+                        <option value="+1">+1 (US/CA)</option>
+                        <option value="+44">+44 (UK)</option>
+                        <option value="+91">+91 (IN)</option>
+                        <option value="+61">+61 (AU)</option>
+                    </select>
+                    <input type="tel" id="phone" required placeholder="9876543210">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="dob">Date of Birth</label>
+                <input type="date" id="dob" required>
+                <div id="dobError" class="error-message">You must be at least 18 years old to sign up.</div>
+            </div>
+
+            <div class="input-group">
+                <label for="gender">Gender</label>
+                <select id="gender" required>
+                    <option value="" disabled selected>Select Gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="prefer-not-to-say">Prefer not to say</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" required placeholder="Create a password">
+            </div>
+
+            <button type="submit" class="btn btn-primary">Sign Up</button>
+        </form>
+
+        <div class="auth-link">
+            Already have an account? <a href="login.html">Login</a>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('signupForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            // Age validation (18+)
+            const dobInput = document.getElementById('dob').value;
+            const dob = new Date(dobInput);
+            const today = new Date();
+            let age = today.getFullYear() - dob.getFullYear();
+            const monthDiff = today.getMonth() - dob.getMonth();
+
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+                age--;
+            }
+
+            const errorMsg = document.getElementById('dobError');
+            if (age < 18) {
+                errorMsg.style.display = 'block';
+                return;
+            } else {
+                errorMsg.style.display = 'none';
+            }
+
+            // If success
+            alert('Account created successfully!');
+            // Here you'd typically send data to your backend
+        });
+    </script>
+</body>
+
+</html>

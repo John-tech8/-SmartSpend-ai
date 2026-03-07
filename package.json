@@ -11,9 +11,22 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^1.13.6",
+    "cores": "^0.8.5",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
+    "grok-sdk": "^0.0.1-security",
+    "groq-sdk": "^0.37.0",
     "node-fetch": "^3.3.2"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/John-tech8/SmartSpend-ai.git"
+  },
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/John-tech8/SmartSpend-ai/issues"
+  },
+  "homepage": "https://github.com/John-tech8/SmartSpend-ai#readme"
 }
