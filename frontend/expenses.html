@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartSpend – Track Expenses</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <style>
+        /* Specific styles for this page (these could be moved to components.css) */
+        body {
+            background-color: var(--bg-color, #f8f9fa);
+        }
+
+        .dashboard-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .form-card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-header h2 {
+            font-size: 28px;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .form-header p {
+            color: #666;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-prefix {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px 12px 35px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .form-control:focus {
+            border-color: #4a90e2;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+        }
+
+        .expense-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            margin: 30px 0 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            color: #1a1a1a;
+        }
+
+        /* Summary Card Styles */
+        .summary-card {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            border-radius: 16px;
+            padding: 30px;
+            color: white;
+            box-shadow: 0 15px 35px rgba(30, 60, 114, 0.2);
+            position: sticky;
+            top: 20px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .summary-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+            margin-top: 20px;
+        }
+
+        .summary-label {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .summary-value {
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .total-balance .summary-label {
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .total-balance .summary-value {
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .balance-positive {
+            color: #4cd964;
+        }
+
+        .balance-negative {
+            color: #ff3b30;
+        }
+
+        .balance-warning {
+            color: #ffcc00;
+        }
+
+        .layout-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 30px;
+            align-items: start;
+        }
+
+        @media (max-width: 900px) {
+            .layout-wrapper {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-card {
+                position: static;
+                margin-bottom: 30px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation (Simplified for App View) -->
+    <header class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">SmartSpend</a>
+            <nav class="nav-links">
+                <a href="#">Dashboard</a>
+                <a href="#" class="active">Expenses</a>
+                <a href="#">Goals</a>
+                <div class="user-profile">JD</div>
+            </nav>
+        </div>
+    </header>
+
+    <div class="dashboard-container">
+
+        <div class="form-header">
+            <h2>Track Your Monthly Finances</h2>
+            <p>Enter your income and expenses to let our AI analyze your financial health.</p>
+        </div>
+
+        <div class="layout-wrapper">
+
+            <!-- Left Column: Input Form -->
+            <div class="form-card">
+                <form id="expenseForm">
+                    <!-- Income Section -->
+                    <div class="form-group">
+                        <label for="monthlyIncome">Monthly Income</label>
+                        <div class="input-group">
+                            <span class="input-prefix">₹</span>
+                            <input type="number" id="monthlyIncome" class="form-control calc-input" placeholder="0.00"
+                                min="0" step="0.01">
+                        </div>
+                    </div>
+
+                    <h3 class="section-title">Monthly Expenses</h3>
+
+                    <div class="expense-grid">
+                        <div class="form-group">
+                            <label for="expRent">Rent / Hostel</label>
+                            <div class="input-group">
+                                <span class="input-prefix">₹</span>
+                                <input type="number" id="expRent" class="form-control calc-input exp-field"
+                                    placeholder="0.00" min="0" step="0.01">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="expFood">Food & Groceries</label>
+                            <div class="input-group">
+                                <span class="input-prefix">₹</span>
+                                <input type="number" id="expFood" class="form-control calc-input exp-field"
+                                    placeholder="0.00" min="0" step="0.01">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="expTransport">Transport</label>
+                            <div class="input-group">
+                                <span class="input-prefix">₹</span>
+                                <input type="number" id="expTransport" class="form-control calc-input exp-field"
+                                    placeholder="0.00" min="0" step="0.01">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="expShopping">Shopping</label>
+                            <div class="input-group">
+                                <span class="input-prefix">₹</span>
+                                <input type="number" id="expShopping" class="form-control calc-input exp-field"
+                                    placeholder="0.00" min="0" step="0.01">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="expEntertainment">Entertainment</label>
+                            <div class="input-group">
+                                <span class="input-prefix">₹</span>
+                                <input type="number" id="expEntertainment" class="form-control calc-input exp-field"
+                                    placeholder="0.00" min="0" step="0.01">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="expEmi">EMI / Debt Repayment</label>
+                            <div class="input-group">
+                                <span class="input-prefix">₹</span>
+                                <input type="number" id="expEmi" class="form-control calc-input exp-field"
+                                    placeholder="0.00" min="0" step="0.01">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="expFamily">Family Support</label>
+                            <div class="input-group">
+                                <span class="input-prefix">₹</span>
+                                <input type="number" id="expFamily" class="form-control calc-input exp-field"
+                                    placeholder="0.00" min="0" step="0.01">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="expMisc">Miscellaneous</label>
+                            <div class="input-group">
+                                <span class="input-prefix">₹</span>
+                                <input type="number" id="expMisc" class="form-control calc-input exp-field"
+                                    placeholder="0.00" min="0" step="0.01">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 30px; text-align: right;">
+                        <button type="submit" class="btn btn-primary btn-large">Save & Analyze</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Right Column: Live Summary -->
+            <div>
+                <div class="summary-card">
+                    <h3 style="margin-top: 0; margin-bottom: 25px; font-weight: 500;">Financial Overview</h3>
+
+                    <div class="summary-row">
+                        <span class="summary-label">Total Income</span>
+                        <span class="summary-value" id="dispIncome">₹0.00</span>
+                    </div>
+
+                    <div class="summary-row">
+                        <span class="summary-label">Total Expenses</span>
+                        <span class="summary-value" id="dispExpenses">₹0.00</span>
+                    </div>
+
+                    <div class="summary-row total-balance">
+                        <span class="summary-label">Remaining Balance</span>
+                        <span class="summary-value" id="dispBalance">₹0.00</span>
+                    </div>
+
+                    <div id="aiInsight"
+                        style="margin-top: 20px; font-size: 14px; line-height: 1.5; background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px;">
+                        Enter your monthly figures to see your projected financial health score and savings rate.
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/pages/expenses.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartSpend – Goal Tracker</title>
+    <!-- Use existing styles if applicable, but fully self-contained as requested -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Base Styling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #F8FAFD;
+            color: #1A202C;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .tracker-container {
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .title {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: #1A202C;
+        }
+
+        .card {
+            background: #FFFFFF;
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px -10px rgba(43, 97, 255, 0.1);
+            border: 1px solid #E2E8F0;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #4A5568;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-prefix {
+            position: absolute;
+            left: 15px;
+            color: #A0AEC0;
+            font-weight: 500;
+            pointer-events: none;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 15px;
+            background: #F8FAFD;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            font-size: 16px;
+            color: #2D3748;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        /* Padding variations for prefix */
+        .has-prefix {
+            padding-left: 35px;
+        }
+
+        .form-control:focus {
+            background: #FFFFFF;
+            border-color: #2B61FF;
+            box-shadow: 0 0 0 4px rgba(43, 97, 255, 0.1);
+        }
+
+        .form-control::placeholder {
+            color: #A0AEC0;
+        }
+
+        .error-message {
+            color: #E53E3E;
+            font-size: 12px;
+            margin-top: 6px;
+            display: none;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 16px;
+            margin-top: 10px;
+            background: linear-gradient(135deg, #2B61FF 0%, #1545CB 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(43, 97, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(43, 97, 255, 0.4);
+        }
+
+        /* Result Card Styles */
+        .result-card {
+            margin-top: 30px;
+            background: linear-gradient(135deg, #2B61FF 0%, #1545CB 100%);
+            border-radius: 16px;
+            padding: 25px 30px;
+            color: white;
+            box-shadow: 0 15px 30px rgba(43, 97, 255, 0.2);
+            display: none;
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        .result-card h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 15px;
+        }
+
+        .result-row:last-child {
+            margin-bottom: 0;
+            margin-top: 20px;
+            font-weight: 600;
+            font-size: 18px;
+            color: #E2E8F0;
+        }
+
+        .result-value {
+            font-weight: 600;
+        }
+
+        .time-value {
+            color: #48BB78;
+            /* Green tint for success feeling */
+            background: #F0FFF4;
+            padding: 4px 12px;
+            border-radius: 8px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="tracker-container">
+        <h2 class="title">Goal-Based Savings Planner</h2>
+
+        <div class="card">
+            <form id="goalForm">
+
+                <!-- 1. Goal Name -->
+                <div class="form-group">
+                    <label for="goalName">Goal Name</label>
+                    <input type="text" id="goalName" class="form-control" placeholder="e.g. Laptop" required>
+                </div>
+
+                <!-- 2. Goal Cost -->
+                <div class="form-group">
+                    <label for="goalCost">Goal Cost (₹)</label>
+                    <div class="input-wrapper">
+                        <span class="input-prefix">₹</span>
+                        <input type="number" id="goalCost" class="form-control has-prefix" placeholder="30000" min="1"
+                            step="0.01" required>
+                    </div>
+                </div>
+
+                <!-- 3. Monthly Saving Amount -->
+                <div class="form-group">
+                    <label for="monthlySaving">Monthly Saving Amount (₹)</label>
+                    <div class="input-wrapper">
+                        <span class="input-prefix">₹</span>
+                        <input type="number" id="monthlySaving" class="form-control has-prefix" placeholder="5000"
+                            min="1" step="0.01">
+                    </div>
+                    <div class="error-message" id="errMonthly">Must be greater than 0</div>
+                </div>
+
+                <!-- 4. Months to Achieve Goal -->
+                <div class="form-group">
+                    <label for="goalMonths">Months to Achieve Goal</label>
+                    <input type="number" id="goalMonths" class="form-control" placeholder="6" min="1" max="120"
+                        step="1">
+                    <div class="error-message" id="errMonths">Months must be between 1 and 120</div>
+                </div>
+
+                <button type="submit" class="btn-primary">Add Goal</button>
+            </form>
+        </div>
+
+        <!-- Dashboard Result Card -->
+        <div class="result-card" id="resultCard">
+            <h3>Goal Summary</h3>
+            <div class="result-row">
+                <span>Goal:</span>
+                <span class="result-value" id="resName">-</span>
+            </div>
+            <div class="result-row">
+                <span>Cost:</span>
+                <span class="result-value" id="resCost">₹0</span>
+            </div>
+            <div class="result-row">
+                <span>Monthly Saving:</span>
+                <span class="result-value" id="resSaving">₹0</span>
+            </div>
+            <div class="result-row">
+                <span>Time Needed:</span>
+                <span class="result-value time-value" id="resTime">0 months</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Select DOM elements
+            const costInput = document.getElementById('goalCost');
+            const savingInput = document.getElementById('monthlySaving');
+            const monthsInput = document.getElementById('goalMonths');
+            const goalForm = document.getElementById('goalForm');
+
+            // Error Elements
+            const errMonthly = document.getElementById('errMonthly');
+            const errMonths = document.getElementById('errMonths');
+
+            // Result Elements
+            const resultCard = document.getElementById('resultCard');
+            const resName = document.getElementById('resName');
+            const resCost = document.getElementById('resCost');
+            const resSaving = document.getElementById('resSaving');
+            const resTime = document.getElementById('resTime');
+
+            // Status trackers to prevent circular events
+            let activeInput = null;
+
+            // Formatter for currency
+            const formatINR = (amount) => {
+                return new Intl.NumberFormat('en-IN', {
+                    style: 'currency',
+                    currency: 'INR',
+                    maximumFractionDigits: 0
+                }).format(amount);
+            };
+
+            // Handle when User types in Monthly Savings
+            savingInput.addEventListener('input', () => {
+                activeInput = 'saving';
+                calculateValues();
+            });
+
+            // Handle when User types in Months
+            monthsInput.addEventListener('input', () => {
+                activeInput = 'months';
+                calculateValues();
+            });
+
+            // Handle when User changes the Goal Cost (updates whichever was last active)
+            costInput.addEventListener('input', () => {
+                calculateValues();
+            });
+
+            // Core Calculation Logic
+            function calculateValues() {
+                const cost = parseFloat(costInput.value) || 0;
+
+                // Reset Errors
+                errMonthly.style.display = 'none';
+                errMonths.style.display = 'none';
+
+                if (cost <= 0) return; // Wait for valid cost
+
+                if (activeInput === 'saving') {
+                    // Case 1: User enters Monthly Saving -> Calculate Months
+                    const saving = parseFloat(savingInput.value);
+                    if (saving > 0) {
+                        let calcMonths = Math.ceil(cost / saving); // Round up to full months
+
+                        if (calcMonths > 120) {
+                            errMonths.style.display = 'block';
+                            errMonths.textContent = `Required time is ${calcMonths} months. Max allowed is 120.`;
+                            monthsInput.value = '';
+                        } else {
+                            monthsInput.value = calcMonths;
+                        }
+                    } else if (savingInput.value !== '') {
+                        errMonthly.style.display = 'block';
+                        monthsInput.value = '';
+                    }
+
+                } else if (activeInput === 'months') {
+                    // Case 2: User enters Months -> Calculate Monthly Saving
+                    const months = parseFloat(monthsInput.value);
+                    if (months >= 1 && months <= 120) {
+                        let calcSaving = cost / months;
+                        savingInput.value = calcSaving.toFixed(2);
+                    } else if (monthsInput.value !== '') {
+                        errMonths.style.display = 'block';
+                        errMonths.textContent = 'Months must be between 1 and 120';
+                        savingInput.value = '';
+                    }
+                }
+            }
+
+            // Handle Form Submissions
+            goalForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                const name = document.getElementById('goalName').value;
+                const cost = parseFloat(costInput.value);
+                const saving = parseFloat(savingInput.value);
+                const months = parseInt(monthsInput.value);
+
+                // Final Validations before showing UI
+                let isValid = true;
+
+                if (!saving || saving <= 0) {
+                    errMonthly.style.display = 'block';
+                    isValid = false;
+                }
+
+                if (!months || months < 1 || months > 120) {
+                    errMonths.style.display = 'block';
+                    errMonths.textContent = 'Months must be between 1 and 120';
+                    isValid = false;
+                }
+
+                if (!isValid) return;
+
+                // Update Result UI
+                resName.textContent = name;
+                resCost.textContent = formatINR(cost);
+                resSaving.textContent = formatINR(saving);
+                resTime.textContent = `${months} month${months > 1 ? 's' : ''}`;
+
+                // Reveal Card
+                resultCard.style.display = 'block';
+
+                // Optional: Scroll to card smoothly
+                resultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            });
+        });
+    </script>
+</body>
+
+</html>

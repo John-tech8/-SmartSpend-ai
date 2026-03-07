@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartSpend AI Financial Advisor</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <style>
+        body {
+            background-color: var(--bg-color, #F8FAFD);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: #fff;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color, #E2E8F0);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            z-index: 10;
+        }
+
+        .back-btn {
+            text-decoration: none;
+            color: var(--primary-blue, #2B61FF);
+            font-weight: 600;
+            margin-right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .back-btn:hover {
+            opacity: 0.8;
+        }
+
+        .chat-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-main, #1A202C);
+            margin: 0;
+        }
+
+        .chat-container {
+            flex: 1;
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            background: #fff;
+            box-shadow: var(--soft-shadow, 0 10px 40px -10px rgba(43, 97, 255, 0.1));
+            border-left: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 30px 20px;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 14px 20px;
+            border-radius: 18px;
+            font-size: 15px;
+            line-height: 1.5;
+            animation: fadeIn 0.3s ease forwards;
+            position: relative;
+        }
+
+        .msg-ai {
+            align-self: flex-start;
+            background-color: #F8FAFD;
+            color: #1A202C;
+            border: 1px solid #E2E8F0;
+            border-bottom-left-radius: 4px;
+        }
+
+        .msg-user {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #2B61FF 0%, #1545CB 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .msg-loading {
+            align-self: flex-start;
+            background-color: #F8FAFD;
+            color: #718096;
+            border: 1px solid #E2E8F0;
+            border-bottom-left-radius: 4px;
+            font-style: italic;
+        }
+
+        /* Markdown support inside AI response */
+        .msg-ai p {
+            margin-bottom: 10px;
+        }
+
+        .msg-ai p:last-child {
+            margin-bottom: 0;
+        }
+
+        .msg-ai ul,
+        .msg-ai ol {
+            margin-left: 20px;
+            margin-bottom: 10px;
+        }
+
+        .msg-ai strong {
+            font-weight: 600;
+            color: #2B61FF;
+        }
+
+        .chat-input-area {
+            padding: 20px;
+            background: #fff;
+            border-top: 1px solid var(--border-color, #E2E8F0);
+        }
+
+        .input-form {
+            display: flex;
+            gap: 15px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 16px 20px;
+            border: 2px solid #E2E8F0;
+            border-radius: 25px;
+            outline: none;
+            font-size: 15px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            background-color: #F8FAFD;
+        }
+
+        .chat-input:focus {
+            background-color: #fff;
+            border-color: #2B61FF;
+            box-shadow: 0 0 0 3px rgba(43, 97, 255, 0.1);
+        }
+
+        .send-btn {
+            background: linear-gradient(135deg, #2B61FF 0%, #1545CB 100%);
+            color: white;
+            border: none;
+            width: 55px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(43, 97, 255, 0.2);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive Mobile Layout */
+        @media (max-width: 768px) {
+            .chat-container {
+                border: none;
+                box-shadow: none;
+            }
+
+            .message {
+                max-width: 90%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="chat-header">
+        <a href="index.html" class="back-btn">&larr; Back</a>
+        <h1 class="chat-title">SmartSpend AI Financial Advisor</h1>
+    </header>
+
+    <div class="chat-container">
+        <div class="chat-messages" id="chatArea">
+            <!-- Initial Greeting -->
+            <div class="message msg-ai">
+                Hi! I'm your SmartSpend AI Financial Advisor. I have context about your finances from the dashboard. How
+                can I help you today?
+            </div>
+        </div>
+
+        <div class="chat-input-area">
+            <form class="input-form" id="chatForm">
+                <input type="text" id="userInput" class="chat-input"
+                    placeholder="Ask about budgeting, saving, or cutting expenses..." required autocomplete="off">
+                <button type="submit" class="send-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/aiagent.js"></script>
+</body>
+
+</html>

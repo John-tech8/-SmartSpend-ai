@@ -1,0 +1,404 @@
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --primary-blue: #2B61FF;
+    --primary-gradient: linear-gradient(135deg, #2B61FF 0%, #1545CB 100%);
+    --bg-color: #F8FAFD;
+    --text-main: #1A202C;
+    --text-muted: #718096;
+    --card-bg: #FFFFFF;
+    --soft-shadow: 0 10px 40px -10px rgba(43, 97, 255, 0.1);
+    --hover-shadow: 0 20px 40px -10px rgba(43, 97, 255, 0.2);
+    --border-color: #E2E8F0;
+    --input-bg: #F8FAFD;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+}
+
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* 1. Navigation */
+.navbar {
+    background-color: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.navbar .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 80px;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--primary-blue);
+    text-decoration: none;
+    letter-spacing: -0.5px;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.nav-links a:not(.btn) {
+    text-decoration: none;
+    color: var(--text-muted);
+    font-weight: 500;
+    font-size: 15px;
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+.nav-links a:not(.btn):hover {
+    color: var(--primary-blue);
+}
+
+.nav-links a:not(.btn)::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -5px;
+    left: 0;
+    background-color: var(--primary-blue);
+    transition: width 0.3s ease;
+}
+
+.nav-links a:not(.btn):hover::after {
+    width: 100%;
+}
+
+/* Buttons */
+.btn {
+    display: inline-block;
+    padding: 12px 28px;
+    border-radius: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: none;
+}
+
+.btn-primary {
+    background: var(--primary-gradient);
+    color: white;
+    box-shadow: 0 4px 15px rgba(43, 97, 255, 0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--hover-shadow);
+}
+
+.btn-outline {
+    background: transparent;
+    color: var(--primary-blue);
+    border: 2px solid var(--primary-blue);
+}
+
+.btn-outline:hover {
+    background: var(--primary-gradient);
+    color: white;
+    border-color: transparent;
+}
+
+.btn-large {
+    padding: 16px 40px;
+    font-size: 18px;
+}
+
+/* 2. Hero Section Title */
+.hero {
+    padding: 100px 0 60px;
+    text-align: center;
+}
+
+.hero-title {
+    font-size: 48px;
+    font-weight: 700;
+    letter-spacing: -1px;
+    line-height: 1.2;
+    margin-bottom: 20px;
+    color: var(--text-main);
+}
+
+.hero-tagline {
+    font-size: 20px;
+    color: var(--text-muted);
+    margin-bottom: 40px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.hero-graphics {
+    margin-top: 60px;
+    display: flex;
+    justify-content: center;
+}
+
+.glass-card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    box-shadow: var(--soft-shadow);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.mockup-card {
+    padding: 30px 40px;
+    text-align: center;
+    animation: float 6s ease-in-out infinite;
+}
+
+.mockup-header {
+    font-size: 14px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+}
+
+.mockup-score {
+    font-size: 42px;
+    font-weight: 700;
+    color: var(--primary-blue);
+}
+
+.trend-up {
+    font-size: 16px;
+    color: #38A169;
+    background: #F0FFF4;
+    padding: 4px 12px;
+    border-radius: 20px;
+    vertical-align: middle;
+}
+
+/* 3. Features Section */
+.features {
+    padding: 80px 0;
+    background: #FFFFFF;
+}
+
+.section-title {
+    text-align: center;
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 60px;
+}
+
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+}
+
+.feature-card {
+    background: var(--bg-color);
+    padding: 40px 30px;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    border: 1px solid var(--border-color);
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--soft-shadow);
+    background: white;
+}
+
+.feature-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 15px;
+    background: var(--primary-gradient);
+    margin-bottom: 25px;
+    opacity: 0.1;
+    /* Placeholder since no SVGs are loaded, acts as a decorative block */
+}
+
+.feature-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.feature-desc {
+    color: var(--text-muted);
+    font-size: 15px;
+}
+
+/* 4. Financial Analysis Form (Overrides inline styles from HTML) */
+.analyze-section {
+    padding: 100px 0 !important;
+    background: var(--bg-color) !important;
+}
+
+.form-container {
+    background: white !important;
+    padding: 40px !important;
+    border-radius: 24px !important;
+    box-shadow: var(--soft-shadow) !important;
+}
+
+.form-group label {
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    color: var(--text-main) !important;
+    margin-bottom: 10px !important;
+}
+
+.form-control {
+    background-color: var(--input-bg) !important;
+    border: 2px solid transparent !important;
+    border-radius: 12px !important;
+    padding: 16px 20px !important;
+    color: var(--text-main) !important;
+    transition: all 0.3s ease !important;
+}
+
+.form-control:focus {
+    background-color: white !important;
+    border-color: var(--primary-blue) !important;
+    box-shadow: 0 0 0 4px rgba(43, 97, 255, 0.1) !important;
+    outline: none !important;
+}
+
+form .btn-primary {
+    margin-top: 10px;
+    height: 54px;
+    border-radius: 12px !important;
+}
+
+/* Dashboard Result Card */
+.results-card {
+    background: white !important;
+    /* Overriding the dark gradient for a cleaner Mint look */
+    color: var(--text-main) !important;
+    padding: 40px !important;
+    border-radius: 24px !important;
+    box-shadow: var(--soft-shadow) !important;
+    border: 1px solid var(--border-color);
+}
+
+.results-card .results-title {
+    color: var(--text-main) !important;
+    font-weight: 600 !important;
+    margin-bottom: 30px !important;
+}
+
+.results-card>div[style*="border-bottom"] {
+    border-color: var(--border-color) !important;
+    padding: 20px 0 !important;
+    margin-bottom: 0 !important;
+}
+
+.results-card span[style*="opacity"] {
+    color: var(--text-muted) !important;
+    opacity: 1 !important;
+}
+
+#resHealth {
+    color: white !important;
+    /* Keep badge text white */
+}
+
+/* 5. CTA Section */
+.cta-section {
+    padding: 100px 0 !important;
+    background: white !important;
+    border-top: 1px solid var(--border-color);
+}
+
+.cta-box h2 {
+    font-size: 36px !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.5px;
+}
+
+/* 6. Footer */
+.footer {
+    background: #0F172A;
+    color: #94A3B8;
+    padding: 40px 0;
+    text-align: center;
+}
+
+.footer-links {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+}
+
+.footer-links a {
+    color: #94A3B8;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+    color: white;
+}
+
+/* Animations */
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-15px);
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 36px;
+    }
+
+    .nav-links {
+        display: none;
+        /* In a real app, this would be a hamburger menu */
+    }
+
+    .form-container,
+    .results-card {
+        padding: 24px !important;
+    }
+
+    .cta-box h2 {
+        font-size: 28px !important;
+    }
+}
