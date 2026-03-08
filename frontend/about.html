@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/animations.css">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .about-section {
             padding: 80px 20px;
@@ -44,12 +46,27 @@
     <!-- Navigation -->
     <header class="navbar">
         <div class="container">
-            <a href="index.html" class="logo">SmartSpend</a>
-            <nav class="nav-links">
-                <a href="index.html#features">Features</a>
-                <a href="about.html">About</a>
-                <a href="aiagent.html">AI Advisor</a>
-                <a href="#" class="btn btn-outline">Log In</a>
+            <a href="index.html" class="logo"><i class="fas fa-chart-line" style="margin-right: 8px;"></i>SmartSpend</a>
+            <nav class="nav-links" style="display: flex; align-items: center; gap: 15px;">
+                <div class="dropdown">
+                    <a href="index.html#features" class="dropbtn" data-i18n="nav.features">Features <i
+                            class="fas fa-chevron-down" style="font-size: 10px; margin-left: 5px;"></i></a>
+                    <div class="dropdown-content">
+                        <a href="expenses.html">Expense Analysis</a>
+                        <a href="dashboard.html">Financial Health Score</a>
+                        <a href="goals.html">Goal Tracker</a>
+                        <a href="monthlyreport.html">Monthly Report</a>
+                    </div>
+                </div>
+                <a href="about.html" data-i18n="nav.about">About</a>
+                <a href="aiagent.html" data-i18n="nav.advisor">AI Advisor</a>
+                <a href="login.html" class="nav-btn" data-i18n="nav.login">Login</a>
+                <a href="signup.html" class="nav-btn primary" data-i18n="nav.signup">Sign Up</a>
+                <select id="languageSelector" class="lang-select">
+                    <option value="en">English</option>
+                    <option value="hi">हिंदी (Hindi)</option>
+                    <option value="ta">தமிழ் (Tamil)</option>
+                </select>
             </nav>
         </div>
     </header>
