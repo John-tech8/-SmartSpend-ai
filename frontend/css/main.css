@@ -9,23 +9,65 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 :root {
-    --primary-blue: #2B61FF;
-    --primary-gradient: linear-gradient(135deg, #2B61FF 0%, #1545CB 100%);
-    --bg-color: #F8FAFD;
-    --text-main: #1A202C;
-    --text-muted: #718096;
-    --card-bg: #FFFFFF;
-    --soft-shadow: 0 10px 40px -10px rgba(43, 97, 255, 0.1);
-    --hover-shadow: 0 20px 40px -10px rgba(43, 97, 255, 0.2);
-    --border-color: #E2E8F0;
-    --input-bg: #F8FAFD;
+    /* Premium Fintech Palette */
+    --primary-blue: #4F46E5;
+    /* Indigo */
+    --primary-gradient: linear-gradient(135deg, #4F46E5 0%, #6366F1 100%);
+    --accent-green: #22C55E;
+    --highlight-blue: #38BDF8;
+
+    /* Dark Theme Backgrounds */
+    --bg-color: #0F172A;
+    --bg-darker: #020617;
+    --card-bg: rgba(255, 255, 255, 0.08);
+
+    /* Text Colors */
+    --text-main: #F8FAFC;
+    --text-muted: #94A3B8;
+
+    /* Effects */
+    --soft-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    --hover-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+    --border-color: rgba(255, 255, 255, 0.1);
+    --input-bg: rgba(255, 255, 255, 0.05);
 }
 
 body {
-    background-color: var(--bg-color);
+    background: linear-gradient(135deg, #0F172A, #1E293B, #020617);
+    background-attachment: fixed;
     color: var(--text-main);
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
+    position: relative;
+}
+
+/* Subtle Animated Background Elements (using pseudo-elements so we don't change HTML structure) */
+body::before,
+body::after {
+    content: '';
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(120px);
+    z-index: -1;
+    pointer-events: none;
+}
+
+body::before {
+    width: 600px;
+    height: 600px;
+    background: rgba(79, 70, 229, 0.15);
+    /* Primary glow */
+    top: -100px;
+    left: -100px;
+}
+
+body::after {
+    width: 500px;
+    height: 500px;
+    background: rgba(56, 189, 248, 0.1);
+    /* Highlight glow */
+    bottom: -100px;
+    right: -100px;
 }
 
 .container {
@@ -36,8 +78,9 @@ body {
 
 /* 1. Navigation */
 .navbar {
-    background-color: rgba(255, 255, 255, 0.95);
+    background-color: rgba(15, 23, 42, 0.7);
     backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     position: sticky;
     top: 0;
     z-index: 100;
@@ -102,9 +145,12 @@ body {
 .dropdown-content {
     display: none;
     position: absolute;
-    background-color: white;
+    background-color: var(--card-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border-color);
     min-width: 220px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--soft-shadow);
     border-radius: 12px;
     z-index: 200;
     top: 100%;
@@ -120,7 +166,7 @@ body {
     display: block;
     font-size: 14px !important;
     font-weight: 500 !important;
-    transition: background-color 0.2s;
+    transition: background-color 0.2s, color 0.2s;
 }
 
 .dropdown-content a::after {
@@ -128,8 +174,8 @@ body {
 }
 
 .dropdown-content a:hover {
-    background-color: var(--bg-color);
-    color: var(--primary-blue) !important;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--highlight-blue) !important;
 }
 
 .dropdown:hover .dropdown-content {
@@ -139,37 +185,41 @@ body {
 /* Buttons */
 .btn {
     display: inline-block;
-    padding: 12px 28px;
+    padding: 12px 24px;
     border-radius: 12px;
     font-weight: 600;
+    letter-spacing: 0.5px;
     text-decoration: none;
     text-align: center;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.3s ease;
     border: none;
 }
 
 .btn-primary {
     background: var(--primary-gradient);
     color: white;
-    box-shadow: 0 4px 15px rgba(43, 97, 255, 0.3);
+    box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
 }
 
 .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: var(--hover-shadow);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+    /* Subtle glow on hover */
+    filter: brightness(1.1);
 }
 
 .btn-outline {
     background: transparent;
-    color: var(--primary-blue);
-    border: 2px solid var(--primary-blue);
+    color: var(--highlight-blue);
+    border: 2px solid var(--highlight-blue);
 }
 
 .btn-outline:hover {
-    background: var(--primary-gradient);
-    color: white;
+    background: var(--highlight-blue);
+    color: #0F172A;
     border-color: transparent;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
 }
 
 .btn-large {
@@ -209,9 +259,11 @@ body {
 
 .glass-card {
     background: var(--card-bg);
-    border-radius: 20px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 16px;
     box-shadow: var(--soft-shadow);
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    border: var(--border-color);
 }
 
 .mockup-card {
@@ -246,7 +298,8 @@ body {
 /* 3. Features Section */
 .features {
     padding: 80px 0;
-    background: #FFFFFF;
+    /* Transparent background to show gradients through from body */
+    background: transparent;
 }
 
 .section-title {
@@ -263,17 +316,20 @@ body {
 }
 
 .feature-card {
-    background: var(--bg-color);
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     padding: 40px 30px;
-    border-radius: 20px;
+    border-radius: 16px;
     transition: all 0.3s ease;
-    border: 1px solid var(--border-color);
+    border: var(--border-color);
+    box-shadow: var(--soft-shadow);
 }
 
 .feature-card:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--soft-shadow);
-    background: white;
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: var(--hover-shadow);
+    background: rgba(255, 255, 255, 0.12);
 }
 
 .feature-icon {
@@ -300,14 +356,16 @@ body {
 /* 4. Financial Analysis Form (Overrides inline styles from HTML) */
 .analyze-section {
     padding: 100px 0 !important;
-    background: var(--bg-color) !important;
+    background: transparent !important;
 }
 
 .form-container {
-    background: white !important;
+    background: var(--card-bg) !important;
+    backdrop-filter: blur(12px);
     padding: 40px !important;
-    border-radius: 24px !important;
+    border-radius: 16px !important;
     box-shadow: var(--soft-shadow) !important;
+    border: 1px solid var(--border-color);
 }
 
 .form-group label {
@@ -341,11 +399,11 @@ form .btn-primary {
 
 /* Dashboard Result Card */
 .results-card {
-    background: white !important;
-    /* Overriding the dark gradient for a cleaner Mint look */
+    background: var(--card-bg) !important;
+    backdrop-filter: blur(12px);
     color: var(--text-main) !important;
     padding: 40px !important;
-    border-radius: 24px !important;
+    border-radius: 16px !important;
     box-shadow: var(--soft-shadow) !important;
     border: 1px solid var(--border-color);
 }
@@ -369,13 +427,12 @@ form .btn-primary {
 
 #resHealth {
     color: white !important;
-    /* Keep badge text white */
 }
 
 /* 5. CTA Section */
 .cta-section {
     padding: 100px 0 !important;
-    background: white !important;
+    background: transparent !important;
     border-top: 1px solid var(--border-color);
 }
 
@@ -387,10 +444,11 @@ form .btn-primary {
 
 /* 6. Footer */
 .footer {
-    background: #0F172A;
-    color: #94A3B8;
+    background: rgba(15, 23, 42, 0.5);
+    color: var(--text-muted);
     padding: 40px 0;
     text-align: center;
+    border-top: 1px solid var(--border-color);
 }
 
 .footer-links {
@@ -444,4 +502,38 @@ form .btn-primary {
     .cta-box h2 {
         font-size: 28px !important;
     }
+}
+
+/* Global Form Input Readability Fix */
+input,
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="password"],
+textarea,
+select {
+    color: #000000 !important;
+    background-color: #ffffff !important;
+}
+
+::placeholder {
+    color: #6b7280 !important;
+    opacity: 1;
+}
+
+input[type="number"] {
+    color: #000000 !important;
+}
+
+label {
+    color: #111827 !important;
+    font-weight: 500 !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    outline: none !important;
+    border: 2px solid #4F46E5 !important;
+    box-shadow: 0 0 8px rgba(79, 70, 229, 0.4) !important;
 }

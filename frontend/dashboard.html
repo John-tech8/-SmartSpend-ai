@@ -27,12 +27,12 @@
 
         .page-header h2 {
             font-size: 28px;
-            color: #1a1a1a;
+            color: #ffffff;
             margin-bottom: 5px;
         }
 
         .page-header p {
-            color: #666;
+            color: #94a3b8;
         }
 
         /* Grid Layout */
@@ -154,7 +154,7 @@
         .card-header {
             font-size: 18px;
             font-weight: 600;
-            color: #1a1a1a;
+            color: #ffffff;
             margin-bottom: 25px;
             display: flex;
             justify-content: space-between;
@@ -232,7 +232,12 @@
                     <option value="hi">हिंदी (Hindi)</option>
                     <option value="ta">தமிழ் (Tamil)</option>
                 </select>
-                <div class="dropdown"><a href="index.html#features" class="dropbtn" data-i18n="nav.features">Features <i class="fas fa-chevron-down" style="font-size: 10px; margin-left: 5px;"></i></a><div class="dropdown-content"><a href="expenses.html">Expense Analysis</a><a href="dashboard.html">Financial Health Score</a><a href="goals.html">Goal Tracker</a><a href="monthlyreport.html">Monthly Report</a></div></div><a href="dashboard.html" class="active" data-i18n="nav.dashboard">Dashboard</a>
+                <div class="dropdown"><a href="index.html#features" class="dropbtn" data-i18n="nav.features">Features <i
+                            class="fas fa-chevron-down" style="font-size: 10px; margin-left: 5px;"></i></a>
+                    <div class="dropdown-content"><a href="expenses.html">Expense Analysis</a><a
+                            href="dashboard.html">Financial Health Score</a><a href="goals.html">Goal Tracker</a><a
+                            href="monthlyreport.html">Monthly Report</a></div>
+                </div><a href="dashboard.html" class="active" data-i18n="nav.dashboard">Dashboard</a>
                 <a href="expenses.html" data-i18n="nav.expenses">Expenses</a>
                 <a href="goals.html" data-i18n="nav.goals">Goals</a>
                 <div class="user-profile">JD</div>
@@ -253,10 +258,10 @@
         </div>
 
         <div id="emptyState"
-            style="display: none; text-align: center; padding: 100px 20px; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+            style="display: none; text-align: center; padding: 100px 20px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
             <i class="fas fa-wallet fa-4x" style="color: #ccc; margin-bottom: 20px;"></i>
-            <h3>No financial data available yet.</h3>
-            <p style="color: #666; margin-bottom: 25px;">Track your income and expenses to get your Financial Health
+            <h3 style="color: #ffffff;">No financial data available yet.</h3>
+            <p style="color: #94a3b8; margin-bottom: 25px;">Track your income and expenses to get your Financial Health
                 Score.</p>
             <a href="expenses.html" class="btn btn-primary"
                 style="padding: 12px 30px; font-size: 16px; border-radius: 8px;">Add Income & Expenses</a>
@@ -265,7 +270,7 @@
         <div class="dashboard-grid" id="dashboardContent" style="display: none;">
 
             <!-- Health Score Hero Card -->
-            <div class="score-card">
+            <div class="score-card animate-on-scroll">
                 <div class="score-info">
                     <span class="score-label">Financial Health Score</span>
                     <div class="score-value">
@@ -275,9 +280,9 @@
                     <p class="score-message" id="healthMessageDisplay">Analyzing your data...</p>
                 </div>
 
-                <div class="insights-panel">
+                <div class="insights-panel animate-on-scroll">
                     <!-- Metric: Savings Rate -->
-                    <div class="metric-card">
+                    <div class="metric-card animate-on-scroll">
                         <div class="metric-label">Savings Rate</div>
                         <div class="metric-value" id="savingsRateDisplay">0%</div>
                         <div class="progress-wrapper">
@@ -288,13 +293,13 @@
                     </div>
 
                     <!-- Metric: Monthly Income -->
-                    <div class="metric-card">
+                    <div class="metric-card animate-on-scroll">
                         <div class="metric-label">Monthly Income</div>
                         <div class="metric-value" id="incomeDisplay">₹0</div>
                     </div>
 
                     <!-- Metric: Remaining Balance -->
-                    <div class="metric-card">
+                    <div class="metric-card animate-on-scroll">
                         <div class="metric-label">Remaining Balance</div>
                         <div class="metric-value" id="balanceDisplay">₹0</div>
                     </div>
@@ -302,7 +307,7 @@
             </div>
 
             <!-- Expense Breakdown Chart -->
-            <div class="chart-container">
+            <div class="chart-container animate-on-scroll">
                 <div class="card-header">
                     <span>Expense Breakdown</span>
                 </div>
@@ -312,7 +317,7 @@
             </div>
 
             <!-- Peer Comparison Chart -->
-            <div class="chart-container">
+            <div class="chart-container animate-on-scroll">
                 <div class="card-header">
                     <span>Peer Comparison <span
                             style="font-size: 13px; color: #666; font-weight: normal; margin-left: 10px;">(Similar
@@ -324,7 +329,7 @@
             </div>
 
             <!-- Detailed Savings Summary -->
-            <div class="summary-container">
+            <div class="summary-container animate-on-scroll">
                 <div class="card-header">
                     <span>Savings Summary</span>
                     <a href="expenses.html" class="btn btn-outline" style="padding: 5px 15px; font-size: 14px;">Edit
@@ -359,7 +364,7 @@
             </div>
 
             <!-- Expense History List -->
-            <div class="summary-container" style="grid-column: span 12;">
+            <div class="summary-container animate-on-scroll" style="grid-column: span 12;">
                 <div class="card-header">
                     <span>Expense History</span>
                 </div>
@@ -380,7 +385,7 @@
             </div>
 
             <!-- Monthly Financial Report Card -->
-            <div class="summary-container" style="grid-column: span 12; margin-top: 10px;">
+            <div class="summary-container animate-on-scroll" style="grid-column: span 12; margin-top: 10px;">
                 <div class="card-header" style="margin-bottom: 15px;">
                     <span>Monthly Financial Report Card</span>
                     <span id="reportMonthStr" style="color: #666; font-weight: normal; font-size: 14px;"></span>
@@ -393,17 +398,17 @@
                                 style="font-size: 40px; font-weight: bold; background: #2B61FF; color: white; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; border-radius: 12px; box-shadow: 0 4px 10px rgba(43, 97, 255, 0.2);">
                                 -</div>
                             <div>
-                                <div style="font-size: 14px; color: #666;">Health Score</div>
-                                <div id="reportScore" style="font-size: 24px; font-weight: bold; color: #1a1a1a;">0 /
+                                <div style="font-size: 14px; color: #94a3b8;">Health Score</div>
+                                <div id="reportScore" style="font-size: 24px; font-weight: bold; color: #ffffff;">0 /
                                     100</div>
                             </div>
                         </div>
                     </div>
                     <div style="flex: 2; min-width: 300px;">
-                        <h4 style="color: #4A5568; margin-bottom: 15px; font-weight: 600;">Top 3 Improvements</h4>
+                        <h4 style="color: #e2e8f0; margin-bottom: 15px; font-weight: 600;">Top 3 Improvements</h4>
                         <ul id="reportImprovements" style="list-style-type: none; padding: 0;">
                             <!-- Populated by JS -->
-                            <li style="color: #666;">Loading...</li>
+                            <li style="color: #94a3b8;">Loading...</li>
                         </ul>
                     </div>
                 </div>

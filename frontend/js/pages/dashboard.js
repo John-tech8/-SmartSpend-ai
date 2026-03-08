@@ -128,7 +128,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     const ctx = document.getElementById('expenseChart').getContext('2d');
     const chartLabels = Object.keys(expenseBreakdown);
     const chartData = Object.values(expenseBreakdown);
-    const bgColors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#C9CBCF'];
+
+    const getPieGradient = (color1, color2) => {
+        const g = ctx.createLinearGradient(0, 0, 0, 400);
+        g.addColorStop(0, color1);
+        g.addColorStop(1, color2);
+        return g;
+    };
+
+    const bgColors = [
+        getPieGradient('#4F46E5', '#6366F1'), // Indigo
+        getPieGradient('#22C55E', '#4ADE80'), // Green
+        getPieGradient('#38BDF8', '#7DD3FC'), // Sky Blue
+        getPieGradient('#F59E0B', '#FCD34D'), // Amber
+        getPieGradient('#EC4899', '#F472B6'), // Pink
+        getPieGradient('#8B5CF6', '#A78BFA'), // Violet
+        getPieGradient('#94A3B8', '#CBD5E1')  // Slate
+    ];
 
     new Chart(ctx, {
         type: 'doughnut',
@@ -138,12 +154,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 data: chartData,
                 backgroundColor: bgColors,
                 borderWidth: 0,
-                hoverOffset: 10
+                hoverOffset: 12
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            animation: { animateScale: true, animateRotate: true, duration: 1500, easing: 'easeOutQuart' },
             plugins: {
                 legend: { position: 'right', labels: { padding: 20, usePointStyle: true, font: { family: "'Inter', sans-serif", size: 13 } } },
                 tooltip: {
@@ -164,6 +181,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // ---- PEER COMPARISON CHART ----
     const peerCtx = document.getElementById('peerChart').getContext('2d');
+
+    const createGradient = (context, colorStart, colorEnd) => {
+        const gradient = context.createLinearGradient(0, 0, 0, 300);
+        gradient.addColorStop(0, colorStart);
+        gradient.addColorStop(1, colorEnd);
+        return gradient;
+    };
+
+    const userGradient = createGradient(peerCtx, '#4F46E5', '#6366F1');
+    const peerGradient = createGradient(peerCtx, '#334155', '#475569');
+
     new Chart(peerCtx, {
         type: 'bar',
         data: {
@@ -172,12 +200,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 {
                     label: 'You',
                     data: [savingsRate.toFixed(1), expenseBreakdown.Food || 0, expenseBreakdown.Shopping || 0],
-                    backgroundColor: '#2B61FF', borderRadius: 4
+                    backgroundColor: userGradient, borderRadius: 8
                 },
                 {
                     label: 'Average Peer',
                     data: [15, 800, 300], // Mock peer data
-                    backgroundColor: '#C9CBCF', borderRadius: 4
+                    backgroundColor: peerGradient, borderRadius: 8
                 }
             ]
         },

@@ -1,0 +1,92 @@
+/* Keyframes for UI Enhancements */
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulseGlow {
+    0% {
+        box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4);
+    }
+
+    70% {
+        box-shadow: 0 0 0 10px rgba(79, 70, 229, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(79, 70, 229, 0);
+    }
+}
+
+/* Scroll Animation Utilities */
+.animate-on-scroll {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+    will-change: opacity, transform;
+}
+
+.animate-on-scroll.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Staggered Delays for Grid elements */
+.delay-100 {
+    transition-delay: 100ms;
+}
+
+.delay-200 {
+    transition-delay: 200ms;
+}
+
+.delay-300 {
+    transition-delay: 300ms;
+}
+
+.delay-400 {
+    transition-delay: 400ms;
+}
+
+/* Enhanced Icons Global Style */
+.feature-icon,
+i.fas {
+    transition: all 0.3s ease;
+}
+
+/* Specific glowing backgrounds for large isolated icons in feature cards */
+.feature-card .fas,
+.results-card .fas,
+.dashboard-grid .fas {
+    background: rgba(79, 70, 229, 0.15);
+    /* Indigo minimal glow */
+    border-radius: 50%;
+    padding: 12px;
+    box-shadow: 0 0 15px rgba(79, 70, 229, 0.1);
+}
+
+/* Exclude tiny inline icons from the big background style */
+.dropbtn i.fas,
+.btn i.fas,
+.logo i.fas {
+    background: transparent;
+    padding: 0;
+    box-shadow: none;
+}
+
+/* Icon Micro-interactions */
+.feature-card:hover .fas,
+.btn-primary:hover i.fas {
+    transform: scale(1.1);
+    color: var(--highlight-blue);
+    background: rgba(56, 189, 248, 0.2);
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+}

@@ -114,4 +114,27 @@ document.addEventListener('DOMContentLoaded', () => {
             resultsCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         });
     }
+
+    // ---- Global UI/UX Animations ----
+    // Initialize Intersection Observer for scroll animations
+    const observerOptions = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.1
+    };
+
+    const animateOnScrollObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                // Optional: stop observing once animated to keep it visible
+                // observer.unobserve(entry.target); 
+            }
+        });
+    }, observerOptions);
+
+    // Apply observer to all elements with the animate-on-scroll class
+    document.querySelectorAll('.animate-on-scroll').forEach((el) => {
+        animateOnScrollObserver.observe(el);
+    });
 });

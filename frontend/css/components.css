@@ -1,0 +1,153 @@
+/* Authentication Pages Specific Styles */
+
+.auth-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 450px;
+    padding: 40px;
+    text-align: center;
+}
+
+.auth-card.signup-card {
+    max-width: 550px;
+}
+
+.auth-title {
+    color: var(--text-main);
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 30px;
+}
+
+.input-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--text-main);
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.input-group input,
+.input-group select {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+/* Override browser autofill styles for dark theme */
+.input-group input:-webkit-autofill,
+.input-group input:-webkit-autofill:hover,
+.input-group input:-webkit-autofill:focus,
+.input-group input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px #ffffff inset !important;
+    -webkit-text-fill-color: black !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+.input-group select option {
+    background: #ffffff;
+    color: #000000;
+}
+
+
+
+.phone-group {
+    display: flex;
+    gap: 10px;
+}
+
+.phone-group select {
+    width: 35%;
+}
+
+.phone-group input {
+    width: 65%;
+}
+
+.auth-card .btn {
+    width: 100%;
+    margin-top: 15px;
+    padding: 16px;
+    font-size: 16px;
+}
+
+.auth-link {
+    display: block;
+    margin-top: 25px;
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
+.auth-link a {
+    color: var(--highlight-blue);
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.auth-link a:hover {
+    color: white;
+    text-decoration: underline;
+}
+
+.error-message {
+    color: #ef4444;
+    font-size: 13px;
+    margin-top: 8px;
+    display: none;
+}
+
+/* HIGHEST SPECIFICITY OVERRIDE FROM USER REQUEST */
+body input,
+body input[type="text"],
+body input[type="number"],
+body input[type="email"],
+body input[type="password"],
+body textarea,
+body select,
+body .form-control {
+    color: #000000 !important;
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    -webkit-text-fill-color: #000000 !important;
+}
+
+body ::placeholder {
+    color: #6b7280 !important;
+    opacity: 1 !important;
+    -webkit-text-fill-color: #6b7280 !important;
+}
+
+body input[type="number"] {
+    color: #000000 !important;
+}
+
+body label {
+    color: #111827 !important;
+    font-weight: 500 !important;
+}
+
+body input:focus,
+body textarea:focus,
+body select:focus,
+body .form-control:focus {
+    outline: none !important;
+    border: 2px solid #4F46E5 !important;
+    box-shadow: 0 0 8px rgba(79, 70, 229, 0.4) !important;
+}

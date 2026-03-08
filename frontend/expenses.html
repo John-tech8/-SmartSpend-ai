@@ -35,23 +35,26 @@
 
         .form-header h2 {
             font-size: 28px;
-            color: #1a1a1a;
+            color: #ffffff;
             margin-bottom: 8px;
         }
 
         .form-header p {
-            color: #666;
+            color: #94a3b8;
         }
 
         .form-group {
             margin-bottom: 20px;
         }
 
-        .form-group label {
+        .form-group label,
+        .expense-label {
             display: block;
             margin-bottom: 8px;
-            font-weight: 500;
-            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+            /* Using 14px to match the existing form-group label size visually, or 16px as requested */
+            color: #000000;
         }
 
         .input-group {
@@ -63,7 +66,7 @@
             left: 15px;
             top: 50%;
             transform: translateY(-50%);
-            color: #666;
+            color: black;
             font-weight: 500;
         }
 
@@ -71,6 +74,8 @@
             width: 100%;
             padding: 12px 15px 12px 35px;
             border: 1px solid #e0e0e0;
+            background: #ffffff;
+            color: black;
             border-radius: 8px;
             font-size: 16px;
             transition: all 0.3s ease;
@@ -94,7 +99,7 @@
             margin: 30px 0 20px;
             padding-bottom: 10px;
             border-bottom: 1px solid #eee;
-            color: #1a1a1a;
+            color: black;
         }
 
         /* Summary Card Styles */
@@ -173,6 +178,27 @@
                 margin-bottom: 30px;
             }
         }
+
+        /* High specificity overrides for form-card text visibility */
+        .form-card label,
+        .form-card .section-title,
+        .form-card .input-prefix {
+            color: #000 !important;
+        }
+
+        .form-card input,
+        .form-card .form-control {
+            color: #000 !important;
+            background-color: #fff !important;
+            -webkit-text-fill-color: #000 !important;
+        }
+
+        .form-card input::placeholder,
+        .form-card .form-control::placeholder {
+            color: #555 !important;
+            opacity: 1 !important;
+            -webkit-text-fill-color: #555 !important;
+        }
     </style>
 </head>
 
@@ -188,7 +214,12 @@
                     <option value="hi">हिंदी (Hindi)</option>
                     <option value="ta">தமிழ் (Tamil)</option>
                 </select>
-                <div class="dropdown"><a href="index.html#features" class="dropbtn" data-i18n="nav.features">Features <i class="fas fa-chevron-down" style="font-size: 10px; margin-left: 5px;"></i></a><div class="dropdown-content"><a href="expenses.html">Expense Analysis</a><a href="dashboard.html">Financial Health Score</a><a href="goals.html">Goal Tracker</a><a href="monthlyreport.html">Monthly Report</a></div></div><a href="dashboard.html" data-i18n="nav.dashboard">Dashboard</a>
+                <div class="dropdown"><a href="index.html#features" class="dropbtn" data-i18n="nav.features">Features <i
+                            class="fas fa-chevron-down" style="font-size: 10px; margin-left: 5px;"></i></a>
+                    <div class="dropdown-content"><a href="expenses.html">Expense Analysis</a><a
+                            href="dashboard.html">Financial Health Score</a><a href="goals.html">Goal Tracker</a><a
+                            href="monthlyreport.html">Monthly Report</a></div>
+                </div><a href="dashboard.html" data-i18n="nav.dashboard">Dashboard</a>
                 <a href="#" class="active" data-i18n="nav.expenses">Expenses</a>
                 <a href="goals.html" data-i18n="nav.goals">Goals</a>
                 <div class="user-profile">JD</div>
@@ -210,7 +241,7 @@
                 <form id="expenseForm">
                     <!-- Income Section -->
                     <div class="form-group">
-                        <label for="monthlyIncome">Monthly Income</label>
+                        <label class="expense-label" for="monthlyIncome">Monthly Income</label>
                         <div class="input-group">
                             <span class="input-prefix">₹</span>
                             <input type="number" id="monthlyIncome" class="form-control calc-input" placeholder="0.00"
@@ -218,11 +249,11 @@
                         </div>
                     </div>
 
-                    <h3 class="section-title">Monthly Expenses</h3>
+
 
                     <div class="expense-grid">
                         <div class="form-group">
-                            <label for="expRent">Rent / Hostel</label>
+                            <label class="expense-label" for="expRent">Rent / Hostel</label>
                             <div class="input-group">
                                 <span class="input-prefix">₹</span>
                                 <input type="number" id="expRent" class="form-control calc-input exp-field"
@@ -231,7 +262,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="expFood">Food & Groceries</label>
+                            <label class="expense-label" for="expFood">Food & Groceries</label>
                             <div class="input-group">
                                 <span class="input-prefix">₹</span>
                                 <input type="number" id="expFood" class="form-control calc-input exp-field"
@@ -240,7 +271,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="expTransport">Transport</label>
+                            <label class="expense-label" for="expTransport">Transport</label>
                             <div class="input-group">
                                 <span class="input-prefix">₹</span>
                                 <input type="number" id="expTransport" class="form-control calc-input exp-field"
@@ -249,7 +280,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="expShopping">Shopping</label>
+                            <label class="expense-label" for="expShopping">Shopping</label>
                             <div class="input-group">
                                 <span class="input-prefix">₹</span>
                                 <input type="number" id="expShopping" class="form-control calc-input exp-field"
@@ -258,7 +289,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="expEntertainment">Entertainment</label>
+                            <label class="expense-label" for="expEntertainment">Entertainment</label>
                             <div class="input-group">
                                 <span class="input-prefix">₹</span>
                                 <input type="number" id="expEntertainment" class="form-control calc-input exp-field"
@@ -267,7 +298,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="expEmi">EMI / Debt Repayment</label>
+                            <label class="expense-label" for="expEmi">EMI / Debt Repayment</label>
                             <div class="input-group">
                                 <span class="input-prefix">₹</span>
                                 <input type="number" id="expEmi" class="form-control calc-input exp-field"
@@ -276,7 +307,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="expFamily">Family Support</label>
+                            <label class="expense-label" for="expFamily">Family Support</label>
                             <div class="input-group">
                                 <span class="input-prefix">₹</span>
                                 <input type="number" id="expFamily" class="form-control calc-input exp-field"
@@ -285,7 +316,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="expMisc">Miscellaneous</label>
+                            <label class="expense-label" for="expMisc">Miscellaneous</label>
                             <div class="input-group">
                                 <span class="input-prefix">₹</span>
                                 <input type="number" id="expMisc" class="form-control calc-input exp-field"

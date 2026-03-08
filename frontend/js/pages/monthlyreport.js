@@ -115,13 +115,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ---- RENDER PIE CHART ----
     const ctx = document.getElementById('monthlyChart').getContext('2d');
 
+    // Create a glossy gradient for each category based on its base hex color
+    const chartBgColors = bgColors.map(hexColor => {
+        const g = ctx.createLinearGradient(0, 0, 0, 400);
+        g.addColorStop(0, hexColor);
+        g.addColorStop(1, '#020617'); // Fade to dark background
+        return g;
+    });
+
     new Chart(ctx, {
         type: 'doughnut',
         data: {
             labels: sortedCategories,
             datasets: [{
                 data: sortedCategories.map(cat => categoryTotals[cat]),
-                backgroundColor: bgColors,
+                backgroundColor: chartBgColors,
                 borderWidth: 0,
                 hoverOffset: 15
             }]
@@ -129,6 +137,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            animation: { animateScale: true, animateRotate: true, duration: 1500, easing: 'easeOutQuart' },
             plugins: {
                 legend: {
                     position: 'right',

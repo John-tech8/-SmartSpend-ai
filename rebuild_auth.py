@@ -1,9 +1,17 @@
-<!DOCTYPE html>
+import os
+import re
+
+def update_auth_page(filepath, title_text, form_content, footer_links):
+    # Extract just the filename to link correctly and set active nav state
+    filename = os.path.basename(filepath)
+    
+    # We will inject the standard navbar and global imports
+    html_template = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Account - SmartSpend AI</title>
+    <title>{title_text} - SmartSpend AI</title>
     <!-- Use standard global stylesheets -->
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/components.css">
@@ -33,17 +41,60 @@
                 </div>
                 <a href="about.html" data-i18n="nav.about">About</a>
                 <a href="aiagent.html" data-i18n="nav.aiadvisor">AI Advisor</a>
-                <a href="login.html" class="" data-i18n="nav.login">Login</a>
+                <a href="login.html" class="{"active" if filename == "login.html" else ""}" data-i18n="nav.login">Login</a>
                 <a href="signup.html" class="btn btn-primary" data-i18n="nav.signup">Sign Up</a>
             </nav>
         </div>
     </header>
 
     <div class="auth-wrapper">
-        <div class="auth-card glass-card animate-on-scroll signup-card">
-            <h1 class="auth-title">Create Account</h1>
+        <div class="auth-card glass-card animate-on-scroll {"signup-card" if filename == "signup.html" else ""}">
+            <h1 class="auth-title">{title_text}</h1>
             
-            <form id="signupForm">
+{form_content}
+
+            <div class="auth-link">
+                {footer_links}
+            </div>
+        </div>
+    </div>
+
+    <!-- Initialization Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabaseClient.js"></script>
+    <script src="locales/i18n.js"></script>
+    <script src="js/app.js"></script> <!-- Required for intersections observers -->
+"""
+
+    if filename == "signup.html":
+        html_template += '    <script src="js/pages/quiz.js"></script>\n'
+        
+    html_template += "</body>\n</html>"
+    
+    with open(filepath, 'w', encoding='utf-8') as f:
+        f.write(html_template)
+
+
+# Rebuild Login Page
+login_form = """            <form id="loginForm">
+                <div class="input-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" required placeholder="Enter your email">
+                </div>
+
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required placeholder="Enter your password">
+                </div>
+
+                <button type="submit" class="btn btn-primary">Login</button>
+            </form>"""
+
+update_auth_page('frontend/login.html', 'Login', login_form, "Don't have an account? <a href='signup.html'>Create Account</a>")
+
+
+# Rebuild Signup Page
+signup_form = """            <form id="signupForm">
                 <div class="input-group">
                     <label for="name">Full Name</label>
                     <input type="text" id="name" required placeholder="John Doe">
@@ -147,19 +198,7 @@
                 <h2 id="personalityTitle" style="color: var(--highlight-blue); margin-bottom: 15px;"></h2>
                 <p id="personalityDesc" style="color: var(--text-main); margin-bottom: 25px; font-size: 15px;"></p>
                 <a href="index.html" class="btn btn-primary" style="text-decoration: none; padding: 12px 20px; display: inline-block;">Go to Home</a>
-            </div>
+            </div>"""
 
-            <div class="auth-link">
-                Already have an account? <a href="login.html" id="loginLink">Login</a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Initialization Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="js/supabaseClient.js"></script>
-    <script src="locales/i18n.js"></script>
-    <script src="js/app.js"></script> <!-- Required for intersections observers -->
-    <script src="js/pages/quiz.js"></script>
-</body>
-</html>
+update_auth_page('frontend/signup.html', 'Create Account', signup_form, 'Already have an account? <a href="login.html" id="loginLink">Login</a>')
+print("Login and Signup pages completely rebuilt for the new Dark CSS theme!")

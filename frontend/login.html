@@ -1,137 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - SmartSpend AI</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Inter', sans-serif;
-        }
-
-        body {
-            background-color: #f5f7fb;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .auth-card {
-            background: white;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-        }
-
-        .auth-title {
-            color: #1a202c;
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 24px;
-        }
-
-        .input-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #4a5568;
-            font-weight: 500;
-            font-size: 14px;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 15px;
-            transition: all 0.2s ease;
-            outline: none;
-        }
-
-        .input-group input:focus {
-            border-color: #2f6df6;
-            box-shadow: 0 0 0 3px rgba(47, 109, 246, 0.1);
-        }
-
-        .btn {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 10px;
-        }
-
-        .btn-primary {
-            background: #2f6df6;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #1e4ed8;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
-        }
-
-        .auth-link {
-            display: block;
-            margin-top: 20px;
-            color: #4a5568;
-            text-decoration: none;
-            font-size: 14px;
-        }
-
-        .auth-link a {
-            color: #2f6df6;
-            font-weight: 600;
-            text-decoration: none;
-        }
-
-        .auth-link a:hover {
-            text-decoration: underline;
-        }
-    </style>
+    <!-- Use standard global stylesheets -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-
 <body>
-    <div class="auth-card">
-        <h1 class="auth-title">SmartSpend AI Login</h1>
+    <!-- Standard Navigation -->
+    <header class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo"><i class="fas fa-chart-line"></i> SmartSpend</a>
+            <nav class="nav-links">
+                <select id="languageSelector" class="lang-select" style="padding: 5px 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 14px; background-color: white; color: #1a1a1a;">
+                    <option value="en">English</option>
+                    <option value="hi">हिंदी (Hindi)</option>
+                    <option value="ta">தமிழ் (Tamil)</option>
+                </select>
+                <div class="dropdown">
+                    <a href="index.html#features" class="dropbtn" data-i18n="nav.features">Features <i class="fas fa-chevron-down" style="font-size: 10px; margin-left: 5px;"></i></a>
+                    <div class="dropdown-content">
+                        <a href="expenses.html">Expense Analysis</a>
+                        <a href="dashboard.html">Financial Health Score</a>
+                        <a href="goals.html">Goal Tracker</a>
+                        <a href="monthlyreport.html">Monthly Report</a>
+                    </div>
+                </div>
+                <a href="about.html" data-i18n="nav.about">About</a>
+                <a href="aiagent.html" data-i18n="nav.aiadvisor">AI Advisor</a>
+                <a href="login.html" class="active" data-i18n="nav.login">Login</a>
+                <a href="signup.html" class="btn btn-primary" data-i18n="nav.signup">Sign Up</a>
+            </nav>
+        </div>
+    </header>
 
-        <form id="loginForm">
-            <div class="input-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" required placeholder="Enter your email">
+    <div class="auth-wrapper">
+        <div class="auth-card glass-card animate-on-scroll ">
+            <h1 class="auth-title">Login</h1>
+            
+            <form id="loginForm">
+                <div class="input-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" required placeholder="Enter your email">
+                </div>
+
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required placeholder="Enter your password">
+                </div>
+
+                <button type="submit" class="btn btn-primary">Login</button>
+            </form>
+
+            <div class="auth-link">
+                Don't have an account? <a href='signup.html'>Create Account</a>
             </div>
-
-            <div class="input-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" required placeholder="Enter your password">
-            </div>
-
-            <button type="submit" class="btn btn-primary">Login</button>
-        </form>
-
-        <div class="auth-link">
-            Don't have an account? <a href="signup.html">Create Account</a>
         </div>
     </div>
-</body>
 
+    <!-- Initialization Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabaseClient.js"></script>
+    <script src="locales/i18n.js"></script>
+    <script src="js/app.js"></script> <!-- Required for intersections observers -->
+</body>
 </html>
