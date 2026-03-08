@@ -69,13 +69,19 @@ document.addEventListener('DOMContentLoaded', () => {
         appendMessage('loading', 'AI is thinking...', loadingId);
 
         try {
+            // Get current language if i18n is loaded
+            const currentLang = window.getCurrentLanguage ? window.getCurrentLanguage() : 'en';
+
             // 3. Send request to backend API (using absolute URL to support any frontend port/file execution)
             const response = await fetch('http://localhost:5000/api/chat', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ message: message })
+                body: JSON.stringify({
+                    message: message,
+                    language: currentLang
+                })
             });
 
             const data = await response.json();

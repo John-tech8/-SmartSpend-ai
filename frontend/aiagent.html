@@ -196,9 +196,17 @@
 
 <body>
 
-    <header class="chat-header">
-        <a href="index.html" class="back-btn">&larr; Back</a>
-        <h1 class="chat-title">SmartSpend AI Financial Advisor</h1>
+    <header class="chat-header" style="justify-content: space-between;">
+        <div style="display: flex; align-items: center;">
+            <a href="index.html" class="back-btn" data-i18n="nav.back">&larr; Back</a>
+            <h1 class="chat-title" data-i18n="nav.advisor">SmartSpend AI Financial Advisor</h1>
+        </div>
+        <select id="languageSelector" class="lang-select"
+            style="padding: 5px 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 14px; background-color: white;">
+            <option value="en">English</option>
+            <option value="hi">हिंदी (Hindi)</option>
+            <option value="ta">தமிழ் (Tamil)</option>
+        </select>
     </header>
 
     <div class="chat-container">
@@ -225,6 +233,7 @@
         </div>
     </div>
 
+    <script src="locales/i18n.js"></script>
     <script src="js/aiagent.js"></script>
 </body>
 

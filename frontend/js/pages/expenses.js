@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     // Input fields
     const incomeInput = document.getElementById('monthlyIncome');
     const expenseInputs = document.querySelectorAll('.exp-field');
@@ -7,8 +7,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const dispIncome = document.getElementById('dispIncome');
     const dispExpenses = document.getElementById('dispExpenses');
     const dispBalance = document.getElementById('dispBalance');
-    const balanceContainer = document.querySelector('.total-balance');
     const aiInsight = document.getElementById('aiInsight');
+
+    // Modal Elements
+    const badHabitModal = document.getElementById('badHabitModal');
+    const badHabitMessage = document.getElementById('badHabitMessage');
+    const closeHabitModal = document.getElementById('closeHabitModal');
+
+    // Initialize Supabase
+    let supabase = null;
+    let userId = null;
+    try {
+        if (window.initSupabase) {
+            supabase = await window.initSupabase();
+            userId = window.getUserId();
+        }
+    } catch (e) { console.error("Supabase init failed", e); }
 
     const formatCurrency = (amount) => {
         return new Intl.NumberFormat('en-IN', {
@@ -69,12 +83,21 @@ document.addEventListener('DOMContentLoaded', () => {
         input.addEventListener('input', updateTotals);
     });
 
+    if (closeHabitModal) {
+        closeHabitModal.addEventListener('click', () => {
+            badHabitModal.style.display = 'none';
+        });
+    }
+
     // Handle Form Submission
-    document.getElementById('expenseForm').addEventListener('submit', (e) => {
+    document.getElementById('expenseForm').addEventListener('submit', async (e) => {
         e.preventDefault();
 
+        const income = parseFloat(incomeInput.value) || 0;
+        if (income <= 0) return;
+
         const expenseData = {
-            income: parseFloat(incomeInput.value) || 0,
+            income: income,
             expenses: {}
         };
 
@@ -85,9 +108,85 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        console.log('Sending data to API:', expenseData);
-        alert('Expense data saved! Processing your AI insights...');
-        // Here we would typically call our API via api.js
+        // Bad Habit Intervention Logic
+        let badPatternDetected = null;
+        let warningMsg = "";
+
+        const foodExp = expenseData.expenses['Food'] || 0;
+        const shopExp = expenseData.expenses['Shopping'] || 0;
+        const entExp = expenseData.expenses['Entertainment'] || 0;
+
+        if (foodExp > income * 0.3) {
+            badPatternDetected = "Excessive Food Spending";
+            warningMsg = "You are spending more than 30% of your income on food. Try cooking at home more often to curb this habit!";
+        } else if (shopExp > income * 0.15) {
+            badPatternDetected = "Impulsive Shopping";
+            warningMsg = "Your shopping expenses are over 15% of your income. Implement the 24-hour rule before making non-essential purchases.";
+        } else if (entExp > income * 0.15) {
+            badPatternDetected = "High Entertainment Cost";
+            warningMsg = "You're spending heavily on entertainment. Consider free or low-cost hobbies to build your savings faster.";
+        }
+
+        if (badPatternDetected && supabase && userId) {
+            // Save to Supabase
+            const { error } = await supabase.from('habits').insert([{
+                user_id: userId,
+                pattern_description: badPatternDetected,
+                warning_message: warningMsg
+            }]);
+
+            if (error) console.error("Error saving habit:", error);
+
+            // Show In-App Alert Modal
+            if (badHabitMessage && badHabitModal) {
+                badHabitMessage.textContent = warningMsg;
+                badHabitModal.style.display = 'flex';
+            }
+        }
+
+        // --- NATIVE DATABASE SAVING ---
+        if (supabase && userId) {
+            try {
+                // 1. Save Income
+                await supabase.from('incomes').insert([{
+                    user_id: userId,
+                    amount: income
+                }]);
+
+                // 2. Save individual expenses
+                const expenseInserts = [];
+                for (const [cat, amt] of Object.entries(expenseData.expenses)) {
+                    expenseInserts.push({
+                        user_id: userId,
+                        category: cat,
+                        amount: amt
+                    });
+                }
+
+                if (expenseInserts.length > 0) {
+                    await supabase.from('expenses').insert(expenseInserts);
+                }
+
+                if (!badPatternDetected) {
+                    alert('Expense data saved to your dashboard! Great job managing your variables!');
+                } else {
+                    alert('Expense data saved to your dashboard! Don\'t forget to check your warnings.');
+                }
+
+                // Redirect back to dashboard to see new score
+                window.location.href = 'dashboard.html';
+
+            } catch (err) {
+                console.error("Failed to save financial data natively", err);
+                alert('Failure saving to database. Are your tables created?');
+            }
+        } else {
+            alert('Expense data processed locally.');
+        }
+
+        // Save for dashboard (legacy fallback)
+        localStorage.setItem('smartspend_income', income);
+        localStorage.setItem('smartspend_latest_expenses', JSON.stringify(expenseData.expenses));
     });
 
     // Initialize with zeros

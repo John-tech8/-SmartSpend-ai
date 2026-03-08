@@ -225,10 +225,16 @@
     <header class="navbar">
         <div class="container">
             <a href="index.html" class="logo">SmartSpend</a>
-            <nav class="nav-links">
-                <a href="#" class="active">Dashboard</a>
-                <a href="expenses.html">Expenses</a>
-                <a href="#">Goals</a>
+            <nav class="nav-links" style="display: flex; align-items: center; gap: 15px;">
+                <select id="languageSelector" class="lang-select"
+                    style="padding: 5px 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 14px; background-color: white;">
+                    <option value="en">English</option>
+                    <option value="hi">हिंदी (Hindi)</option>
+                    <option value="ta">தமிழ் (Tamil)</option>
+                </select>
+                <a href="#" class="active" data-i18n="nav.dashboard">Dashboard</a>
+                <a href="expenses.html" data-i18n="nav.expenses">Expenses</a>
+                <a href="goals.html" data-i18n="nav.goals">Goals</a>
                 <div class="user-profile">JD</div>
             </nav>
         </div>
@@ -241,7 +247,22 @@
             <p>Here is your financial overview for this month.</p>
         </div>
 
-        <div class="dashboard-grid">
+        <div id="dashboardLoading" style="text-align: center; padding: 100px;">
+            <i class="fas fa-spinner fa-spin fa-3x" style="color: #2f6df6; margin-bottom: 20px;"></i>
+            <h3>Loading your financial data...</h3>
+        </div>
+
+        <div id="emptyState"
+            style="display: none; text-align: center; padding: 100px 20px; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+            <i class="fas fa-wallet fa-4x" style="color: #ccc; margin-bottom: 20px;"></i>
+            <h3>No financial data available yet.</h3>
+            <p style="color: #666; margin-bottom: 25px;">Track your income and expenses to get your Financial Health
+                Score.</p>
+            <a href="expenses.html" class="btn btn-primary"
+                style="padding: 12px 30px; font-size: 16px; border-radius: 8px;">Add Income & Expenses</a>
+        </div>
+
+        <div class="dashboard-grid" id="dashboardContent" style="display: none;">
 
             <!-- Health Score Hero Card -->
             <div class="score-card">
@@ -290,6 +311,18 @@
                 </div>
             </div>
 
+            <!-- Peer Comparison Chart -->
+            <div class="chart-container">
+                <div class="card-header">
+                    <span>Peer Comparison <span
+                            style="font-size: 13px; color: #666; font-weight: normal; margin-left: 10px;">(Similar
+                            Income Bracket)</span></span>
+                </div>
+                <div class="pie-chart-wrapper">
+                    <canvas id="peerChart"></canvas>
+                </div>
+            </div>
+
             <!-- Detailed Savings Summary -->
             <div class="summary-container">
                 <div class="card-header">
@@ -325,9 +358,68 @@
                 </div>
             </div>
 
+            <!-- Expense History List -->
+            <div class="summary-container" style="grid-column: span 12;">
+                <div class="card-header">
+                    <span>Expense History</span>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid #eee; color: #666; font-size: 14px;">
+                                <th style="padding: 12px; font-weight: 500;">Date</th>
+                                <th style="padding: 12px; font-weight: 500;">Category</th>
+                                <th style="padding: 12px; font-weight: 500; text-align: right;">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="expenseHistoryTableBody">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Monthly Financial Report Card -->
+            <div class="summary-container" style="grid-column: span 12; margin-top: 10px;">
+                <div class="card-header" style="margin-bottom: 15px;">
+                    <span>Monthly Financial Report Card</span>
+                    <span id="reportMonthStr" style="color: #666; font-weight: normal; font-size: 14px;"></span>
+                </div>
+                <div id="reportCardContent" style="display: flex; gap: 30px; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 250px;">
+                        <h4 style="color: #4A5568; margin-bottom: 15px; font-weight: 600;">Overall Grade</h4>
+                        <div style="display: flex; gap: 20px; align-items: center;">
+                            <div id="reportGrade"
+                                style="font-size: 40px; font-weight: bold; background: #2B61FF; color: white; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; border-radius: 12px; box-shadow: 0 4px 10px rgba(43, 97, 255, 0.2);">
+                                -</div>
+                            <div>
+                                <div style="font-size: 14px; color: #666;">Health Score</div>
+                                <div id="reportScore" style="font-size: 24px; font-weight: bold; color: #1a1a1a;">0 /
+                                    100</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="flex: 2; min-width: 300px;">
+                        <h4 style="color: #4A5568; margin-bottom: 15px; font-weight: 600;">Top 3 Improvements</h4>
+                        <ul id="reportImprovements" style="list-style-type: none; padding: 0;">
+                            <!-- Populated by JS -->
+                            <li style="color: #666;">Loading...</li>
+                        </ul>
+                    </div>
+                </div>
+                <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #E2E8F0; display: flex; gap: 10px; overflow-x: auto;"
+                    id="pastReportsList">
+                    <!-- Past reports buttons -->
+                </div>
+            </div>
+
         </div>
     </div>
 
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabaseClient.js"></script>
+    <script src="locales/i18n.js"></script>
     <!-- Load the Calculator Module and the Dashboard Logic -->
     <script type="module" src="js/pages/dashboard.js"></script>
 </body>

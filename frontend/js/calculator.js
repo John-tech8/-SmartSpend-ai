@@ -109,14 +109,15 @@ export const calculateFinancialHealthScore = (income, savingsRate, expenseBreakd
     score = Math.max(0, Math.min(100, score));
 
     // 3. Determine Grade
-    let grade = 'F';
-    if (score >= 90) {
+    let grade = 'D';
+
+    if (score >= 60) {
         grade = 'A';
-    } else if (score >= 75) {
-        grade = 'B';
-    } else if (score >= 60) {
-        grade = 'C';
     } else if (score >= 40) {
+        grade = 'B';
+    } else if (score >= 20) {
+        grade = 'C';
+    } else {
         grade = 'D';
     }
 

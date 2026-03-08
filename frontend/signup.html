@@ -186,39 +186,74 @@
             <button type="submit" class="btn btn-primary">Sign Up</button>
         </form>
 
-        <div class="auth-link">
+        <form id="quizForm" style="display: none;">
+            <p style="margin-bottom: 20px; color: #4a5568;">Let's customize your experience with a quick 5-question
+                financial personality quiz!</p>
+
+            <div class="input-group">
+                <label>1. When you receive money, what is your first instinct?</label>
+                <select id="q1" required>
+                    <option value="" disabled selected>Select an option</option>
+                    <option value="saver">Put a portion into savings</option>
+                    <option value="spender">Buy something I've been wanting</option>
+                    <option value="impulsive">Treat myself immediately without thinking</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>2. How do you feel about budgeting?</label>
+                <select id="q2" required>
+                    <option value="" disabled selected>Select an option</option>
+                    <option value="saver">I love it, I track every penny</option>
+                    <option value="spender">I have a loose budget in my head</option>
+                    <option value="impulsive">I try but always fail, or don't budget at all</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>3. If you see something you want but don't need, what do you do?</label>
+                <select id="q3" required>
+                    <option value="" disabled selected>Select an option</option>
+                    <option value="saver">Wait a few days to see if I still want it</option>
+                    <option value="spender">Check if I have money, then maybe buy it</option>
+                    <option value="impulsive">Buy it immediately</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>4. Do you have an emergency fund?</label>
+                <select id="q4" required>
+                    <option value="" disabled selected>Select an option</option>
+                    <option value="saver">Yes, with 3-6 months of expenses</option>
+                    <option value="spender">Yes, but it's very small</option>
+                    <option value="impulsive">No, I live paycheck to paycheck</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>5. How often do you exceed your monthly budget?</label>
+                <select id="q5" required>
+                    <option value="" disabled selected>Select an option</option>
+                    <option value="saver">Rarely</option>
+                    <option value="spender">Sometimes</option>
+                    <option value="impulsive">Often or Always</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="finishSignupBtn">Finish Profile</button>
+        </form>
+
+        <div id="quizResult" style="display: none; text-align: center;">
+            <h2 id="personalityTitle" style="color: #2f6df6; margin-bottom: 10px;"></h2>
+            <p id="personalityDesc" style="color: #4a5568; margin-bottom: 20px; font-size: 15px;"></p>
+            <a href="index.html" class="btn btn-primary"
+                style="text-decoration: none; padding: 12px 20px; display: inline-block;">Go to Home</a>
+        </div>
+
+        <div class="auth-link" id="loginLink">
             Already have an account? <a href="login.html">Login</a>
         </div>
     </div>
 
-    <script>
-        document.getElementById('signupForm').addEventListener('submit', function (e) {
-            e.preventDefault();
-
-            // Age validation (18+)
-            const dobInput = document.getElementById('dob').value;
-            const dob = new Date(dobInput);
-            const today = new Date();
-            let age = today.getFullYear() - dob.getFullYear();
-            const monthDiff = today.getMonth() - dob.getMonth();
-
-            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
-                age--;
-            }
-
-            const errorMsg = document.getElementById('dobError');
-            if (age < 18) {
-                errorMsg.style.display = 'block';
-                return;
-            } else {
-                errorMsg.style.display = 'none';
-            }
-
-            // If success
-            alert('Account created successfully!');
-            // Here you'd typically send data to your backend
-        });
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabaseClient.js"></script>
+    <script src="js/pages/quiz.js"></script>
 </body>
 
 </html>

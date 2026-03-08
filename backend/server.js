@@ -22,6 +22,7 @@ app.get("/", (req, res) => {
 app.post("/api/chat", async (req, res) => {
     try {
         const userMessage = req.body.message;
+        const lang = req.body.language || 'en';
         const apiKey = process.env.GROQ_API_KEY;
 
         if (!apiKey) {
@@ -30,12 +31,17 @@ app.post("/api/chat", async (req, res) => {
 
         const groq = new Groq({ apiKey });
 
+        // Define language instruction
+        let langInstruction = "Please reply in English.";
+        if (lang === 'hi') langInstruction = "Please reply strictly in Hindi (हिंदी).";
+        if (lang === 'ta') langInstruction = "Please reply strictly in Tamil (தமிழ்).";
+
         const response = await groq.chat.completions.create({
             model: "llama-3.3-70b-versatile",
             messages: [
                 {
                     role: "system",
-                    content: "You are a helpful financial advisor AI for a budgeting web app called SmartSpend."
+                    content: `You are a helpful financial advisor AI for a budgeting web app called SmartSpend. ${langInstruction}`
                 },
                 {
                     role: "user",
@@ -56,6 +62,14 @@ app.post("/api/chat", async (req, res) => {
 
 // Port
 const PORT = process.env.PORT || 5000;
+
+// Config endpoint for frontend Supabase initialization
+app.get("/api/config", (req, res) => {
+    res.json({
+        supabaseUrl: process.env.SUPABASE_URL,
+        supabaseKey: process.env.SUPABASE_ANON_KEY
+    });
+});
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);

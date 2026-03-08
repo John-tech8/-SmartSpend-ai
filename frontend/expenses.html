@@ -181,10 +181,16 @@
     <header class="navbar">
         <div class="container">
             <a href="index.html" class="logo">SmartSpend</a>
-            <nav class="nav-links">
-                <a href="#">Dashboard</a>
-                <a href="#" class="active">Expenses</a>
-                <a href="#">Goals</a>
+            <nav class="nav-links" style="display: flex; align-items: center; gap: 15px;">
+                <select id="languageSelector" class="lang-select"
+                    style="padding: 5px 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 14px; background-color: white;">
+                    <option value="en">English</option>
+                    <option value="hi">हिंदी (Hindi)</option>
+                    <option value="ta">தமிழ் (Tamil)</option>
+                </select>
+                <a href="dashboard.html" data-i18n="nav.dashboard">Dashboard</a>
+                <a href="#" class="active" data-i18n="nav.expenses">Expenses</a>
+                <a href="goals.html" data-i18n="nav.goals">Goals</a>
                 <div class="user-profile">JD</div>
             </nav>
         </div>
@@ -324,7 +330,26 @@
         </div>
     </div>
 
+    <!-- Bad Habit Alert Modal -->
+    <div id="badHabitModal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000;">
+        <div
+            style="background: white; padding: 30px; border-radius: 16px; max-width: 400px; width: 90%; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
+            <div style="font-size: 40px; color: #ff3b30; margin-bottom: 15px;">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h3 style="font-size: 22px; color: #1a1a1a; margin-bottom: 10px;">Warning: Spending Pattern Detected</h3>
+            <p id="badHabitMessage" style="color: #666; font-size: 15px; margin-bottom: 25px; line-height: 1.5;"></p>
+            <button id="closeHabitModal" class="btn btn-primary"
+                style="width: 100%; padding: 12px; border-radius: 8px;">I Understand</button>
+        </div>
+    </div>
+
     <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabaseClient.js"></script>
+    <script src="locales/i18n.js"></script>
     <script src="js/pages/expenses.js"></script>
 </body>
 

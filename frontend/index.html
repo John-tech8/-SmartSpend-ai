@@ -35,6 +35,14 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
         }
+
+        .lang-select {
+            padding: 5px 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            background-color: white;
+        }
     </style>
 </head>
 
@@ -43,12 +51,17 @@
     <header class="navbar">
         <div class="container">
             <a href="#" class="logo"><i class="fas fa-chart-line" style="margin-right: 8px;"></i>SmartSpend</a>
-            <nav class="nav-links">
-                <a href="#features">Features</a>
-                <a href="about.html">About</a>
-                <a href="aiagent.html">AI Advisor</a>
-                <a href="login.html" class="nav-btn">Login</a>
-                <a href="signup.html" class="nav-btn primary">Sign Up</a>
+            <nav class="nav-links" style="display: flex; align-items: center; gap: 15px;">
+                <select id="languageSelector" class="lang-select">
+                    <option value="en">English</option>
+                    <option value="hi">हिंदी (Hindi)</option>
+                    <option value="ta">தமிழ் (Tamil)</option>
+                </select>
+                <a href="#features" data-i18n="nav.features">Features</a>
+                <a href="about.html" data-i18n="nav.about">About</a>
+                <a href="aiagent.html" data-i18n="nav.advisor">AI Advisor</a>
+                <a href="login.html" class="nav-btn" data-i18n="nav.login">Login</a>
+                <a href="signup.html" class="nav-btn primary" data-i18n="nav.signup">Sign Up</a>
             </nav>
         </div>
     </header>
@@ -57,17 +70,18 @@
     <section id="hero" class="hero"
         style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
         <div class="container hero-content" style="text-align: center; max-width: 800px;">
-            <h1 class="hero-title">SmartSpend – AI Financial Advisor</h1>
-            <p class="hero-tagline">AI Financial Coach for First-Time Earners</p>
+            <h1 class="hero-title" data-i18n="hero.title">SmartSpend – AI Financial Advisor</h1>
+            <p class="hero-tagline" data-i18n="hero.tagline">AI Financial Coach for First-Time Earners</p>
             <div class="hero-actions">
-                <a href="#analyze" class="btn btn-primary btn-large">Start Analysis</a>
+                <a href="#analyze" class="btn btn-primary btn-large" data-i18n="hero.cta">Start Analysis</a>
             </div>
         </div>
         <div class="hero-graphics">
             <!-- Placeholder for fintech UI mockup / dashboard graphic -->
-            <div class="glass-card mockup-card">
-                <div class="mockup-header">Financial Health</div>
-                <div class="mockup-score">85/100</div>
+            <div class="glass-card mockup-card" id="indexHealthCard">
+                <div class="mockup-header" data-i18n="feature.health.title">Financial Health</div>
+                <div class="mockup-score" id="indexHealthScore">Loading...</div>
+                <div id="indexHealthAction" style="margin-top: 15px;"></div>
             </div>
         </div>
     </section>
@@ -75,27 +89,29 @@
     <!-- Features Section -->
     <section id="features" class="features">
         <div class="container">
-            <h2 class="section-title">Everything You Need to Master Your Money</h2>
+            <h2 class="section-title" data-i18n="features.title">Everything You Need to Master Your Money</h2>
             <div class="feature-grid">
 
                 <!-- Feature 1 -->
                 <a href="expenses.html" style="text-decoration: none; color: inherit; display: block;">
                     <div class="feature-card">
                         <i class="fas fa-wallet fa-2x" style="color: #2f6df6; margin-bottom: 15px; display: block;"></i>
-                        <h3 class="feature-title">Expense Analysis</h3>
-                        <p class="feature-desc">Automatically categorize and track your spending habits to see exactly
+                        <h3 class="feature-title" data-i18n="feature.expense.title">Expense Analysis</h3>
+                        <p class="feature-desc" data-i18n="feature.expense.desc">Automatically categorize and track your
+                            spending habits to see exactly
                             where
                             your money goes.</p>
                     </div>
                 </a>
 
                 <!-- Feature 2 -->
-                <a href="#hero" style="text-decoration: none; color: inherit; display: block;">
+                <a href="dashboard.html" style="text-decoration: none; color: inherit; display: block;">
                     <div class="feature-card">
                         <i class="fas fa-heartbeat fa-2x"
                             style="color: #2f6df6; margin-bottom: 15px; display: block;"></i>
-                        <h3 class="feature-title">Financial Health Score</h3>
-                        <p class="feature-desc">Get a real-time health score based on your savings rate, debt, and
+                        <h3 class="feature-title" data-i18n="feature.health.title">Financial Health Score</h3>
+                        <p class="feature-desc" data-i18n="feature.health.desc">Get a real-time health score based on
+                            your savings rate, debt, and
                             spending
                             patterns.</p>
                     </div>
@@ -105,8 +121,9 @@
                 <a href="aiagent.html" style="text-decoration: none; color: inherit; display: block;">
                     <div class="feature-card">
                         <i class="fas fa-robot fa-2x" style="color: #2f6df6; margin-bottom: 15px; display: block;"></i>
-                        <h3 class="feature-title">AI Financial Advice</h3>
-                        <p class="feature-desc">Receive personalized, actionable advice from your smart AI coach to
+                        <h3 class="feature-title" data-i18n="feature.ai.title">AI Financial Advice</h3>
+                        <p class="feature-desc" data-i18n="feature.ai.desc">Receive personalized, actionable advice from
+                            your smart AI coach to
                             improve
                             your finances.</p>
                     </div>
@@ -117,8 +134,9 @@
                     <div class="feature-card">
                         <i class="fas fa-bullseye fa-2x"
                             style="color: #2f6df6; margin-bottom: 15px; display: block;"></i>
-                        <h3 class="feature-title">Goal-based Savings Tracker</h3>
-                        <p class="feature-desc">Set milestones and track your progress towards a new car, emergency
+                        <h3 class="feature-title" data-i18n="feature.goal.title">Goal-based Savings Tracker</h3>
+                        <p class="feature-desc" data-i18n="feature.goal.desc">Set milestones and track your progress
+                            towards a new car, emergency
                             fund, or
                             vacation.</p>
                     </div>
@@ -151,6 +169,10 @@
     </footer>
 
     <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabaseClient.js"></script>
+    <script src="locales/i18n.js"></script>
+    <script src="js/index.js"></script>
     <script src="js/app.js"></script>
 </body>
 
