@@ -72,8 +72,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // Get current language if i18n is loaded
             const currentLang = window.getCurrentLanguage ? window.getCurrentLanguage() : 'en';
 
-            // 3. Send request to backend API (using absolute URL to support any frontend port/file execution)
-            const response = await fetch('http://localhost:5000/api/chat', {
+            // 3. Send request to backend API (using deployed URL)
+            const response = await fetch('https://smartspend-ai-1-q37g.onrender.com/api/chat', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
