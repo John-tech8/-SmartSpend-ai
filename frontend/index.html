@@ -52,11 +52,6 @@
         <div class="container">
             <a href="#" class="logo"><i class="fas fa-chart-line" style="margin-right: 8px;"></i>SmartSpend</a>
             <nav class="nav-links" style="display: flex; align-items: center; gap: 15px;">
-                <select id="languageSelector" class="lang-select">
-                    <option value="en">English</option>
-                    <option value="hi">हिंदी (Hindi)</option>
-                    <option value="ta">தமிழ் (Tamil)</option>
-                </select>
                 <div class="dropdown">
                     <a href="#features" class="dropbtn" data-i18n="nav.features">Features <i class="fas fa-chevron-down"
                             style="font-size: 10px; margin-left: 5px;"></i></a>
@@ -71,6 +66,11 @@
                 <a href="aiagent.html" data-i18n="nav.advisor">AI Advisor</a>
                 <a href="login.html" class="nav-btn" data-i18n="nav.login">Login</a>
                 <a href="signup.html" class="nav-btn primary" data-i18n="nav.signup">Sign Up</a>
+                <select id="languageSelector" class="lang-select">
+                    <option value="en">English</option>
+                    <option value="hi">हिंदी (Hindi)</option>
+                    <option value="ta">தமிழ் (Tamil)</option>
+                </select>
             </nav>
         </div>
     </header>
@@ -82,7 +82,7 @@
             <h1 class="hero-title" data-i18n="hero.title">SmartSpend – AI Financial Advisor</h1>
             <p class="hero-tagline" data-i18n="hero.tagline">AI Financial Coach for First-Time Earners</p>
             <div class="hero-actions">
-                <a href="#analyze" class="btn btn-primary btn-large" data-i18n="hero.cta">Start Analysis</a>
+                <a href="#" id="startQuizBtn" class="btn btn-primary btn-large">Start Analysis</a>
             </div>
         </div>
         <div class="hero-graphics">
@@ -164,7 +164,7 @@
                 future?</h2>
             <p style="margin-bottom: 30px; font-size: 18px; color: #666;">Join thousands of first-time earners building
                 wealth with SmartSpend.</p>
-            <a href="#analyze" class="btn btn-primary"
+            <a href="expenses.html" class="btn btn-primary"
                 style="padding: 12px 30px; font-size: 16px; background-color: #4a90e2; color: white; text-decoration: none; border-radius: 8px; font-weight: 600;">Get
                 Started Now</a>
         </div>
@@ -177,9 +177,86 @@
         </div>
     </footer>
 
+    <!-- Financial Quiz Modal (Hidden by Default) -->
+    <div id="quizModal"
+        style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
+        <div class="glass-card"
+            style="background: white; width: 90%; max-width: 600px; padding: 40px; position: relative; max-height: 90vh; overflow-y: auto;">
+            <button id="closeQuizBtn"
+                style="position: absolute; right: 20px; top: 20px; background: none; border: none; font-size: 24px; cursor: pointer; color: #666;"><i
+                    class="fas fa-times"></i></button>
+
+            <!-- Quiz Question Container -->
+            <div id="quizQuestionContainer">
+                <div
+                    style="font-size: 14px; color: #2B61FF; font-weight: 600; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px;">
+                    Financial Analysis Quiz</div>
+                <h2 id="quizQuestionText"
+                    style="font-size: 24px; color: #1a1a1a; margin-bottom: 30px; line-height: 1.4;">Loading question...
+                </h2>
+                <div id="quizOptionsContainer" style="display: flex; flex-direction: column; gap: 15px;">
+                    <!-- Options populated by JS -->
+                </div>
+                <!-- Progress indicator -->
+                <div style="margin-top: 30px; display: flex; align-items: center; justify-content: space-between;">
+                    <span id="quizProgressText" style="color: #666; font-size: 14px;">Question 1 of 5</span>
+                    <div
+                        style="flex: 1; margin-left: 15px; background: #eee; height: 6px; border-radius: 3px; overflow: hidden;">
+                        <div id="quizProgressBar"
+                            style="width: 20%; background: #2f6df6; height: 100%; transition: width 0.3s ease;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Result Container -->
+            <div id="quizResultContainer" style="display: none;">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <div
+                        style="width: 80px; height: 80px; background: #EBF1FF; color: #2B61FF; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; margin: 0 auto 20px;">
+                        <i id="quizResultIcon" class="fas fa-magic"></i>
+                    </div>
+                    <div
+                        style="font-size: 14px; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">
+                        Your Financial Stage</div>
+                    <h2 id="quizStageTitle" style="font-size: 32px; color: #1a1a1a; margin-bottom: 10px;">Analyzer</h2>
+                </div>
+
+                <div style="background: #F8FAFD; border-radius: 12px; padding: 25px; margin-bottom: 25px;">
+                    <h4 style="color: #4A5568; margin-bottom: 15px; font-weight: 600; font-size: 16px;"><i
+                            class="fas fa-check-circle" style="color: #38A169; margin-right: 8px;"></i>Why you're in
+                        this stage:</h4>
+                    <ul id="quizReasonsList"
+                        style="list-style-type: none; padding: 0; color: #4A5568; font-size: 15px;">
+                        <!-- JS populated -->
+                    </ul>
+                </div>
+
+                <div style="background: #FFF5F5; border-radius: 12px; padding: 25px; margin-bottom: 30px;">
+                    <h4 style="color: #C53030; margin-bottom: 15px; font-weight: 600; font-size: 16px;"><i
+                            class="fas fa-arrow-up" style="color: #E53E3E; margin-right: 8px;"></i>Suggestions for
+                        improvement:</h4>
+                    <ul id="quizSuggestionsList"
+                        style="list-style-type: none; padding: 0; color: #4A5568; font-size: 15px;">
+                        <!-- JS populated -->
+                    </ul>
+                </div>
+
+                <div style="text-align: center;">
+                    <p id="quizGoodMessage"
+                        style="color: #38A169; font-weight: 500; margin-bottom: 20px; display: none;"><i
+                            class="fas fa-star" style="margin-right: 5px;"></i>You are ready to go!</p>
+                    <a href="expenses.html" class="btn btn-primary btn-large" style="width: 100%;">Continue to
+                        Expenses</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabaseClient.js"></script>
+    <script src="js/quiz.js"></script>
     <script src="locales/i18n.js"></script>
     <script src="js/index.js"></script>
     <script src="js/app.js"></script>
