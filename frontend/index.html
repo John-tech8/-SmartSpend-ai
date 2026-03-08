@@ -57,7 +57,16 @@
                     <option value="hi">हिंदी (Hindi)</option>
                     <option value="ta">தமிழ் (Tamil)</option>
                 </select>
-                <a href="#features" data-i18n="nav.features">Features</a>
+                <div class="dropdown">
+                    <a href="#features" class="dropbtn" data-i18n="nav.features">Features <i class="fas fa-chevron-down"
+                            style="font-size: 10px; margin-left: 5px;"></i></a>
+                    <div class="dropdown-content">
+                        <a href="expenses.html">Expense Analysis</a>
+                        <a href="dashboard.html">Financial Health Score</a>
+                        <a href="goals.html">Goal Tracker</a>
+                        <a href="monthlyreport.html">Monthly Report</a>
+                    </div>
+                </div>
                 <a href="about.html" data-i18n="nav.about">About</a>
                 <a href="aiagent.html" data-i18n="nav.advisor">AI Advisor</a>
                 <a href="login.html" class="nav-btn" data-i18n="nav.login">Login</a>
