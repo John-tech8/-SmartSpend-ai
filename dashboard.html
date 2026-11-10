@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SmartSpend – Financial Dashboard</title>
+    <meta name="description" content="Your SmartSpend Financial Health Score dashboard. View your savings rate, expense breakdown, debt ratio, and emergency fund coverage.">
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/animations.css">
@@ -81,7 +82,7 @@
         }
 
         .score-grade {
-            font-size: 32px;
+            font-size: 28px;
             background: rgba(255, 255, 255, 0.2);
             padding: 5px 15px;
             border-radius: 12px;
@@ -92,6 +93,13 @@
             margin-top: 15px;
             font-size: 16px;
             opacity: 0.9;
+        }
+
+        .score-partial-note {
+            margin-top: 8px;
+            font-size: 13px;
+            opacity: 0.7;
+            font-style: italic;
         }
 
         /* Insights/Progress column */
@@ -111,23 +119,29 @@
         }
 
         .metric-label {
-            font-size: 14px;
+            font-size: 13px;
             opacity: 0.8;
             margin-bottom: 5px;
         }
 
         .metric-value {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 600;
+        }
+
+        .metric-sub {
+            font-size: 12px;
+            opacity: 0.6;
+            margin-top: 4px;
         }
 
         /* Progress Bar element */
         .progress-wrapper {
-            margin-top: 15px;
+            margin-top: 10px;
         }
 
         .progress-bar-bg {
-            height: 8px;
+            height: 6px;
             background: rgba(255, 255, 255, 0.2);
             border-radius: 4px;
             overflow: hidden;
@@ -140,6 +154,9 @@
             width: 0%;
             transition: width 1s ease-in-out;
         }
+
+        .progress-bar-fill.warning { background: #ffcc00; }
+        .progress-bar-fill.danger  { background: #ff3b30; }
 
         /* Chart & Details Row */
         .chart-container,
@@ -199,24 +216,80 @@
             color: #1a1a1a;
         }
 
-        .positive-text {
-            color: #34c759;
+        .positive-text { color: #34c759; }
+        .negative-text { color: #ff3b30; }
+
+        /* Score Explanation */
+        .score-breakdown {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            grid-column: span 12;
         }
 
-        .negative-text {
-            color: #ff3b30;
+        .breakdown-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .breakdown-item:last-child { border-bottom: none; }
+
+        .breakdown-label {
+            flex: 1;
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .breakdown-pts {
+            font-size: 14px;
+            font-weight: 700;
+            color: #2a5298;
+            min-width: 80px;
+            text-align: right;
+        }
+
+        .breakdown-bar {
+            flex: 2;
+            height: 8px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .breakdown-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2a5298, #4a90e2);
+            border-radius: 4px;
+            transition: width 1s ease-in-out;
+        }
+
+        .breakdown-unavailable {
+            font-size: 12px;
+            color: #999;
+            font-style: italic;
+        }
+
+        @media (max-width: 1100px) {
+            .insights-panel { grid-template-columns: repeat(3, 1fr); }
         }
 
         @media (max-width: 992px) {
-            .insights-panel {
-                grid-template-columns: 1fr;
-            }
-
-            .chart-container,
-            .summary-container {
-                grid-column: span 12;
-            }
+            .insights-panel { grid-template-columns: 1fr 1fr; }
+            .chart-container, .summary-container { grid-column: span 12; }
         }
+
+        @media (max-width: 600px) {
+            .insights-panel { grid-template-columns: 1fr; }
+        }
+
+        /* No data state */
+        #emptyState { animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 
@@ -249,24 +322,26 @@
 
         <div class="page-header">
             <h2>Welcome back, John!</h2>
-            <p>Here is your financial overview for this month.</p>
+            <p id="dashboardSubtitle">Here is your financial overview for this month.</p>
         </div>
 
+        <!-- Loading State -->
         <div id="dashboardLoading" style="text-align: center; padding: 100px;">
             <i class="fas fa-spinner fa-spin fa-3x" style="color: #2f6df6; margin-bottom: 20px;"></i>
             <h3>Loading your financial data...</h3>
         </div>
 
+        <!-- Empty / No Data State -->
         <div id="emptyState"
             style="display: none; text-align: center; padding: 100px 20px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
             <i class="fas fa-wallet fa-4x" style="color: #ccc; margin-bottom: 20px;"></i>
-            <h3 style="color: #ffffff;">No financial data available yet.</h3>
-            <p style="color: #94a3b8; margin-bottom: 25px;">Track your income and expenses to get your Financial Health
-                Score.</p>
+            <h3 style="color: #ffffff;">No financial data for this month yet.</h3>
+            <p style="color: #94a3b8; margin-bottom: 25px;">Track your income and expenses to get your Financial Health Score.</p>
             <a href="expenses.html" class="btn btn-primary"
-                style="padding: 12px 30px; font-size: 16px; border-radius: 8px;">Add Income & Expenses</a>
+                style="padding: 12px 30px; font-size: 16px; border-radius: 8px;">Add Income &amp; Expenses</a>
         </div>
 
+        <!-- Dashboard Content -->
         <div class="dashboard-grid" id="dashboardContent" style="display: none;">
 
             <!-- Health Score Hero Card -->
@@ -275,16 +350,18 @@
                     <span class="score-label">Financial Health Score</span>
                     <div class="score-value">
                         <span id="healthScoreDisplay">0</span>
-                        <span class="score-grade" id="healthGradeDisplay">-</span>
+                        <span class="score-grade" id="healthGradeDisplay">—</span>
                     </div>
                     <p class="score-message" id="healthMessageDisplay">Analyzing your data...</p>
+                    <p class="score-partial-note" id="scorePartialNote" style="display:none;"></p>
                 </div>
 
                 <div class="insights-panel animate-on-scroll">
                     <!-- Metric: Savings Rate -->
                     <div class="metric-card animate-on-scroll">
                         <div class="metric-label">Savings Rate</div>
-                        <div class="metric-value" id="savingsRateDisplay">0%</div>
+                        <div class="metric-value" id="savingsRateDisplay">—</div>
+                        <div class="metric-sub" id="savingsRateSub"></div>
                         <div class="progress-wrapper">
                             <div class="progress-bar-bg">
                                 <div class="progress-bar-fill" id="savingsRateBar"></div>
@@ -292,17 +369,40 @@
                         </div>
                     </div>
 
-                    <!-- Metric: Monthly Income -->
+                    <!-- Metric: Expense-to-Income Ratio -->
                     <div class="metric-card animate-on-scroll">
-                        <div class="metric-label">Monthly Income</div>
-                        <div class="metric-value" id="incomeDisplay">₹0</div>
+                        <div class="metric-label">Expense-to-Income Ratio</div>
+                        <div class="metric-value" id="expenseRatioDisplay">—</div>
+                        <div class="metric-sub" id="expenseRatioSub"></div>
+                        <div class="progress-wrapper">
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" id="expenseRatioBar"></div>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Metric: Remaining Balance -->
+                    <!-- Metric: Debt-to-Income Ratio -->
                     <div class="metric-card animate-on-scroll">
-                        <div class="metric-label">Remaining Balance</div>
-                        <div class="metric-value" id="balanceDisplay">₹0</div>
+                        <div class="metric-label">Debt-to-Income Ratio</div>
+                        <div class="metric-value" id="debtRatioDisplay">—</div>
+                        <div class="metric-sub" id="debtRatioSub"></div>
+                        <div class="progress-wrapper">
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" id="debtRatioBar"></div>
+                            </div>
+                        </div>
                     </div>
+                    </div>
+                </div>
+
+            <!-- Score Breakdown Explanation -->
+            <div class="score-breakdown animate-on-scroll">
+                <div class="card-header" style="margin-bottom: 15px;">
+                    <span>How Your Score Was Calculated</span>
+                    <span id="scoreBreakdownNote" style="font-size: 13px; color: #94a3b8; font-weight: normal;"></span>
+                </div>
+                <div id="scoreBreakdownItems">
+                    <!-- Populated by JS -->
                 </div>
             </div>
 
@@ -332,12 +432,10 @@
             <div class="summary-container animate-on-scroll">
                 <div class="card-header">
                     <span>Savings Summary</span>
-                    <a href="expenses.html" class="btn btn-outline" style="padding: 5px 15px; font-size: 14px;">Edit
-                        Data</a>
+                    <a href="expenses.html" class="btn btn-outline" style="padding: 5px 15px; font-size: 14px;">Edit Data</a>
                 </div>
 
                 <ul class="summary-list" id="summaryList">
-                    <!-- Populated by JS -->
                     <li class="summary-item">
                         <span class="label">Total Income</span>
                         <span class="amount" id="sumIncome">₹0.00</span>
@@ -351,22 +449,25 @@
                         <span class="amount positive-text" id="sumSavings">+₹0.00</span>
                     </li>
                     <li class="summary-item">
-                        <span class="label">Primary Expense</span>
-                        <span class="amount" id="topExpense">-</span>
+                        <span class="label">Highest Spending Category</span>
+                        <span class="amount" id="topExpense">—</span>
+                    </li>
+                    <li class="summary-item">
+                        <span class="label">Lowest Spending Category</span>
+                        <span class="amount" id="bottomExpense">—</span>
                     </li>
                 </ul>
 
-                <div style="margin-top: 25px; padding: 15px; background: #fff3cd; border-radius: 8px; color: #856404; font-size: 14px; display: none;"
+                <!-- Dynamic AI Warning — hidden by default, shown only when triggered by data -->
+                <div style="margin-top: 15px; padding: 12px 15px; border-radius: 8px; color: #856404; font-size: 14px; display: none; background: #fff3cd; border: 1px solid #ffc107;"
                     id="aiWarningAlert">
-                    <strong>AI Note:</strong> Your dining expenses are higher than recommended. Consider cooking at home
-                    to boost your savings rate!
                 </div>
             </div>
 
             <!-- Expense History List -->
             <div class="summary-container animate-on-scroll" style="grid-column: span 12;">
                 <div class="card-header">
-                    <span>Expense History</span>
+                    <span>Expense History (This Month)</span>
                 </div>
                 <div style="overflow-x: auto;">
                     <table style="width: 100%; border-collapse: collapse; text-align: left;">
@@ -375,6 +476,7 @@
                                 <th style="padding: 12px; font-weight: 500;">Date</th>
                                 <th style="padding: 12px; font-weight: 500;">Category</th>
                                 <th style="padding: 12px; font-weight: 500; text-align: right;">Amount</th>
+                                <th style="padding: 12px; font-weight: 500; text-align: right;">% of Total</th>
                             </tr>
                         </thead>
                         <tbody id="expenseHistoryTableBody">
@@ -396,11 +498,10 @@
                         <div style="display: flex; gap: 20px; align-items: center;">
                             <div id="reportGrade"
                                 style="font-size: 40px; font-weight: bold; background: #2B61FF; color: white; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; border-radius: 12px; box-shadow: 0 4px 10px rgba(43, 97, 255, 0.2);">
-                                -</div>
+                                —</div>
                             <div>
                                 <div style="font-size: 14px; color: #94a3b8;">Health Score</div>
-                                <div id="reportScore" style="font-size: 24px; font-weight: bold; color: #ffffff;">0 /
-                                    100</div>
+                                <div id="reportScore" style="font-size: 24px; font-weight: bold; color: #ffffff;">— / 100</div>
                             </div>
                         </div>
                     </div>
@@ -425,7 +526,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabaseClient.js"></script>
     <script src="js/i18n.js"></script>
-    <!-- Load the Calculator Module and the Dashboard Logic -->
+    <!-- Load the Calculator Module and the Dashboard Logic as ES Module -->
     <script type="module" src="js/dashboard.js"></script>
 </body>
 
