@@ -28,6 +28,11 @@ if (supabaseUrl && supabaseKey) {
 const memoryStore = {
     conversations: new Map(), // id -> conversation
     messages: new Map(),      // id -> message
+    incomes: new Map(),       // id -> income
+    expenses: new Map(),      // id -> expense
+    budgets: new Map(),       // id -> budget
+    goals: new Map(),         // id -> goal
+    financial_health_history: new Map(), // id -> snapshot
     activeInstruction: {
         id: 'default-instruction-uuid',
         title: 'Default Financial Coach Instructions',
@@ -81,7 +86,6 @@ const db = {
             }
         }
 
-        // Resilient in-memory fallback
         const record = { id, user_id: userId, title, created_at: now, updated_at: now };
         memoryStore.conversations.set(id, record);
         return record;
@@ -104,11 +108,9 @@ const db = {
             }
         }
 
-        // Fallback filter
-        const list = Array.from(memoryStore.conversations.values())
+        return Array.from(memoryStore.conversations.values())
             .filter(c => !userId || c.user_id === userId)
             .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
-        return list;
     },
 
     async getConversation(conversationId, userId) {
@@ -223,10 +225,254 @@ const db = {
             }
         }
 
-        const msgs = Array.from(memoryStore.messages.values())
+        return Array.from(memoryStore.messages.values())
             .filter(m => m.conversation_id === conversationId)
             .sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
-        return msgs;
+    },
+
+    // -------------------------------------------------------------
+    // FINANCIAL DATA: Incomes, Expenses, Budgets, Goals, Snapshots
+    // -------------------------------------------------------------
+
+    async getIncomes(userId, startDate = null, endDate = null) {
+        if (!userId) return [];
+        if (supabase) {
+            try {
+                let query = supabase.from('incomes').select('*').eq('user_id', userId);
+                if (startDate) query = query.gte('date', startDate);
+                if (endDate) query = query.lte('date', endDate);
+                const { data, error } = await query.order('date', { ascending: false });
+                if (!error && data) return data;
+            } catch (err) {
+                console.error("Exception in getIncomes:", err.message);
+            }
+        }
+
+        // Memory fallback
+        return Array.from(memoryStore.incomes.values()).filter(inc => {
+            if (inc.user_id !== userId) return false;
+            const incDate = inc.date || inc.created_at?.slice(0, 10);
+            if (startDate && incDate < startDate) return false;
+            if (endDate && incDate > endDate) return false;
+            return true;
+        }).sort((a, b) => new Date(b.date || b.created_at) - new Date(a.date || a.created_at));
+    },
+
+    async addIncome({ userId, amount, category = 'Salary', date = null, source = 'Income' }) {
+        const id = generateId();
+        const now = new Date().toISOString();
+        const record = {
+            id,
+            user_id: userId,
+            amount: Number(amount),
+            date: date || now.slice(0, 10),
+            source,
+            created_at: now
+        };
+
+        if (supabase) {
+            try {
+                const { data, error } = await supabase.from('incomes').insert([record]).select().single();
+                if (!error && data) return data;
+            } catch (err) {
+                console.error("Exception in addIncome:", err.message);
+            }
+        }
+
+        memoryStore.incomes.set(id, record);
+        return record;
+    },
+
+    async getExpenses(userId, startDate = null, endDate = null) {
+        if (!userId) return [];
+        if (supabase) {
+            try {
+                let query = supabase.from('expenses').select('*').eq('user_id', userId);
+                if (startDate) query = query.gte('date', startDate);
+                if (endDate) query = query.lte('date', endDate);
+                const { data, error } = await query.order('date', { ascending: false });
+                if (!error && data) return data;
+            } catch (err) {
+                console.error("Exception in getExpenses:", err.message);
+            }
+        }
+
+        return Array.from(memoryStore.expenses.values()).filter(exp => {
+            if (exp.user_id !== userId) return false;
+            const expDate = exp.date || exp.created_at?.slice(0, 10);
+            if (startDate && expDate < startDate) return false;
+            if (endDate && expDate > endDate) return false;
+            return true;
+        }).sort((a, b) => new Date(b.date || b.created_at) - new Date(a.date || a.created_at));
+    },
+
+    async addExpense({ userId, category, amount, date = null }) {
+        const id = generateId();
+        const now = new Date().toISOString();
+        const record = {
+            id,
+            user_id: userId,
+            category: category || 'Others',
+            amount: Number(amount),
+            date: date || now.slice(0, 10),
+            created_at: now
+        };
+
+        if (supabase) {
+            try {
+                const { data, error } = await supabase.from('expenses').insert([record]).select().single();
+                if (!error && data) return data;
+            } catch (err) {
+                console.error("Exception in addExpense:", err.message);
+            }
+        }
+
+        memoryStore.expenses.set(id, record);
+        return record;
+    },
+
+    async getBudgets(userId, month = null) {
+        if (!userId) return [];
+        if (supabase) {
+            try {
+                let query = supabase.from('budgets').select('*').eq('user_id', userId);
+                if (month) {
+                    query = query.or(`month.eq.${month},month.is.null`);
+                }
+                const { data, error } = await query;
+                if (!error && data) return data;
+            } catch (err) {
+                console.warn("Budgets table query, falling back to memory:", err.message);
+            }
+        }
+
+        return Array.from(memoryStore.budgets.values()).filter(b => {
+            if (b.user_id !== userId) return false;
+            if (month && b.month && b.month !== month) return false;
+            return true;
+        });
+    },
+
+    async setBudget({ userId, category, monthlyLimit, month = null }) {
+        const id = generateId();
+        const now = new Date().toISOString();
+        const record = {
+            id,
+            user_id: userId,
+            category,
+            monthly_limit: Number(monthlyLimit),
+            month,
+            created_at: now,
+            updated_at: now
+        };
+
+        if (supabase) {
+            try {
+                const { data, error } = await supabase.from('budgets').upsert([record]).select().single();
+                if (!error && data) return data;
+            } catch (err) {
+                console.warn("Supabase setBudget, falling back to memory:", err.message);
+            }
+        }
+
+        memoryStore.budgets.set(id, record);
+        return record;
+    },
+
+    async getGoals(userId) {
+        if (!userId) return [];
+        if (supabase) {
+            try {
+                const { data, error } = await supabase.from('goals').select('*').eq('user_id', userId);
+                if (!error && data) return data;
+            } catch (err) {
+                console.error("Exception in getGoals:", err.message);
+            }
+        }
+
+        return Array.from(memoryStore.goals.values()).filter(g => g.user_id === userId);
+    },
+
+    async addGoal({ userId, name, targetAmount, currentAmount = 0, targetDate = null }) {
+        const id = generateId();
+        const now = new Date().toISOString();
+        const record = {
+            id,
+            user_id: userId,
+            name,
+            target_amount: Number(targetAmount),
+            current_amount: Number(currentAmount),
+            target_date: targetDate || now.slice(0, 10),
+            created_at: now
+        };
+
+        if (supabase) {
+            try {
+                const { data, error } = await supabase.from('goals').insert([record]).select().single();
+                if (!error && data) return data;
+            } catch (err) {
+                console.error("Exception in addGoal:", err.message);
+            }
+        }
+
+        memoryStore.goals.set(id, record);
+        return record;
+    },
+
+    async saveHealthScoreSnapshot(snapshot) {
+        const id = generateId();
+        const now = new Date().toISOString();
+        const record = {
+            id,
+            user_id: snapshot.userId,
+            score: Number(snapshot.score),
+            classification: snapshot.classification,
+            component_scores: snapshot.componentScores,
+            earned_points: Number(snapshot.earnedPoints),
+            available_points: Number(snapshot.availablePoints),
+            data_completeness: snapshot.dataCompleteness || 'medium',
+            calculated_at: now
+        };
+
+        if (supabase) {
+            try {
+                const { data, error } = await supabase
+                    .from('financial_health_history')
+                    .insert([record])
+                    .select()
+                    .single();
+
+                if (!error && data) return data;
+            } catch (err) {
+                console.warn("Exception in saveHealthScoreSnapshot, storing in memory:", err.message);
+            }
+        }
+
+        memoryStore.financial_health_history.set(id, record);
+        return record;
+    },
+
+    async getHealthScoreHistory(userId, limit = 10) {
+        if (!userId) return [];
+        if (supabase) {
+            try {
+                const { data, error } = await supabase
+                    .from('financial_health_history')
+                    .select('*')
+                    .eq('user_id', userId)
+                    .order('calculated_at', { ascending: false })
+                    .limit(limit);
+
+                if (!error && data) return data;
+            } catch (err) {
+                console.warn("Exception in getHealthScoreHistory:", err.message);
+            }
+        }
+
+        return Array.from(memoryStore.financial_health_history.values())
+            .filter(s => s.user_id === userId)
+            .sort((a, b) => new Date(b.calculated_at) - new Date(a.calculated_at))
+            .slice(0, limit);
     },
 
     // AI Instructions
@@ -258,7 +504,6 @@ const db = {
 
         if (supabase) {
             try {
-                // Deactivate prior instructions
                 await supabase
                     .from('ai_instructions')
                     .update({ is_active: false })

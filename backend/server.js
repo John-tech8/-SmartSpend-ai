@@ -6,6 +6,8 @@ require("dotenv").config({ path: path.join(__dirname, "../.env") });
 const chatRoutes = require("./routes/chat");
 const conversationRoutes = require("./routes/conversations");
 const adminRoutes = require("./routes/admin");
+const analyticsRoutes = require("./routes/analytics");
+const scoreRoutes = require("./routes/score");
 
 const app = express();
 
@@ -36,6 +38,10 @@ app.get("/", (req, res) => {
 app.use("/api/chat", chatRoutes);
 app.use("/api/conversations", conversationRoutes);
 app.use("/api/admin", adminRoutes);
+
+// Intelligent Expense Analysis & Financial Health Score routes
+app.use("/api/analytics", analyticsRoutes);
+app.use("/api/financial-health", scoreRoutes);
 
 // Config endpoint for frontend Supabase initialization
 app.get("/api/config", (req, res) => {

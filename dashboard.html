@@ -4,25 +4,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SmartSpend – Financial Dashboard</title>
+    <title>SmartSpend – Financial Dashboard & Analytics</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/animations.css">
-    <!-- Chart.js for Pie Chart -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js for Visualizations -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
-            background-color: var(--bg-color, #f4f6fb);
+            background-color: var(--bg-color, #0F172A);
         }
 
         .dashboard-container {
             max-width: 1200px;
-            margin: 40px auto;
+            margin: 30px auto;
             padding: 0 20px;
         }
 
         .page-header {
-            margin-bottom: 30px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
         .page-header h2 {
@@ -33,189 +39,440 @@
 
         .page-header p {
             color: #94a3b8;
+            margin: 0;
+        }
+
+        /* Dashboard Section Divider */
+        .dashboard-section-header {
+            grid-column: span 12;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .section-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #38BDF8;
+            background: rgba(56, 189, 248, 0.1);
+            padding: 4px 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+        }
+
+        /* Filter Controls */
+        .filter-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #94A3B8;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .filter-btn:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .filter-btn.active {
+            background: #4F46E5;
+            color: #ffffff;
+            border-color: #6366F1;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+
+        .custom-date-box {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 4px 10px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .custom-date-input {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            outline: none;
         }
 
         /* Grid Layout */
         .dashboard-grid {
             display: grid;
             grid-template-columns: repeat(12, 1fr);
-            gap: 25px;
+            gap: 20px;
         }
 
-        /* Score Card Container */
-        .score-card {
-            grid-column: span 12;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        /* Glass Cards */
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 20px;
-            padding: 35px;
-            color: white;
+            padding: 24px;
+            color: #ffffff;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Section B: Financial Health Card Hero */
+        .health-hero-card {
+            grid-column: span 12;
+            background: linear-gradient(135deg, #1E3A8A 0%, #1E1B4B 50%, #0F172A 100%);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(30, 58, 138, 0.3);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            box-shadow: 0 15px 35px rgba(30, 60, 114, 0.2);
             flex-wrap: wrap;
             gap: 30px;
         }
 
-        .score-info {
-            flex: 1;
-            min-width: 250px;
-        }
-
-        .score-label {
-            font-size: 16px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            opacity: 0.8;
-            margin-bottom: 10px;
-            display: block;
-        }
-
-        .score-value {
-            font-size: 64px;
-            font-weight: 700;
-            line-height: 1;
+        .health-gauge-box {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 24px;
+            min-width: 280px;
         }
 
-        .score-grade {
-            font-size: 32px;
-            background: rgba(255, 255, 255, 0.2);
-            padding: 5px 15px;
-            border-radius: 12px;
-            backdrop-filter: blur(10px);
+        .circular-chart {
+            width: 130px;
+            height: 130px;
+            position: relative;
         }
 
-        .score-message {
-            margin-top: 15px;
-            font-size: 16px;
-            opacity: 0.9;
+        .circular-chart svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
         }
 
-        /* Insights/Progress column */
-        .insights-panel {
-            grid-column: span 12;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin-top: 10px;
+        .circle-bg {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.1);
+            stroke-width: 3.2;
         }
 
-        .metric-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 20px;
-            border-radius: 15px;
+        .circle {
+            fill: none;
+            stroke-width: 3.2;
+            stroke-linecap: round;
+            stroke: #22C55E;
+            transition: stroke-dasharray 1.2s ease-out, stroke 0.4s;
         }
 
-        .metric-label {
+        .gauge-inner-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .gauge-score {
+            font-size: 34px;
+            font-weight: 700;
+            line-height: 1;
+            color: #ffffff;
+        }
+
+        .gauge-out-of {
+            font-size: 11px;
+            color: #94A3B8;
+            text-transform: uppercase;
+        }
+
+        .health-hero-meta h3 {
             font-size: 14px;
-            opacity: 0.8;
-            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #94A3B8;
+            margin: 0 0 6px 0;
         }
 
-        .metric-value {
-            font-size: 24px;
-            font-weight: 600;
+        .health-classification-badge {
+            display: inline-block;
+            font-size: 20px;
+            font-weight: 700;
+            padding: 4px 14px;
+            border-radius: 10px;
+            background: rgba(34, 197, 94, 0.2);
+            color: #4ADE80;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            margin-bottom: 8px;
         }
 
-        /* Progress Bar element */
-        .progress-wrapper {
-            margin-top: 15px;
+        .health-completeness-tag {
+            font-size: 12px;
+            color: #CBD5E1;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
-        .progress-bar-bg {
-            height: 8px;
-            background: rgba(255, 255, 255, 0.2);
+        /* 5 Component Scoring Breakdown */
+        .components-grid {
+            flex: 1;
+            min-width: 320px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .comp-row {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .comp-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+        }
+
+        .comp-title {
+            color: #CBD5E1;
+            font-weight: 500;
+        }
+
+        .comp-points {
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .comp-bar-bg {
+            height: 7px;
+            background: rgba(255, 255, 255, 0.12);
             border-radius: 4px;
             overflow: hidden;
         }
 
-        .progress-bar-fill {
+        .comp-bar-fill {
             height: 100%;
-            background: #4cd964;
+            background: #38BDF8;
             border-radius: 4px;
             width: 0%;
             transition: width 1s ease-in-out;
         }
 
-        /* Chart & Details Row */
-        .chart-container,
-        .summary-container {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        /* Recommendations Panel */
+        .recommendations-box {
+            grid-column: span 12;
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 18px;
+            padding: 20px;
+        }
+
+        .rec-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            border-left: 4px solid #38BDF8;
+            margin-bottom: 10px;
+        }
+
+        .rec-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .rec-item i {
+            color: #38BDF8;
+            font-size: 16px;
+            margin-top: 2px;
+        }
+
+        .rec-body h5 {
+            margin: 0 0 3px 0;
+            font-size: 14px;
+            color: #ffffff;
+        }
+
+        .rec-body p {
+            margin: 0;
+            font-size: 13px;
+            color: #94A3B8;
+        }
+
+        /* Overview KPI Cards */
+        .kpi-card {
+            grid-column: span 2;
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .kpi-label {
+            font-size: 12px;
+            color: #94A3B8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .kpi-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .kpi-sub {
+            font-size: 11px;
+            color: #94A3B8;
+            margin-top: 4px;
+        }
+
+        .positive-val { color: #4ADE80; }
+        .negative-val { color: #F87171; }
+
+        /* Chart Wrappers */
+        .chart-box {
+            grid-column: span 6;
+            min-height: 340px;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 260px;
+            width: 100%;
+        }
+
+        /* Spending Behaviour & Anomaly Box */
+        .behaviour-box {
             grid-column: span 6;
         }
 
-        .card-header {
-            font-size: 18px;
+        .anomaly-badge {
+            background: rgba(239, 68, 68, 0.15);
+            color: #F87171;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 11px;
             font-weight: 600;
+        }
+
+        .recurring-badge {
+            background: rgba(139, 92, 246, 0.15);
+            color: #C084FC;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        /* AI Insights Card (Gemini) */
+        .ai-insights-panel {
+            grid-column: span 12;
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.15) 0%, rgba(30, 41, 59, 0.8) 100%);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 20px;
+            padding: 24px;
+        }
+
+        .ai-insights-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .ai-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, #4F46E5, #06B6D4);
             color: #ffffff;
-            margin-bottom: 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        /* Customizing Chart Wrapper */
-        .pie-chart-wrapper {
-            position: relative;
-            height: 300px;
-            display: flex;
-            justify-content: center;
-        }
-
-        /* Savings Summary Breakdown */
-        .summary-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .summary-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 15px 0;
-            border-bottom: 1px solid #eee;
-        }
-
-        .summary-item:last-child {
-            border-bottom: none;
-        }
-
-        .summary-item .label {
-            color: #666;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .summary-item .amount {
+            font-size: 12px;
             font-weight: 600;
-            color: #1a1a1a;
+            padding: 4px 10px;
+            border-radius: 12px;
         }
 
-        .positive-text {
-            color: #34c759;
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-top: 14px;
         }
 
-        .negative-text {
-            color: #ff3b30;
+        .insight-tile {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .insight-tile h5 {
+            margin: 0 0 8px 0;
+            font-size: 13.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .insight-tile ul {
+            margin: 0;
+            padding-left: 18px;
+            font-size: 13px;
+            color: #CBD5E1;
+            line-height: 1.6;
+        }
+
+        /* History Table */
+        .history-panel {
+            grid-column: span 12;
         }
 
         @media (max-width: 992px) {
-            .insights-panel {
-                grid-template-columns: 1fr;
-            }
+            .kpi-card { grid-column: span 4; }
+            .chart-box, .behaviour-box { grid-column: span 12; }
+            .insights-grid { grid-template-columns: 1fr; }
+        }
 
-            .chart-container,
-            .summary-container {
-                grid-column: span 12;
-            }
+        @media (max-width: 600px) {
+            .kpi-card { grid-column: span 6; }
+            .health-hero-card { padding: 20px; }
+            .health-gauge-box { flex-direction: column; text-align: center; }
         }
     </style>
 </head>
@@ -224,7 +481,7 @@
     <!-- Navigation -->
     <header class="navbar">
         <div class="container">
-            <a href="index.html" class="logo">SmartSpend</a>
+            <a href="index.html" class="logo"><i class="fas fa-chart-line" style="margin-right: 8px;"></i>SmartSpend</a>
             <nav class="nav-links" style="display: flex; align-items: center; gap: 15px;">
                 <select id="languageSelector" class="lang-select"
                     style="padding: 5px 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 14px; background-color: white;">
@@ -232,12 +489,16 @@
                     <option value="hi">हिंदी (Hindi)</option>
                     <option value="ta">தமிழ் (Tamil)</option>
                 </select>
-                <div class="dropdown"><a href="index.html#features" class="dropbtn" data-i18n="nav.features">Features <i
-                            class="fas fa-chevron-down" style="font-size: 10px; margin-left: 5px;"></i></a>
-                    <div class="dropdown-content"><a href="expenses.html">Expense Analysis</a><a
-                            href="dashboard.html">Financial Health Score</a><a href="goals.html">Goal Tracker</a><a
-                            href="monthlyreport.html">Monthly Report</a></div>
-                </div><a href="dashboard.html" class="active" data-i18n="nav.dashboard">Dashboard</a>
+                <div class="dropdown">
+                    <a href="index.html#features" class="dropbtn" data-i18n="nav.features">Features <i class="fas fa-chevron-down" style="font-size: 10px; margin-left: 5px;"></i></a>
+                    <div class="dropdown-content">
+                        <a href="expenses.html">Expense Analysis</a>
+                        <a href="dashboard.html">Financial Health Score</a>
+                        <a href="goals.html">Goal Tracker</a>
+                        <a href="monthlyreport.html">Monthly Report</a>
+                    </div>
+                </div>
+                <a href="dashboard.html" class="active" data-i18n="nav.dashboard">Dashboard</a>
                 <a href="expenses.html" data-i18n="nav.expenses">Expenses</a>
                 <a href="goals.html" data-i18n="nav.goals">Goals</a>
                 <div class="user-profile">JD</div>
@@ -246,175 +507,325 @@
     </header>
 
     <div class="dashboard-container">
-
+        <!-- Page Header -->
         <div class="page-header">
-            <h2>Welcome back, John!</h2>
-            <p>Here is your financial overview for this month.</p>
+            <div>
+                <h2>Financial Health & Expense Intelligence</h2>
+                <p>Real-time analytics and transparent financial health scoring based on actual PostgreSQL transactions.</p>
+            </div>
+            <a href="expenses.html" class="btn btn-primary" style="padding: 10px 20px; font-size: 14px; border-radius: 10px;">
+                <i class="fas fa-plus" style="margin-right: 6px;"></i> Add Income / Expense
+            </a>
         </div>
 
+        <!-- Loading State -->
         <div id="dashboardLoading" style="text-align: center; padding: 100px;">
-            <i class="fas fa-spinner fa-spin fa-3x" style="color: #2f6df6; margin-bottom: 20px;"></i>
-            <h3>Loading your financial data...</h3>
+            <i class="fas fa-spinner fa-spin fa-3x" style="color: #4F46E5; margin-bottom: 20px;"></i>
+            <h3>Analyzing your financial transactions...</h3>
+            <p style="color: #94A3B8;">Connecting to Supabase PostgreSQL and calculating financial metrics...</p>
         </div>
 
-        <div id="emptyState"
-            style="display: none; text-align: center; padding: 100px 20px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
-            <i class="fas fa-wallet fa-4x" style="color: #ccc; margin-bottom: 20px;"></i>
-            <h3 style="color: #ffffff;">No financial data available yet.</h3>
-            <p style="color: #94a3b8; margin-bottom: 25px;">Track your income and expenses to get your Financial Health
-                Score.</p>
-            <a href="expenses.html" class="btn btn-primary"
-                style="padding: 12px 30px; font-size: 16px; border-radius: 8px;">Add Income & Expenses</a>
+        <!-- Empty State -->
+        <div id="emptyState" style="display: none; text-align: center; padding: 80px 20px; background: rgba(30, 41, 59, 0.5); border: 1px dashed rgba(255,255,255,0.2); border-radius: 20px;">
+            <i class="fas fa-wallet fa-4x" style="color: #64748B; margin-bottom: 20px;"></i>
+            <h3 style="color: #ffffff; margin-bottom: 10px;">No financial records found yet.</h3>
+            <p style="color: #94A3B8; margin-bottom: 25px; max-width: 500px; margin-left: auto; margin-right: auto;">
+                Log your income and expenses to unlock your 100-point Financial Health Score, anomaly detection, and Gemini AI insights.
+            </p>
+            <a href="expenses.html" class="btn btn-primary" style="padding: 12px 30px; font-size: 15px; border-radius: 8px;">
+                Log First Income & Expense
+            </a>
         </div>
 
+        <!-- Main Dashboard Content Grid -->
         <div class="dashboard-grid" id="dashboardContent" style="display: none;">
 
-            <!-- Health Score Hero Card -->
-            <div class="score-card animate-on-scroll">
-                <div class="score-info">
-                    <span class="score-label">Financial Health Score</span>
-                    <div class="score-value">
-                        <span id="healthScoreDisplay">0</span>
-                        <span class="score-grade" id="healthGradeDisplay">-</span>
-                    </div>
-                    <p class="score-message" id="healthMessageDisplay">Analyzing your data...</p>
-                </div>
+            <!-- =========================================================
+                 SECTION B: FINANCIAL HEALTH SCORE (HERO)
+                 ========================================================= -->
+            <div class="dashboard-section-header">
+                <span class="section-tag"><i class="fas fa-heartbeat"></i> Section B: Financial Health Score</span>
+                <span id="healthScoreTimestamp" style="color: #94A3B8; font-size: 12px;">Last calculated: just now</span>
+            </div>
 
-                <div class="insights-panel animate-on-scroll">
-                    <!-- Metric: Savings Rate -->
-                    <div class="metric-card animate-on-scroll">
-                        <div class="metric-label">Savings Rate</div>
-                        <div class="metric-value" id="savingsRateDisplay">0%</div>
-                        <div class="progress-wrapper">
-                            <div class="progress-bar-bg">
-                                <div class="progress-bar-fill" id="savingsRateBar"></div>
-                            </div>
+            <div class="health-hero-card">
+                <!-- Circular Score Indicator -->
+                <div class="health-gauge-box">
+                    <div class="circular-chart">
+                        <svg viewBox="0 0 36 36">
+                            <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            <path id="scoreCirclePath" class="circle" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        </svg>
+                        <div class="gauge-inner-text">
+                            <div class="gauge-score" id="healthScoreDisplay">0</div>
+                            <div class="gauge-out-of">out of 100</div>
                         </div>
                     </div>
+                    <div class="health-hero-meta">
+                        <h3>Financial Status</h3>
+                        <div class="health-classification-badge" id="healthClassification">Calculating...</div>
+                        <div class="health-completeness-tag">
+                            <i class="fas fa-shield-alt"></i>
+                            <span id="healthDataCompleteness">Confidence: Calculating</span>
+                        </div>
+                    </div>
+                </div>
 
-                    <!-- Metric: Monthly Income -->
-                    <div class="metric-card animate-on-scroll">
-                        <div class="metric-label">Monthly Income</div>
-                        <div class="metric-value" id="incomeDisplay">₹0</div>
+                <!-- 5 Component Scoring Breakdown -->
+                <div class="components-grid">
+                    <!-- 1. Savings Rate (30 pts) -->
+                    <div class="comp-row">
+                        <div class="comp-header">
+                            <span class="comp-title">1. Savings Rate (30 pts)</span>
+                            <span class="comp-points" id="compSavingsRatePts">0 / 30</span>
+                        </div>
+                        <div class="comp-bar-bg"><div class="comp-bar-fill" id="compSavingsRateBar"></div></div>
                     </div>
 
-                    <!-- Metric: Remaining Balance -->
-                    <div class="metric-card animate-on-scroll">
-                        <div class="metric-label">Remaining Balance</div>
-                        <div class="metric-value" id="balanceDisplay">₹0</div>
+                    <!-- 2. Expense Management (25 pts) -->
+                    <div class="comp-row">
+                        <div class="comp-header">
+                            <span class="comp-title">2. Expense Management (25 pts)</span>
+                            <span class="comp-points" id="compExpenseMgmtPts">0 / 25</span>
+                        </div>
+                        <div class="comp-bar-bg"><div class="comp-bar-fill" id="compExpenseMgmtBar"></div></div>
+                    </div>
+
+                    <!-- 3. Budget Management (20 pts) -->
+                    <div class="comp-row">
+                        <div class="comp-header">
+                            <span class="comp-title">3. Budget Management (20 pts)</span>
+                            <span class="comp-points" id="compBudgetMgmtPts">0 / 20</span>
+                        </div>
+                        <div class="comp-bar-bg"><div class="comp-bar-fill" id="compBudgetMgmtBar"></div></div>
+                    </div>
+
+                    <!-- 4. Financial Consistency (15 pts) -->
+                    <div class="comp-row">
+                        <div class="comp-header">
+                            <span class="comp-title">4. Financial Consistency (15 pts)</span>
+                            <span class="comp-points" id="compConsistencyPts">0 / 15</span>
+                        </div>
+                        <div class="comp-bar-bg"><div class="comp-bar-fill" id="compConsistencyBar"></div></div>
+                    </div>
+
+                    <!-- 5. Savings Goal Progress (10 pts) -->
+                    <div class="comp-row">
+                        <div class="comp-header">
+                            <span class="comp-title">5. Savings Goal Progress (10 pts)</span>
+                            <span class="comp-points" id="compGoalProgressPts">0 / 10</span>
+                        </div>
+                        <div class="comp-bar-bg"><div class="comp-bar-fill" id="compGoalProgressBar"></div></div>
                     </div>
                 </div>
             </div>
 
-            <!-- Expense Breakdown Chart -->
-            <div class="chart-container animate-on-scroll">
-                <div class="card-header">
-                    <span>Expense Breakdown</span>
+            <!-- Score Improvement Recommendations -->
+            <div class="recommendations-box">
+                <h4 style="margin: 0 0 14px 0; font-size: 15px; color: #ffffff; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-lightbulb" style="color: #FCD34D;"></i> Data-Driven Score Improvement Recommendations
+                </h4>
+                <div id="scoreRecommendationsList">
+                    <!-- Populated dynamically with 'Why It Matters' explanations -->
                 </div>
-                <div class="pie-chart-wrapper">
+            </div>
+
+
+            <!-- =========================================================
+                 SECTION A: INTELLIGENT EXPENSE ANALYSIS
+                 ========================================================= -->
+            <div class="dashboard-section-header">
+                <span class="section-tag"><i class="fas fa-chart-pie"></i> Section A: Intelligent Expense Analysis</span>
+                
+                <!-- Interactive Time-Filter Toolbar -->
+                <div class="filter-toolbar">
+                    <button class="filter-btn active" data-range="current_month">Current Month</button>
+                    <button class="filter-btn" data-range="previous_month">Previous Month</button>
+                    <button class="filter-btn" data-range="3_months">Last 3 Months</button>
+                    <button class="filter-btn" data-range="6_months">Last 6 Months</button>
+                    <button class="filter-btn" data-range="custom">Custom</button>
+
+                    <div class="custom-date-box" id="customDateBox">
+                        <input type="date" id="customStartInput" class="custom-date-input" title="Start Date">
+                        <span style="color: #94A3B8; font-size: 12px;">to</span>
+                        <input type="date" id="customEndInput" class="custom-date-input" title="End Date">
+                        <button id="applyCustomDateBtn" class="btn btn-primary" style="padding: 4px 10px; font-size: 11px; border-radius: 6px;">Apply</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Overview KPI Cards (6 metrics) -->
+            <!-- 1. Total Income -->
+            <div class="kpi-card">
+                <div class="kpi-label"><i class="fas fa-arrow-down" style="color: #4ADE80;"></i> Total Income</div>
+                <div class="kpi-value positive-val" id="kpiIncome">₹0</div>
+                <div class="kpi-sub" id="kpiIncomeSub">Recorded inflow</div>
+            </div>
+
+            <!-- 2. Total Expenses -->
+            <div class="kpi-card">
+                <div class="kpi-label"><i class="fas fa-arrow-up" style="color: #F87171;"></i> Total Expenses</div>
+                <div class="kpi-value negative-val" id="kpiExpenses">₹0</div>
+                <div class="kpi-sub" id="kpiExpenseSub">0 transactions</div>
+            </div>
+
+            <!-- 3. Net Savings -->
+            <div class="kpi-card">
+                <div class="kpi-label"><i class="fas fa-piggy-bank" style="color: #38BDF8;"></i> Net Savings</div>
+                <div class="kpi-value" id="kpiSavings">₹0</div>
+                <div class="kpi-sub" id="kpiSavingsRate">Rate: 0%</div>
+            </div>
+
+            <!-- 4. Average Daily Spend -->
+            <div class="kpi-card">
+                <div class="kpi-label"><i class="fas fa-calendar-day" style="color: #A78BFA;"></i> Daily Average</div>
+                <div class="kpi-value" id="kpiDailySpend">₹0</div>
+                <div class="kpi-sub">Per day in range</div>
+            </div>
+
+            <!-- 5. Highest Category -->
+            <div class="kpi-card">
+                <div class="kpi-label"><i class="fas fa-crown" style="color: #FCD34D;"></i> Top Category</div>
+                <div class="kpi-value" style="font-size: 18px;" id="kpiTopCategory">-</div>
+                <div class="kpi-sub" id="kpiTopCategorySub">0% of budget</div>
+            </div>
+
+            <!-- 6. Total Transactions -->
+            <div class="kpi-card">
+                <div class="kpi-label"><i class="fas fa-receipt" style="color: #34D399;"></i> Transactions</div>
+                <div class="kpi-value" id="kpiTxnCount">0</div>
+                <div class="kpi-sub">Verified entries</div>
+            </div>
+
+            <!-- Visual Charts: Category Doughnut + Monthly Spending Trends -->
+            <!-- Category Chart -->
+            <div class="glass-panel chart-box">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h4 style="margin: 0; font-size: 16px;"><i class="fas fa-chart-pie" style="color: #38BDF8; margin-right: 8px;"></i>Category-Wise Breakdown</h4>
+                    <span id="categoryRangeBadge" style="font-size: 12px; color: #94A3B8;">Current Month</span>
+                </div>
+                <div class="chart-wrapper">
                     <canvas id="expenseChart"></canvas>
                 </div>
-            </div>
-
-            <!-- Peer Comparison Chart -->
-            <div class="chart-container animate-on-scroll">
-                <div class="card-header">
-                    <span>Peer Comparison <span
-                            style="font-size: 13px; color: #666; font-weight: normal; margin-left: 10px;">(Similar
-                            Income Bracket)</span></span>
-                </div>
-                <div class="pie-chart-wrapper">
-                    <canvas id="peerChart"></canvas>
+                <div id="categorySummaryPills" style="margin-top: 15px; display: flex; gap: 8px; flex-wrap: wrap; font-size: 12px;">
+                    <!-- Top & Lowest category pill -->
                 </div>
             </div>
 
-            <!-- Detailed Savings Summary -->
-            <div class="summary-container animate-on-scroll">
-                <div class="card-header">
-                    <span>Savings Summary</span>
-                    <a href="expenses.html" class="btn btn-outline" style="padding: 5px 15px; font-size: 14px;">Edit
-                        Data</a>
+            <!-- Spending Trends & Monthly Comparison -->
+            <div class="glass-panel chart-box">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h4 style="margin: 0; font-size: 16px;"><i class="fas fa-chart-line" style="color: #4ADE80; margin-right: 8px;"></i>Monthly Spending Trends</h4>
+                    <span style="font-size: 12px; color: #94A3B8;">Income vs Expenses vs Savings</span>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="trendChart"></canvas>
+                </div>
+                <div id="monthlyComparisonBanner" style="margin-top: 15px; padding: 10px 14px; background: rgba(255,255,255,0.05); border-radius: 10px; font-size: 12.5px; color: #CBD5E1;">
+                    <!-- MoM comparison text -->
+                </div>
+            </div>
+
+            <!-- Spending Behaviour & Anomaly Detection Panel -->
+            <div class="glass-panel behaviour-box" style="grid-column: span 12;">
+                <h4 style="margin: 0 0 16px 0; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-user-check" style="color: #C084FC;"></i> Spending Behaviour & Pattern Anomalies
+                </h4>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;" id="behaviourGrid">
+                    <!-- Unusually high expenses -->
+                    <div class="insight-tile">
+                        <h5><span class="anomaly-badge">Spikes</span> Statistical Anomalies</h5>
+                        <ul id="unusualExpensesList" style="padding-left: 16px; margin: 0; font-size: 12.5px; color: #CBD5E1;">
+                            <li>No unusual spending surges detected.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Recurring expenses -->
+                    <div class="insight-tile">
+                        <h5><span class="recurring-badge">Recurring</span> Identified Subscriptions</h5>
+                        <ul id="recurringExpensesList" style="padding-left: 16px; margin: 0; font-size: 12.5px; color: #CBD5E1;">
+                            <li>Analyzing historical patterns...</li>
+                        </ul>
+                    </div>
+
+                    <!-- Potential unnecessary spending -->
+                    <div class="insight-tile">
+                        <h5><i class="fas fa-exclamation-triangle" style="color: #FCD34D;"></i> Review Outlays</h5>
+                        <ul id="discretionaryList" style="padding-left: 16px; margin: 0; font-size: 12.5px; color: #CBD5E1;">
+                            <li>Discretionary spending is well balanced.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI-Powered Expense Insights (Gemini) -->
+            <div class="ai-insights-panel">
+                <div class="ai-insights-header">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span class="ai-badge"><i class="fas fa-brain"></i> Gemini AI</span>
+                        <h4 style="margin: 0; font-size: 17px; color: #ffffff;">AI-Powered Financial Insights</h4>
+                    </div>
+                    <span style="font-size: 12px; color: #CBD5E1;" id="aiInsightsSource">Grounded in database transactions</span>
                 </div>
 
-                <ul class="summary-list" id="summaryList">
-                    <!-- Populated by JS -->
-                    <li class="summary-item">
-                        <span class="label">Total Income</span>
-                        <span class="amount" id="sumIncome">₹0.00</span>
-                    </li>
-                    <li class="summary-item">
-                        <span class="label">Total Expenses</span>
-                        <span class="amount negative-text" id="sumExpenses">-₹0.00</span>
-                    </li>
-                    <li class="summary-item">
-                        <span class="label">Total Savings</span>
-                        <span class="amount positive-text" id="sumSavings">+₹0.00</span>
-                    </li>
-                    <li class="summary-item">
-                        <span class="label">Primary Expense</span>
-                        <span class="amount" id="topExpense">-</span>
-                    </li>
-                </ul>
+                <div id="aiSummaryText" style="font-size: 14.5px; line-height: 1.6; color: #F1F5F9; background: rgba(0,0,0,0.2); padding: 14px; border-radius: 12px; border-left: 4px solid #6366F1;">
+                    Generating automated analysis from your recorded financial metrics...
+                </div>
 
-                <div style="margin-top: 25px; padding: 15px; background: #fff3cd; border-radius: 8px; color: #856404; font-size: 14px; display: none;"
-                    id="aiWarningAlert">
-                    <strong>AI Note:</strong> Your dining expenses are higher than recommended. Consider cooking at home
-                    to boost your savings rate!
+                <div class="insights-grid">
+                    <!-- Biggest Concerns -->
+                    <div class="insight-tile">
+                        <h5 style="color: #F87171;"><i class="fas fa-exclamation-circle"></i> Biggest Spending Concerns</h5>
+                        <ul id="aiConcernsList">
+                            <li>Analyzing data...</li>
+                        </ul>
+                    </div>
+
+                    <!-- Positive Habits -->
+                    <div class="insight-tile">
+                        <h5 style="color: #4ADE80;"><i class="fas fa-check-circle"></i> Positive Financial Habits</h5>
+                        <ul id="aiHabitsList">
+                            <li>Analyzing data...</li>
+                        </ul>
+                    </div>
+
+                    <!-- Areas for Improvement -->
+                    <div class="insight-tile">
+                        <h5 style="color: #FCD34D;"><i class="fas fa-wrench"></i> Areas Requiring Improvement</h5>
+                        <ul id="aiImprovementsList">
+                            <li>Analyzing data...</li>
+                        </ul>
+                    </div>
+
+                    <!-- Reduction Suggestions & Recommendations -->
+                    <div class="insight-tile">
+                        <h5 style="color: #38BDF8;"><i class="fas fa-bullseye"></i> Practical Reduction Suggestions</h5>
+                        <ul id="aiSuggestionsList">
+                            <li>Analyzing data...</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
 
             <!-- Expense History List -->
-            <div class="summary-container animate-on-scroll" style="grid-column: span 12;">
-                <div class="card-header">
-                    <span>Expense History</span>
+            <div class="glass-panel history-panel">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <h4 style="margin: 0; font-size: 16px;"><i class="fas fa-history" style="color: #94A3B8; margin-right: 8px;"></i>Recent Transactions</h4>
+                    <a href="expenses.html" class="btn btn-outline" style="padding: 4px 12px; font-size: 12px; border-radius: 8px;">Manage Transactions</a>
                 </div>
                 <div style="overflow-x: auto;">
                     <table style="width: 100%; border-collapse: collapse; text-align: left;">
                         <thead>
-                            <tr style="border-bottom: 2px solid #eee; color: #666; font-size: 14px;">
+                            <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.1); color: #94A3B8; font-size: 13px;">
                                 <th style="padding: 12px; font-weight: 500;">Date</th>
                                 <th style="padding: 12px; font-weight: 500;">Category</th>
                                 <th style="padding: 12px; font-weight: 500; text-align: right;">Amount</th>
                             </tr>
                         </thead>
-                        <tbody id="expenseHistoryTableBody">
+                        <tbody id="expenseHistoryTableBody" style="font-size: 14px;">
                             <!-- Populated by JS -->
                         </tbody>
                     </table>
-                </div>
-            </div>
-
-            <!-- Monthly Financial Report Card -->
-            <div class="summary-container animate-on-scroll" style="grid-column: span 12; margin-top: 10px;">
-                <div class="card-header" style="margin-bottom: 15px;">
-                    <span>Monthly Financial Report Card</span>
-                    <span id="reportMonthStr" style="color: #666; font-weight: normal; font-size: 14px;"></span>
-                </div>
-                <div id="reportCardContent" style="display: flex; gap: 30px; flex-wrap: wrap;">
-                    <div style="flex: 1; min-width: 250px;">
-                        <h4 style="color: #4A5568; margin-bottom: 15px; font-weight: 600;">Overall Grade</h4>
-                        <div style="display: flex; gap: 20px; align-items: center;">
-                            <div id="reportGrade"
-                                style="font-size: 40px; font-weight: bold; background: #2B61FF; color: white; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; border-radius: 12px; box-shadow: 0 4px 10px rgba(43, 97, 255, 0.2);">
-                                -</div>
-                            <div>
-                                <div style="font-size: 14px; color: #94a3b8;">Health Score</div>
-                                <div id="reportScore" style="font-size: 24px; font-weight: bold; color: #ffffff;">0 /
-                                    100</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div style="flex: 2; min-width: 300px;">
-                        <h4 style="color: #e2e8f0; margin-bottom: 15px; font-weight: 600;">Top 3 Improvements</h4>
-                        <ul id="reportImprovements" style="list-style-type: none; padding: 0;">
-                            <!-- Populated by JS -->
-                            <li style="color: #94a3b8;">Loading...</li>
-                        </ul>
-                    </div>
-                </div>
-                <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #E2E8F0; display: flex; gap: 10px; overflow-x: auto;"
-                    id="pastReportsList">
-                    <!-- Past reports buttons -->
                 </div>
             </div>
 
@@ -425,8 +836,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabaseClient.js"></script>
     <script src="js/i18n.js"></script>
-    <!-- Load the Calculator Module and the Dashboard Logic -->
-    <script type="module" src="js/dashboard.js"></script>
+    <script src="js/dashboard.js"></script>
     <script src="js/speechService.js"></script>
     <script src="js/miniBuddy.js"></script>
 </body>
