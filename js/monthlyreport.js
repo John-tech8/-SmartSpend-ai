@@ -7,6 +7,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             supabase = await window.initSupabase();
             userId = window.getUserId();
         }
+        if (window.requireAuth && supabase) {
+            const authUser = await window.requireAuth();
+            if (!authUser) return;
+        }
     } catch (e) { console.error("Supabase init failed", e); }
 
     const loadingEl = document.getElementById('loadingState');

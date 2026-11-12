@@ -145,13 +145,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     const confirmOverwrite = document.getElementById('confirmOverwrite');
     const cancelOverwrite  = document.getElementById('cancelOverwrite');
 
-    // ── Supabase Init ───────────────────────────────────────────────────────
+    // ── Supabase Init & Auth Guard ──────────────────────────────────────────
     let supabase = null;
     let userId   = null;
     try {
         if (window.initSupabase) {
             supabase = await window.initSupabase();
             userId   = window.getUserId();
+        }
+        if (window.requireAuth && supabase) {
+            const authUser = await window.requireAuth();
+            if (!authUser) return; // requireAuth redirects to login.html
         }
     } catch (e) {
         console.error('Supabase init failed', e);

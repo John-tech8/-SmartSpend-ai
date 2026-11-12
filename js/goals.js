@@ -31,9 +31,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         }).format(amount);
     };
 
-    // Initialize Supabase
-    const supabase = await window.initSupabase();
-    const userId = window.getUserId();
+    // Initialize Supabase & Auth Guard
+    let supabase = null;
+    let userId = null;
+    if (window.initSupabase) {
+        supabase = await window.initSupabase();
+        userId = window.getUserId();
+    }
+    if (window.requireAuth && supabase) {
+        const authUser = await window.requireAuth();
+        if (!authUser) return;
+    }
 
     // Fetch and display active goals
     async function fetchGoals() {

@@ -10,12 +10,28 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Serve frontend
-app.use(express.static(path.join(__dirname, "../frontend")));
+// Block access to sensitive files
+app.use((req, res, next) => {
+    const blocked = [/\.env/, /\.git/, /package\.json/, /package-lock\.json/, /node_modules/];
+    if (blocked.some(rx => rx.test(req.path))) {
+        return res.status(403).send("Access Denied");
+    }
+    next();
+});
 
-// Test route
-app.get("/", (req, res) => {
-    res.send("SmartSpend AI Backend is running 🚀");
+// Serve frontend static files from project root
+app.use(express.static(path.join(__dirname, ".."), {
+    dotfiles: "ignore",
+    index: "index.html"
+}));
+
+// Health check endpoint
+app.get("/api/health", (req, res) => {
+    res.json({
+        status: "ok",
+        supabaseConfigured: !!(process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY),
+        aiConfigured: !!process.env.GROQ_API_KEY
+    });
 });
 
 // Chat endpoint

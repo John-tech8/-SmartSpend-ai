@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     showState(loadingEl, emptyEl, contentEl, 'loading');
 
-    // ── Supabase Init ────────────────────────────────────────────────────────
+    // ── Supabase Init & Auth Guard ───────────────────────────────────────────
     let supabase = null;
     let userId   = null;
     try {
@@ -108,8 +108,22 @@ document.addEventListener('DOMContentLoaded', async () => {
             supabase = await window.initSupabase();
             userId   = window.getUserId();
         }
+        if (window.requireAuth && supabase) {
+            const authUser = await window.requireAuth();
+            if (!authUser) return; // requireAuth redirects to login.html
+        }
     } catch (e) {
         console.error('Supabase init failed', e);
+    }
+
+    // Personalize welcome heading with authenticated user name
+    const welcomeEl = document.getElementById('dashboardWelcomeHeading');
+    if (welcomeEl) {
+        const u = window.getCurrentUser ? window.getCurrentUser() : null;
+        const name = u?.user_metadata?.full_name || localStorage.getItem('smartspend_user_name');
+        if (name) {
+            welcomeEl.textContent = `Welcome back, ${name.split(' ')[0]}!`;
+        }
     }
 
     // ── No Supabase: Try localStorage fallback ───────────────────────────────

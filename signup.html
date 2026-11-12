@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,19 +12,22 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
     <!-- Standard Navigation -->
     <header class="navbar">
         <div class="container">
             <a href="index.html" class="logo"><i class="fas fa-chart-line"></i> SmartSpend</a>
             <nav class="nav-links">
-                <select id="languageSelector" class="lang-select" style="padding: 5px 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 14px; background-color: white; color: #1a1a1a;">
+                <select id="languageSelector" class="lang-select"
+                    style="padding: 5px 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 14px; background-color: white; color: #1a1a1a;">
                     <option value="en">English</option>
                     <option value="hi">हिंदी (Hindi)</option>
                     <option value="ta">தமிழ் (Tamil)</option>
                 </select>
                 <div class="dropdown">
-                    <a href="index.html#features" class="dropbtn" data-i18n="nav.features">Features <i class="fas fa-chevron-down" style="font-size: 10px; margin-left: 5px;"></i></a>
+                    <a href="index.html#features" class="dropbtn" data-i18n="nav.features">Features <i
+                            class="fas fa-chevron-down" style="font-size: 10px; margin-left: 5px;"></i></a>
                     <div class="dropdown-content">
                         <a href="expenses.html">Expense Analysis</a>
                         <a href="dashboard.html">Financial Health Score</a>
@@ -33,7 +37,7 @@
                 </div>
                 <a href="about.html" data-i18n="nav.about">About</a>
                 <a href="aiagent.html" data-i18n="nav.aiadvisor">AI Advisor</a>
-                <a href="login.html" class="" data-i18n="nav.login">Login</a>
+                <a href="login.html" data-i18n="nav.login">Login</a>
                 <a href="signup.html" class="btn btn-primary" data-i18n="nav.signup">Sign Up</a>
             </nav>
         </div>
@@ -42,112 +46,77 @@
     <div class="auth-wrapper">
         <div class="auth-card glass-card animate-on-scroll signup-card">
             <h1 class="auth-title">Create Account</h1>
-            
-            <form id="signupForm">
+
+            <!-- Alert Container for Success / Error / Info Messages -->
+            <div id="authAlert" style="display: none;"></div>
+
+            <form id="signupForm" novalidate autocomplete="off">
+                <!-- 1. Full Name -->
                 <div class="input-group">
-                    <label for="name">Full Name</label>
-                    <input type="text" id="name" required placeholder="John Doe">
+                    <label for="name"><i class="fas fa-user" style="margin-right: 6px;"></i> Full Name</label>
+                    <input type="text" id="name" required placeholder="e.g. John Doe" autocomplete="name">
                 </div>
 
+                <!-- 2. Email Address -->
                 <div class="input-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" required placeholder="name@example.com">
+                    <label for="email"><i class="fas fa-envelope" style="margin-right: 6px;"></i> Email Address</label>
+                    <input type="email" id="email" required placeholder="name@example.com" autocomplete="email">
                 </div>
 
+                <!-- 3. Password -->
                 <div class="input-group">
-                    <label>Phone Number</label>
-                    <div class="phone-group">
-                        <select id="countryCode">
-                            <option value="+1">+1 (US/CA)</option>
-                            <option value="+44">+44 (UK)</option>
-                            <option value="+91">+91 (IN)</option>
-                            <option value="+61">+61 (AU)</option>
-                        </select>
-                        <input type="tel" id="phone" required placeholder="9876543210">
+                    <label for="password"><i class="fas fa-lock" style="margin-right: 6px;"></i> Password</label>
+                    <div class="password-field-wrapper">
+                        <input type="password" id="password" required placeholder="Create a strong password"
+                            autocomplete="new-password">
+                        <button type="button" class="password-toggle-btn" id="togglePassword"
+                            title="Show/Hide Password" aria-label="Toggle password visibility">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+
+                    <!-- Live Password Requirements Checklist -->
+                    <div class="password-requirements">
+                        <div class="password-requirements-title">
+                            <i class="fas fa-shield-alt"></i> Password Security Requirements:
+                        </div>
+                        <div class="requirement-item invalid" id="req-length">
+                            <i class="far fa-circle"></i> At least 8 characters
+                        </div>
+                        <div class="requirement-item invalid" id="req-upper">
+                            <i class="far fa-circle"></i> At least one uppercase letter (A-Z)
+                        </div>
+                        <div class="requirement-item invalid" id="req-lower">
+                            <i class="far fa-circle"></i> At least one lowercase letter (a-z)
+                        </div>
+                        <div class="requirement-item invalid" id="req-number">
+                            <i class="far fa-circle"></i> At least one number (0-9)
+                        </div>
+                        <div class="requirement-item invalid" id="req-special">
+                            <i class="far fa-circle"></i> At least one special character (!@#$%^&*...)
+                        </div>
                     </div>
                 </div>
 
+                <!-- 4. Confirm Password -->
                 <div class="input-group">
-                    <label for="dob">Date of Birth</label>
-                    <input type="date" id="dob" required>
-                    <div id="dobError" class="error-message">You must be at least 18 years old to sign up.</div>
+                    <label for="confirmPassword"><i class="fas fa-check-double" style="margin-right: 6px;"></i> Confirm
+                        Password</label>
+                    <div class="password-field-wrapper">
+                        <input type="password" id="confirmPassword" required placeholder="Re-enter your password"
+                            autocomplete="new-password">
+                        <button type="button" class="password-toggle-btn" id="toggleConfirmPassword"
+                            title="Show/Hide Password" aria-label="Toggle confirm password visibility">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div id="passwordMatchStatus" class="password-match-status" style="display: none;"></div>
                 </div>
 
-                <div class="input-group">
-                    <label for="gender">Gender</label>
-                    <select id="gender" required>
-                        <option value="" disabled selected>Select Gender</option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                        <option value="prefer-not-to-say">Prefer not to say</option>
-                    </select>
-                </div>
-
-                <div class="input-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" required placeholder="Create a password">
-                </div>
-
-                <button type="submit" class="btn btn-primary">Sign Up</button>
+                <button type="submit" class="btn btn-primary" id="signupSubmitBtn">
+                    <i class="fas fa-user-plus" style="margin-right: 8px;"></i> Create Account
+                </button>
             </form>
-
-            <form id="quizForm" style="display: none;">
-                <p style="margin-bottom: 20px; color: var(--text-muted);">Let's customize your experience with a quick 5-question financial personality quiz!</p>
-
-                <div class="input-group">
-                    <label>1. When you receive money, what is your first instinct?</label>
-                    <select id="q1" required>
-                        <option value="" disabled selected>Select an option</option>
-                        <option value="saver">Put a portion into savings</option>
-                        <option value="spender">Buy something I've been wanting</option>
-                        <option value="impulsive">Treat myself immediately without thinking</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label>2. How do you feel about budgeting?</label>
-                    <select id="q2" required>
-                        <option value="" disabled selected>Select an option</option>
-                        <option value="saver">I love it, I track every penny</option>
-                        <option value="spender">I have a loose budget in my head</option>
-                        <option value="impulsive">I try but always fail, or don't budget at all</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label>3. If you see something you want but don't need, what do you do?</label>
-                    <select id="q3" required>
-                        <option value="" disabled selected>Select an option</option>
-                        <option value="saver">Wait a few days to see if I still want it</option>
-                        <option value="spender">Check if I have money, then maybe buy it</option>
-                        <option value="impulsive">Buy it immediately</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label>4. Do you have an emergency fund?</label>
-                    <select id="q4" required>
-                        <option value="" disabled selected>Select an option</option>
-                        <option value="saver">Yes, with 3-6 months of expenses</option>
-                        <option value="spender">Yes, but it's very small</option>
-                        <option value="impulsive">No, I live paycheck to paycheck</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label>5. How often do you exceed your monthly budget?</label>
-                    <select id="q5" required>
-                        <option value="" disabled selected>Select an option</option>
-                        <option value="saver">Rarely</option>
-                        <option value="spender">Sometimes</option>
-                        <option value="impulsive">Often or Always</option>
-                    </select>
-                </div>
-
-                <button type="submit" class="btn btn-primary" id="finishSignupBtn">Finish Profile</button>
-            </form>
-
-            <div id="quizResult" style="display: none; text-align: center;">
-                <h2 id="personalityTitle" style="color: var(--highlight-blue); margin-bottom: 15px;"></h2>
-                <p id="personalityDesc" style="color: var(--text-main); margin-bottom: 25px; font-size: 15px;"></p>
-                <a href="index.html" class="btn btn-primary" style="text-decoration: none; padding: 12px 20px; display: inline-block;">Go to Home</a>
-            </div>
 
             <div class="auth-link">
                 Already have an account? <a href="login.html" id="loginLink">Login</a>
@@ -158,8 +127,9 @@
     <!-- Initialization Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabaseClient.js"></script>
+    <script src="js/auth.js"></script>
     <script src="js/i18n.js"></script>
-    <script src="js/app.js"></script> <!-- Required for intersections observers -->
-    <script src="js/quiz.js"></script>
+    <script src="js/app.js"></script>
 </body>
+
 </html>
