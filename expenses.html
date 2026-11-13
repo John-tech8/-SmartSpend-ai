@@ -4,183 +4,187 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SmartSpend – Track Expenses</title>
-    <meta name="description" content="Track your monthly income and expenses with SmartSpend. Get your Financial Health Score and AI-powered spending insights.">
+    <title>Expense Ledger – SmartSpend</title>
+    <meta name="description" content="Structured monthly expense ledger and real-time cash flow analysis with SmartSpend.">
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/animations.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            background-color: var(--bg-color, #f8f9fa);
+        .dashboard-container {
+            max-width: 1140px;
+            margin: 32px auto 64px;
+            padding: 0 32px;
         }
 
-        .dashboard-container {
-            max-width: 850px;
-            margin: 40px auto;
-            padding: 20px;
+        .page-header {
+            margin-bottom: 28px;
+        }
+
+        .page-header h2 {
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--primary-forest);
+            margin-bottom: 4px;
+        }
+
+        .page-header p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .layout-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 28px;
+            align-items: start;
         }
 
         .form-card {
-            background: white;
-            border-radius: 16px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-            margin-bottom: 30px;
-        }
-
-        .form-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .form-header h2 {
-            font-size: 28px;
-            color: #ffffff;
-            margin-bottom: 8px;
-        }
-
-        .form-header p {
-            color: #94a3b8;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label,
-        .expense-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            font-size: 14px;
-            color: #000000;
-        }
-
-        .input-group {
-            position: relative;
-        }
-
-        .input-prefix {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: black;
-            font-weight: 500;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 12px 15px 12px 35px;
-            border: 1px solid #e0e0e0;
-            background: #ffffff;
-            color: black;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            box-sizing: border-box;
-        }
-
-        .form-control:focus {
-            border-color: #4a90e2;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
-        }
-
-        .form-control.input-error {
-            border-color: #ff3b30;
-            box-shadow: 0 0 0 3px rgba(255, 59, 48, 0.1);
-        }
-
-        .field-error {
-            display: none;
-            color: #ff3b30;
-            font-size: 12px;
-            margin-top: 4px;
-            font-weight: 500;
-        }
-
-        .field-error.visible {
-            display: block;
-        }
-
-        .expense-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
+            background: var(--surface-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: 32px;
+            box-shadow: var(--shadow-sm);
         }
 
         .section-title {
-            font-size: 18px;
-            margin: 30px 0 15px;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--primary-forest);
+            margin: 28px 0 6px;
             padding-bottom: 8px;
-            border-bottom: 2px solid #eee;
-            color: #111;
-            font-weight: 700;
+            border-bottom: 1px solid var(--border-subtle);
+            letter-spacing: -0.01em;
         }
 
         .section-subtitle {
             font-size: 13px;
-            color: #666;
-            margin-top: -10px;
-            margin-bottom: 15px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            line-height: 1.5;
         }
 
-        /* Summary Card Styles */
+        .expense-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        /* Institutional Summary Card */
         .summary-card {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            border-radius: 16px;
-            padding: 30px;
-            color: white;
-            box-shadow: 0 15px 35px rgba(30, 60, 114, 0.2);
+            background: var(--primary-forest);
+            border-radius: var(--radius-xl);
+            padding: 24px;
+            color: #FFFFFF;
+            box-shadow: var(--shadow-md);
             position: sticky;
-            top: 20px;
+            top: 88px;
+            border: 1px solid rgba(24, 40, 32, 0.1);
+        }
+
+        .summary-card h3 {
+            margin: 0 0 18px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #A3B3A8;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
         .summary-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 15px;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 14px;
         }
 
-        .summary-row:last-child {
+        .summary-row:last-of-type {
             border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
         }
 
         .summary-label {
-            font-size: 14px;
-            opacity: 0.9;
+            color: #D2DCD4;
         }
 
         .summary-value {
-            font-size: 20px;
             font-weight: 600;
+            color: #FFFFFF;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .total-balance {
+            padding-top: 4px;
+            margin-top: 4px;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
         }
 
         .total-balance .summary-label {
-            font-size: 16px;
-            font-weight: 500;
+            font-weight: 600;
+            color: #FFFFFF;
         }
 
         .total-balance .summary-value {
-            font-size: 28px;
+            font-size: 22px;
             font-weight: 700;
         }
 
-        .balance-positive { color: #4cd964; }
-        .balance-negative { color: #ff3b30; }
-        .balance-warning  { color: #ffcc00; }
+        .balance-positive { color: #86EFAC !important; }
+        .balance-negative { color: #FCA5A5 !important; }
+        .balance-warning  { color: #FDE047 !important; }
 
-        .layout-wrapper {
-            display: grid;
-            grid-template-columns: 1fr 320px;
-            gap: 30px;
-            align-items: start;
+        .savings-rate-row {
+            font-size: 13px;
+            margin-top: 14px;
+            padding: 10px 12px;
+            border-radius: var(--radius-md);
+            background: rgba(255, 255, 255, 0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .insight-box {
+            margin-top: 14px;
+            font-size: 12px;
+            line-height: 1.55;
+            padding: 12px;
+            border-radius: var(--radius-md);
+            background: rgba(255, 255, 255, 0.08);
+            color: #D2DCD4;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .optional-badge {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-left: 6px;
+            background: var(--bg-page);
+            padding: 2px 7px;
+            border-radius: var(--radius-sm);
+        }
+
+        #overwriteNotice {
+            display: none;
+            background: var(--warning-bg);
+            border: 1px solid rgba(164, 123, 53, 0.3);
+            border-radius: var(--radius-md);
+            padding: 14px 18px;
+            margin-bottom: 24px;
+            font-size: 13px;
+            color: var(--color-warning);
+        }
+
+        #overwriteNotice .notice-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
         }
 
         @media (max-width: 900px) {
@@ -189,275 +193,182 @@
             }
             .summary-card {
                 position: static;
-                margin-bottom: 30px;
+                margin-top: 24px;
             }
-        }
-
-        /* High specificity overrides for form-card text visibility */
-        .form-card label,
-        .form-card .section-title,
-        .form-card .input-prefix {
-            color: #000 !important;
-        }
-
-        .form-card input,
-        .form-card .form-control {
-            color: #000 !important;
-            background-color: #fff !important;
-            -webkit-text-fill-color: #000 !important;
-        }
-
-        .form-card input::placeholder,
-        .form-card .form-control::placeholder {
-            color: #555 !important;
-            opacity: 1 !important;
-            -webkit-text-fill-color: #555 !important;
-        }
-
-        /* Status banner */
-        .status-banner {
-            display: none;
-            padding: 12px 18px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 14px;
-            font-weight: 500;
-            align-items: center;
-            gap: 10px;
-        }
-        .status-banner.success {
-            display: flex;
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        .status-banner.error {
-            display: flex;
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        .status-banner.info {
-            display: flex;
-            background: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
-        }
-
-        /* Optional field badge */
-        .optional-badge {
-            font-size: 11px;
-            font-weight: 400;
-            color: #888;
-            margin-left: 6px;
-            background: #f0f0f0;
-            padding: 1px 6px;
-            border-radius: 4px;
-        }
-
-        /* Savings rate display */
-        .savings-rate-row {
-            font-size: 13px;
-            margin-top: 10px;
-            padding: 8px 12px;
-            border-radius: 8px;
-            background: rgba(255,255,255,0.1);
-            display: flex;
-            justify-content: space-between;
-        }
-
-        /* Submit button states */
-        .btn-loading {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-
-        /* Confirm overwrite notice */
-        #overwriteNotice {
-            display: none;
-            background: #fff3cd;
-            border: 1px solid #ffc107;
-            border-radius: 8px;
-            padding: 12px 15px;
-            margin-bottom: 20px;
-            font-size: 14px;
-            color: #856404;
-        }
-        #overwriteNotice .notice-actions {
-            margin-top: 10px;
-            display: flex;
-            gap: 10px;
+            .expense-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 
 <body>
-    <!-- Navigation -->
+    <!-- Standard Navigation -->
     <header class="navbar">
         <div class="container">
-            <a href="index.html" class="logo">SmartSpend</a>
-            <nav class="nav-links" style="display: flex; align-items: center; gap: 15px;">
-                <select id="languageSelector" class="lang-select"
-                    style="padding: 5px 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 14px; background-color: white;">
+            <a href="index.html" class="logo"><span class="logo-mark"></span> SmartSpend</a>
+            <nav class="nav-links">
+                <select id="languageSelector" class="lang-select" aria-label="Select Language">
                     <option value="en">English</option>
                     <option value="hi">हिंदी (Hindi)</option>
                     <option value="ta">தமிழ் (Tamil)</option>
                 </select>
-                <div class="dropdown"><a href="index.html#features" class="dropbtn" data-i18n="nav.features">Features <i
-                            class="fas fa-chevron-down" style="font-size: 10px; margin-left: 5px;"></i></a>
-                    <div class="dropdown-content"><a href="expenses.html">Expense Analysis</a><a
-                            href="dashboard.html">Financial Health Score</a><a href="goals.html">Goal Tracker</a><a
-                            href="monthlyreport.html">Monthly Report</a></div>
-                </div><a href="dashboard.html" data-i18n="nav.dashboard">Dashboard</a>
-                <a href="#" class="active" data-i18n="nav.expenses">Expenses</a>
+                <div class="dropdown">
+                    <a href="index.html#features" class="dropbtn" data-i18n="nav.features">Features <i class="fas fa-chevron-down" style="font-size: 10px; margin-left: 4px;"></i></a>
+                    <div class="dropdown-content">
+                        <a href="expenses.html">Expense Analysis</a>
+                        <a href="dashboard.html">Financial Health Score</a>
+                        <a href="goals.html">Goal Tracker</a>
+                        <a href="monthlyreport.html">Monthly Report</a>
+                    </div>
+                </div>
+                <a href="dashboard.html" data-i18n="nav.dashboard">Dashboard</a>
+                <a href="expenses.html" class="active" data-i18n="nav.expenses">Expenses</a>
                 <a href="goals.html" data-i18n="nav.goals">Goals</a>
-                <div class="user-profile">JD</div>
+                <a href="aiagent.html" data-i18n="nav.aiadvisor">AI Advisor</a>
             </nav>
         </div>
     </header>
 
     <div class="dashboard-container">
-
-        <div class="form-header">
-            <h2>Track Your Monthly Finances</h2>
-            <p>Enter your income and expenses to get your Financial Health Score and AI-powered insights.</p>
+        <!-- Page Header -->
+        <div class="page-header">
+            <h2>Monthly Expense Ledger</h2>
+            <p>Record monthly income and categorical outflows to evaluate retained cash flow.</p>
         </div>
 
         <!-- Status Banner -->
-        <div id="statusBanner" class="status-banner" role="alert"></div>
+        <div id="statusBanner" class="status-banner" role="alert" style="display: none;"></div>
 
-        <!-- Overwrite Notice -->
+        <!-- Overwrite Confirmation Notice -->
         <div id="overwriteNotice">
-            <strong>⚠️ You already have saved data for this month.</strong>
-            Submitting will overwrite your existing entries for <span id="overwriteMonth"></span>.
+            <strong>Existing Records Detected:</strong>
+            Submitting will update and overwrite existing ledger entries for <span id="overwriteMonth" style="font-weight: 600;"></span>.
             <div class="notice-actions">
-                <button id="confirmOverwrite" class="btn btn-primary" style="padding: 6px 16px; font-size: 13px;">Yes, Overwrite</button>
-                <button id="cancelOverwrite" class="btn btn-outline" style="padding: 6px 16px; font-size: 13px;">Cancel</button>
+                <button id="confirmOverwrite" class="btn btn-primary btn-sm">Confirm Update</button>
+                <button id="cancelOverwrite" class="btn btn-outline btn-sm">Cancel</button>
             </div>
         </div>
 
         <div class="layout-wrapper">
-
             <!-- Left Column: Input Form -->
             <div class="form-card">
-                <form id="expenseForm" novalidate>
+                <form id="expenseForm" novalidate autocomplete="off">
 
                     <!-- Income Section -->
                     <div class="form-group">
-                        <label class="expense-label" for="monthlyIncome">Monthly Income</label>
-                        <div class="input-group">
+                        <label for="monthlyIncome">Net Monthly Inflow / Income</label>
+                        <div class="input-prefix-wrapper">
                             <span class="input-prefix">₹</span>
                             <input type="number" id="monthlyIncome" class="form-control calc-input"
-                                placeholder="0.00" min="0" step="0.01" autocomplete="off">
+                                placeholder="0.00" min="0" step="0.01">
                         </div>
                         <div class="field-error" id="err-monthlyIncome"></div>
                     </div>
 
-                    <p class="section-title">Monthly Expenses</p>
+                    <p class="section-title">Categorized Outflows</p>
+                    <p class="section-subtitle">Enter monthly departmental commitments.</p>
 
                     <div class="expense-grid">
                         <div class="form-group">
-                            <label class="expense-label" for="expRent">Rent / Hostel</label>
-                            <div class="input-group">
+                            <label for="expRent">Housing &amp; Rent</label>
+                            <div class="input-prefix-wrapper">
                                 <span class="input-prefix">₹</span>
                                 <input type="number" id="expRent" class="form-control calc-input exp-field"
-                                    placeholder="0.00" min="0" step="0.01" autocomplete="off">
+                                    placeholder="0.00" min="0" step="0.01">
                             </div>
                             <div class="field-error" id="err-expRent"></div>
                         </div>
 
                         <div class="form-group">
-                            <label class="expense-label" for="expFood">Food &amp; Groceries</label>
-                            <div class="input-group">
+                            <label for="expFood">Food &amp; Groceries</label>
+                            <div class="input-prefix-wrapper">
                                 <span class="input-prefix">₹</span>
                                 <input type="number" id="expFood" class="form-control calc-input exp-field"
-                                    placeholder="0.00" min="0" step="0.01" autocomplete="off">
+                                    placeholder="0.00" min="0" step="0.01">
                             </div>
                             <div class="field-error" id="err-expFood"></div>
                         </div>
 
                         <div class="form-group">
-                            <label class="expense-label" for="expTransport">Transport</label>
-                            <div class="input-group">
+                            <label for="expTransport">Transportation</label>
+                            <div class="input-prefix-wrapper">
                                 <span class="input-prefix">₹</span>
                                 <input type="number" id="expTransport" class="form-control calc-input exp-field"
-                                    placeholder="0.00" min="0" step="0.01" autocomplete="off">
+                                    placeholder="0.00" min="0" step="0.01">
                             </div>
                             <div class="field-error" id="err-expTransport"></div>
                         </div>
 
                         <div class="form-group">
-                            <label class="expense-label" for="expShopping">Shopping</label>
-                            <div class="input-group">
+                            <label for="expShopping">Discretionary Shopping</label>
+                            <div class="input-prefix-wrapper">
                                 <span class="input-prefix">₹</span>
                                 <input type="number" id="expShopping" class="form-control calc-input exp-field"
-                                    placeholder="0.00" min="0" step="0.01" autocomplete="off">
+                                    placeholder="0.00" min="0" step="0.01">
                             </div>
                             <div class="field-error" id="err-expShopping"></div>
                         </div>
 
                         <div class="form-group">
-                            <label class="expense-label" for="expEntertainment">Entertainment</label>
-                            <div class="input-group">
+                            <label for="expEntertainment">Entertainment &amp; Media</label>
+                            <div class="input-prefix-wrapper">
                                 <span class="input-prefix">₹</span>
                                 <input type="number" id="expEntertainment" class="form-control calc-input exp-field"
-                                    placeholder="0.00" min="0" step="0.01" autocomplete="off">
+                                    placeholder="0.00" min="0" step="0.01">
                             </div>
                             <div class="field-error" id="err-expEntertainment"></div>
                         </div>
 
                         <div class="form-group">
-                            <label class="expense-label" for="expEmi">EMI / Debt Repayment</label>
-                            <div class="input-group">
+                            <label for="expEmi">Debt Servicing &amp; EMI</label>
+                            <div class="input-prefix-wrapper">
                                 <span class="input-prefix">₹</span>
                                 <input type="number" id="expEmi" class="form-control calc-input exp-field"
-                                    placeholder="0.00" min="0" step="0.01" autocomplete="off">
+                                    placeholder="0.00" min="0" step="0.01">
                             </div>
                             <div class="field-error" id="err-expEmi"></div>
                         </div>
 
                         <div class="form-group">
-                            <label class="expense-label" for="expFamily">Family Support</label>
-                            <div class="input-group">
+                            <label for="expFamily">Family Support</label>
+                            <div class="input-prefix-wrapper">
                                 <span class="input-prefix">₹</span>
                                 <input type="number" id="expFamily" class="form-control calc-input exp-field"
-                                    placeholder="0.00" min="0" step="0.01" autocomplete="off">
+                                    placeholder="0.00" min="0" step="0.01">
                             </div>
                             <div class="field-error" id="err-expFamily"></div>
                         </div>
 
                         <div class="form-group">
-                            <label class="expense-label" for="expMisc">Miscellaneous</label>
-                            <div class="input-group">
+                            <label for="expMisc">Miscellaneous Outflows</label>
+                            <div class="input-prefix-wrapper">
                                 <span class="input-prefix">₹</span>
                                 <input type="number" id="expMisc" class="form-control calc-input exp-field"
-                                    placeholder="0.00" min="0" step="0.01" autocomplete="off">
+                                    placeholder="0.00" min="0" step="0.01">
                             </div>
                             <div class="field-error" id="err-expMisc"></div>
                         </div>
                     </div>
 
-                    <!-- Health Score Inputs Section -->
-                    <p class="section-title">Debt Information <span class="optional-badge">Optional – improves score accuracy</span></p>
-                    <p class="section-subtitle">Your EMI is already captured above. Add any additional monthly debt payments here to improve your Debt-to-Income score accuracy.</p>
+                    <!-- Additional Debt Section -->
+                    <p class="section-title">Debt Commitments <span class="optional-badge">Optional</span></p>
+                    <p class="section-subtitle">Add secondary debt obligations outside primary monthly EMI.</p>
 
-                    <div class="expense-grid">
-                        <div class="form-group">
-                            <label class="expense-label" for="outstandingDebt">
-                                Additional Monthly Debt Payments
-                                <span class="optional-badge">Optional</span>
-                            </label>
-                            <div class="input-group">
-                                <span class="input-prefix">₹</span>
-                                <input type="number" id="outstandingDebt" class="form-control calc-input"
-                                    placeholder="e.g. personal loan, credit card" min="0" step="0.01" autocomplete="off">
-                            </div>
-                            <div class="field-error" id="err-outstandingDebt"></div>
+                    <div class="form-group">
+                        <label for="outstandingDebt">Additional Monthly Debt Payments</label>
+                        <div class="input-prefix-wrapper">
+                            <span class="input-prefix">₹</span>
+                            <input type="number" id="outstandingDebt" class="form-control calc-input"
+                                placeholder="0.00" min="0" step="0.01">
                         </div>
+                        <div class="field-error" id="err-outstandingDebt"></div>
                     </div>
 
-                    <div style="margin-top: 30px; text-align: right;">
-                        <button type="submit" id="submitBtn" class="btn btn-primary btn-large">Save &amp; Analyze</button>
+                    <div style="margin-top: 32px; text-align: right;">
+                        <button type="submit" id="submitBtn" class="btn btn-primary btn-large">
+                            Save &amp; Analyze Ledger
+                        </button>
                     </div>
                 </form>
             </div>
@@ -465,7 +376,7 @@
             <!-- Right Column: Live Summary -->
             <div>
                 <div class="summary-card">
-                    <h3 style="margin-top: 0; margin-bottom: 20px; font-weight: 600; font-size: 16px;">📊 Live Financial Overview</h3>
+                    <h3>Live Position</h3>
 
                     <div class="summary-row">
                         <span class="summary-label">Monthly Income</span>
@@ -473,47 +384,41 @@
                     </div>
 
                     <div class="summary-row">
-                        <span class="summary-label">Total Expenses</span>
+                        <span class="summary-label">Total Outflows</span>
                         <span class="summary-value" id="dispExpenses">₹0.00</span>
                     </div>
 
                     <div class="summary-row total-balance">
-                        <span class="summary-label">Remaining Balance</span>
+                        <span class="summary-label">Net Balance</span>
                         <span class="summary-value" id="dispBalance">₹0.00</span>
                     </div>
 
                     <div class="savings-rate-row">
-                        <span>Savings Rate</span>
-                        <span id="dispSavingsRate" style="font-weight: 700;">—</span>
+                        <span style="color: #D2DCD4;">Savings Rate</span>
+                        <span id="dispSavingsRate" style="font-weight: 600;">—</span>
                     </div>
 
-                    <div id="aiInsight"
-                        style="margin-top: 15px; font-size: 13px; line-height: 1.6; background: rgba(255,255,255,0.1); padding: 12px; border-radius: 8px;">
-                        Enter your monthly figures to see your projected financial health score and savings rate.
+                    <div id="aiInsight" class="insight-box">
+                        Enter monthly inflow and expense parameters to generate your live financial rating and savings rate.
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 
     <!-- Bad Habit Alert Modal -->
-    <div id="badHabitModal"
-        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000;">
-        <div
-            style="background: white; padding: 30px; border-radius: 16px; max-width: 400px; width: 90%; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
-            <div style="font-size: 40px; color: #ff3b30; margin-bottom: 15px;">
-                <i class="fas fa-exclamation-triangle"></i>
+    <div id="badHabitModal" style="display: none; position: fixed; inset: 0; background: rgba(24, 40, 32, 0.6); backdrop-filter: blur(4px); align-items: center; justify-content: center; z-index: 1000; padding: 20px;">
+        <div style="background: var(--surface-card); padding: 32px; border-radius: var(--radius-xl); max-width: 440px; width: 100%; text-align: left; box-shadow: var(--shadow-lg); border: 1px solid var(--border-color);">
+            <div style="display: flex; align-items: center; gap: 10px; color: var(--color-warning); margin-bottom: 12px;">
+                <i class="fas fa-exclamation-triangle" style="font-size: 20px;"></i>
+                <h3 style="font-size: 17px; font-weight: 700; color: var(--primary-forest); margin: 0;">Spending Advisory Detected</h3>
             </div>
-            <h3 style="font-size: 22px; color: #1a1a1a; margin-bottom: 10px;">Warning: Spending Pattern Detected</h3>
-            <p id="badHabitMessage" style="color: #666; font-size: 15px; margin-bottom: 25px; line-height: 1.5;"></p>
-            <button id="closeHabitModal" class="btn btn-primary"
-                style="width: 100%; padding: 12px; border-radius: 8px;">I Understand</button>
+            <p id="badHabitMessage" style="color: var(--text-secondary); font-size: 14px; margin-bottom: 24px; line-height: 1.55;"></p>
+            <button id="closeHabitModal" class="btn btn-primary" style="width: 100%;">Acknowledge &amp; Proceed</button>
         </div>
     </div>
 
-    <!-- Scripts -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <!-- Initialization Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabaseClient.js"></script>
     <script src="js/i18n.js"></script>

@@ -229,29 +229,29 @@ document.addEventListener('DOMContentLoaded', async () => {
             dispSavingsRate.textContent = income === 0 ? 'No income' : '—';
         } else {
             dispSavingsRate.textContent = savingsRate.toFixed(1) + '%';
-            dispSavingsRate.style.color = savingsRate >= 0 ? '#4cd964' : '#ff3b30';
+            dispSavingsRate.style.color = savingsRate >= 0 ? '#86EFAC' : '#FCA5A5';
         }
 
         // AI insight
         if (income === 0 && totalExpenses === 0) {
-            aiInsight.textContent = 'Enter your monthly figures to see your projected financial health score and savings rate.';
-            aiInsight.style.backgroundColor = 'rgba(255,255,255,0.1)';
+            aiInsight.textContent = 'Enter monthly inflow and expense parameters to generate your live financial rating and savings rate.';
+            aiInsight.style.backgroundColor = 'rgba(255,255,255,0.08)';
         } else if (income === 0 && totalExpenses > 0) {
-            aiInsight.innerHTML = `⚠️ <strong>No Income Recorded.</strong> You have ₹${totalExpenses.toLocaleString('en-IN')} in expenses but no income. Please enter your monthly income.`;
-            aiInsight.style.backgroundColor = 'rgba(255, 59, 48, 0.2)';
+            aiInsight.innerHTML = `<strong>Inflow Required:</strong> You have recorded ${formatCurrency(totalExpenses)} in expenses without recorded income. Please provide monthly income to calculate savings.`;
+            aiInsight.style.backgroundColor = 'rgba(182, 92, 75, 0.2)';
         } else if (balance !== null && balance < 0) {
             const deficit = Math.abs(balance);
-            aiInsight.innerHTML = `🚨 <strong>Deficit of ${formatCurrency(deficit)}.</strong> Your expenses exceed your income by this amount. Identify categories to reduce immediately.`;
-            aiInsight.style.backgroundColor = 'rgba(255, 59, 48, 0.2)';
+            aiInsight.innerHTML = `<strong>Deficit Position:</strong> Monthly expenditures exceed net income by ${formatCurrency(deficit)}. Review variable categories to eliminate the deficit.`;
+            aiInsight.style.backgroundColor = 'rgba(182, 92, 75, 0.2)';
         } else if (balance === 0) {
-            aiInsight.innerHTML = `⚖️ You are breaking exactly even. Try to save even a small amount — aim for at least 5% of your income as an emergency cushion.`;
-            aiInsight.style.backgroundColor = 'rgba(255, 204, 0, 0.2)';
+            aiInsight.innerHTML = `<strong>Neutral Position:</strong> Cash flow is breaking even. Target retaining at least 5% of monthly income to build essential liquidity.`;
+            aiInsight.style.backgroundColor = 'rgba(164, 123, 53, 0.2)';
         } else if (savingsRate !== null && savingsRate >= 20) {
-            aiInsight.innerHTML = `🌟 <strong>Great job!</strong> Your savings rate is ${savingsRate.toFixed(1)}%. This puts you on track toward your financial goals. Keep it up!`;
-            aiInsight.style.backgroundColor = 'rgba(76, 217, 100, 0.2)';
+            aiInsight.innerHTML = `<strong>Target Reached:</strong> Savings rate is currently ${savingsRate.toFixed(1)}%, meeting the recommended institutional 20% benchmark.`;
+            aiInsight.style.backgroundColor = 'rgba(54, 122, 83, 0.2)';
         } else if (savingsRate !== null) {
-            aiInsight.innerHTML = `💡 Your savings rate is ${savingsRate.toFixed(1)}%. Aim for at least 20% by reducing variable expenses. Even small cuts add up!`;
-            aiInsight.style.backgroundColor = 'rgba(255, 204, 0, 0.2)';
+            aiInsight.innerHTML = `<strong>Positive Reserve:</strong> Savings rate is ${savingsRate.toFixed(1)}%. Aiming for 20% via discretionary adjustments will accelerate milestone achievement.`;
+            aiInsight.style.backgroundColor = 'rgba(82, 118, 93, 0.2)';
         }
     }
 
@@ -634,7 +634,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         submitBtn.classList.remove('btn-loading');
 
         if (!success) {
-            showStatus('error', '❌ Failed to save data. Please check your connection and try again.');
+            showStatus('error', 'Failed to save financial data. Please check your network connection and retry.');
             return;
         }
 
@@ -648,7 +648,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 window.location.href = 'dashboard.html';
             };
         } else {
-            showStatus('success', `✅ Financial data saved for ${getMonthName(currentMonth)}! Redirecting to your dashboard...`);
+            showStatus('success', `Financial records verified and saved for ${getMonthName(currentMonth)}. Redirecting to dashboard...`);
             setTimeout(() => { window.location.href = 'dashboard.html'; }, 1500);
         }
     }

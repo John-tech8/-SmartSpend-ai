@@ -29,16 +29,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             else if (latest.health_score >= 40) grade = 'B';
             else if (latest.health_score >= 20) grade = 'C';
 
-            // Display "Financial Health Score: 67% (Grade A)" as requested
-            scoreElement.innerHTML = `<span style="font-size: 24px;">${latest.health_score}%</span> <span style="font-size: 16px; opacity: 0.9;">(Grade ${grade})</span>`;
+            // Display institutional health score
+            scoreElement.innerHTML = `<span style="font-size: 32px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--text-primary);">${latest.health_score}</span><span style="font-size: 16px; color: var(--text-secondary); margin-right: 8px;">/100</span> <span class="health-badge" style="background: var(--color-light-green); color: var(--color-primary-forest); padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">Grade ${grade}</span>`;
 
-            // Optional: You could add a button to go see full details
-            actionElement.innerHTML = `<a href="dashboard.html" class="btn btn-outline" style="padding: 5px 15px; font-size: 13px; border-color: white; color: white;">View Details</a>`;
+            // Clean institutional link
+            actionElement.innerHTML = `<a href="dashboard.html" class="btn btn-outline" style="font-size: 13px; padding: 6px 14px;">View Score Telemetry <i class="fas fa-arrow-right" style="font-size: 11px; margin-left: 4px;"></i></a>`;
 
         } else {
             // User has no report yet
-            scoreElement.innerHTML = '-';
-            actionElement.innerHTML = `<a href="dashboard.html" class="btn btn-primary" style="padding: 8px 16px; font-size: 14px; background: white; color: #2B61FF; border: none; font-weight: 600;">Check Your Financial Health Score</a>`;
+            scoreElement.innerHTML = `<span style="font-size: 28px; font-weight: 600; color: var(--text-secondary);">&mdash;</span>`;
+            actionElement.innerHTML = `<a href="dashboard.html" class="btn btn-primary" style="font-size: 13px; padding: 8px 16px;">Calculate Health Score</a>`;
         }
 
     } catch (e) {

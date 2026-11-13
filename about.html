@@ -4,53 +4,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About SmartSpend – AI Financial Advisor</title>
+    <title>About SmartSpend – Institutional Methodology & Mission</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Design System Stylesheets -->
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/animations.css">
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .about-section {
-            padding: 80px 20px;
-            background-color: #f8f9fa;
+        .about-hero {
+            padding: 56px 0 40px 0;
             text-align: center;
         }
 
-        .about-container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-        }
-
-        .about-header {
-            font-size: 32px;
-            color: #1a1a1a;
-            margin-bottom: 20px;
+        .about-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 12px;
+            background-color: var(--color-light-green);
+            color: var(--color-primary-forest);
+            border-radius: var(--radius-sm);
+            font-size: 11px;
             font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 16px;
         }
 
-        .about-description {
-            font-size: 18px;
-            line-height: 1.8;
-            color: #555;
-            text-align: left;
+        .about-card {
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-container);
+            box-shadow: var(--shadow-sm);
+            padding: 48px;
+            margin-bottom: 64px;
+            max-width: 840px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .pillar-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin: 28px 0;
+        }
+
+        @media (max-width: 768px) {
+            .about-card {
+                padding: 24px;
+            }
+            .pillar-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .pillar-item {
+            background-color: var(--bg-page);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-card);
+            padding: 20px;
+        }
+
+        .pillar-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .pillar-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            background-color: var(--color-light-green);
+            color: var(--color-primary-forest);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+        }
+
+        .pillar-desc {
+            font-size: 13px;
+            line-height: 1.55;
+            color: var(--text-secondary);
         }
     </style>
 </head>
 
 <body>
-    <!-- Navigation -->
+    <!-- Standard Navigation -->
     <header class="navbar">
         <div class="container">
-            <a href="index.html" class="logo"><i class="fas fa-chart-line" style="margin-right: 8px;"></i>SmartSpend</a>
-            <nav class="nav-links" style="display: flex; align-items: center; gap: 15px;">
+            <a href="index.html" class="logo"><span class="logo-mark"></span> SmartSpend</a>
+            <nav class="nav-links">
+                <select id="languageSelector" class="lang-select">
+                    <option value="en">English</option>
+                    <option value="hi">हिंदी (Hindi)</option>
+                    <option value="ta">தமிழ் (Tamil)</option>
+                </select>
                 <div class="dropdown">
-                    <a href="index.html#features" class="dropbtn" data-i18n="nav.features">Features <i
-                            class="fas fa-chevron-down" style="font-size: 10px; margin-left: 5px;"></i></a>
+                    <a href="index.html#features" class="dropbtn" data-i18n="nav.features">Features <i class="fas fa-chevron-down" style="font-size: 10px; margin-left: 5px;"></i></a>
                     <div class="dropdown-content">
                         <a href="expenses.html">Expense Analysis</a>
                         <a href="dashboard.html">Financial Health Score</a>
@@ -58,78 +121,114 @@
                         <a href="monthlyreport.html">Monthly Report</a>
                     </div>
                 </div>
-                <a href="about.html" data-i18n="nav.about">About</a>
-                <a href="aiagent.html" data-i18n="nav.advisor">AI Advisor</a>
-                <a href="login.html" class="nav-btn" data-i18n="nav.login">Login</a>
-                <a href="signup.html" class="nav-btn primary" data-i18n="nav.signup">Sign Up</a>
-                <select id="languageSelector" class="lang-select">
-                    <option value="en">English</option>
-                    <option value="hi">हिंदी (Hindi)</option>
-                    <option value="ta">தமிழ் (Tamil)</option>
-                </select>
+                <a href="about.html" class="active" data-i18n="nav.about">About</a>
+                <a href="aiagent.html" data-i18n="nav.aiadvisor">AI Advisor</a>
+                <a href="login.html" data-i18n="nav.login">Login</a>
+                <a href="signup.html" class="btn btn-primary" data-i18n="nav.signup">Sign Up</a>
             </nav>
         </div>
     </header>
 
-    <!-- Header Section -->
-    <section class="hero"
-        style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 40vh;">
-        <div class="container hero-content" style="text-align: center; max-width: 800px;">
-            <h1 class="hero-title">SmartSpend – AI Financial Advisor</h1>
-        </div>
-    </section>
+    <main class="container">
+        <!-- Hero Header -->
+        <section class="about-hero">
+            <div class="about-eyebrow">Institutional Mission & Framework</div>
+            <h1 style="font-size: 36px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em; margin-bottom: 12px;">
+                Democratizing Financial Telemetry
+            </h1>
+            <p style="font-size: 16px; color: var(--text-secondary); max-width: 620px; margin: 0 auto; line-height: 1.6;">
+                Built on modern banking engineering and deterministic math to empower first-time earners with institutional-level capital management.
+            </p>
+        </section>
 
-    <!-- About Content Section -->
-    <section class="about-section">
-        <div class="about-container">
-            <h2 class="about-header">About SmartSpend</h2>
-            <div class="about-description">
-                <p>Welcome to <strong>SmartSpend</strong>, your personal AI-powered financial assistant designed to help
-                    users manage their money effectively. Managing finances can be intimidating, especially for
-                    first-time earners navigating adult responsibilities, loans, and everyday expenses. Our goal is to
-                    make financial planning simple, smart, and accessible for everyone.</p>
+        <!-- Main Narrative Card -->
+        <article class="about-card">
+            <h2 style="font-size: 22px; font-weight: 700; color: var(--text-primary); margin-bottom: 16px; letter-spacing: -0.01em;">
+                About SmartSpend
+            </h2>
+            <p style="font-size: 15px; line-height: 1.7; color: var(--text-secondary); margin-bottom: 24px;">
+                Managing personal cash flow can be intimidating, particularly for first-time earners navigating full-time compensation, credit responsibilities, student debt, and volatile lifestyle costs. SmartSpend was engineered to replace emotional financial decisions with structured, deterministic telemetry.
+            </p>
 
-                <h3 style="margin-top: 30px; font-weight: 600; color: #333;">Our Mission</h3>
-                <p>We are on a mission to democratize financial intelligence. We believe that professional financial
-                    advice should not be a luxury reserved for the wealthy. Through advanced AI and intuitive design,
-                    SmartSpend provides personalized, real-time insights that empower young professionals to take
-                    definitive control over their financial futures.</p>
+            <h3 style="font-size: 18px; font-weight: 600; color: var(--text-primary); margin-top: 32px; margin-bottom: 12px;">
+                Our Mission
+            </h3>
+            <p style="font-size: 15px; line-height: 1.7; color: var(--text-secondary); margin-bottom: 24px;">
+                We believe that institutional-grade financial intelligence should not be a proprietary service reserved for private wealth clients. By combining zero-drift financial algorithms with transparent, audit-ready data models, SmartSpend equips emerging professionals with the exact tools needed to accumulate enduring wealth.
+            </p>
 
-                <h3 style="margin-top: 30px; font-weight: 600; color: #333;">Why We Created SmartSpend</h3>
-                <p>The transition from a student budget to managing a full-time salary comes with unique challenges. Too
-                    often, young earners fall into common traps like lifestyle inflation, high-interest debt, or
-                    neglecting an emergency fund. SmartSpend was built to act as a safeguard against these pitfalls. By
-                    automatically tracking expenses and analyzing spending patterns, we help users visualize where their
-                    money goes before it disappears.</p>
+            <h3 style="font-size: 18px; font-weight: 600; color: var(--text-primary); margin-top: 32px; margin-bottom: 12px;">
+                Why We Built SmartSpend
+            </h3>
+            <p style="font-size: 15px; line-height: 1.7; color: var(--text-secondary); margin-bottom: 24px;">
+                The transition from university life to corporate compensation is characterized by lifestyle inflation and opaque balance sheets. Without an objective framework, income rises while real savings stagnate. SmartSpend establishes an uncompromising benchmark: precise monthly ledgers, disciplined debt ratios, and an objective solvency score.
+            </p>
 
-                <h3 style="margin-top: 30px; font-weight: 600; color: #333;">How We Help You Succeed</h3>
-                <ul style="padding-left: 20px; text-align: left; margin-top: 15px; margin-bottom: 25px;">
-                    <li style="margin-bottom: 10px;"><strong>Automated Expense Tracking:</strong> Categorize and monitor
-                        your spending habits seamlessly.</li>
-                    <li style="margin-bottom: 10px;"><strong>Goal-Based Saving:</strong> Whether it's a new car or an
-                        emergency fund, set clear goals and track your progress daily.</li>
-                    <li style="margin-bottom: 10px;"><strong>Financial Health Scoring:</strong> Get a holistic view of
-                        your financial well-being based on saving rates, debt ratios, and consistency in positive
-                        financial behaviors.</li>
-                    <li style="margin-bottom: 10px;"><strong>AI-Powered Advice:</strong> Receive context-aware advice to
-                        cut unnecessary costs, optimize budgets, and improve your financial health score over time.</li>
-                </ul>
+            <h3 style="font-size: 18px; font-weight: 600; color: var(--text-primary); margin-top: 32px; margin-bottom: 16px;">
+                Core Architectural Pillars
+            </h3>
+            <div class="pillar-grid">
+                <div class="pillar-item">
+                    <div class="pillar-title">
+                        <span class="pillar-icon"><i class="fas fa-calculator"></i></span>
+                        <span>Deterministic Math</span>
+                    </div>
+                    <p class="pillar-desc">
+                        Every calculation adheres to verified decimal precision. Zero NaN leaks, division safeguards, and strict input validation.
+                    </p>
+                </div>
 
-                <h3 style="margin-top: 30px; font-weight: 600; color: #333;">Our Vision</h3>
-                <p>Looking ahead, we envision a world where financial literacy is intuitive. We are constantly evolving
-                    the SmartSpend platform to introduce broader wealth management features, including guided investment
-                    options and tailored content to help our users transition from managing debt and expenses to
-                    actively building long-term generational wealth.</p>
-                <p style="margin-top: 20px; font-weight: 500; text-align: center; color: #2B61FF;">Join us on the
-                    journey to smarter spending.</p>
+                <div class="pillar-item">
+                    <div class="pillar-title">
+                        <span class="pillar-icon"><i class="fas fa-shield-alt"></i></span>
+                        <span>Solvency Scoring</span>
+                    </div>
+                    <p class="pillar-desc">
+                        A multi-factor algorithmic rating assessing savings efficiency, debt exposure, and peer percentile distribution.
+                    </p>
+                </div>
+
+                <div class="pillar-item">
+                    <div class="pillar-title">
+                        <span class="pillar-icon"><i class="fas fa-bullseye"></i></span>
+                        <span>Milestone Forecasting</span>
+                    </div>
+                    <p class="pillar-desc">
+                        Target amortization modeling that projects verifiable target achievement dates based on actual monthly cash surplus.
+                    </p>
+                </div>
+
+                <div class="pillar-item">
+                    <div class="pillar-title">
+                        <span class="pillar-icon"><i class="fas fa-user-shield"></i></span>
+                        <span>Data Sovereignty</span>
+                    </div>
+                    <p class="pillar-desc">
+                        Row-level security enforcement with Supabase PostgreSQL, ensuring your financial records remain strictly private and encrypted.
+                    </p>
+                </div>
             </div>
-        </div>
-    </section>
 
-    <!-- Footer -->
+            <div style="border-top: 1px solid var(--border); padding-top: 28px; margin-top: 36px; text-align: center;">
+                <p style="font-size: 15px; font-weight: 600; color: var(--color-primary-forest); margin-bottom: 16px;">
+                    Take the first step toward institutional financial discipline.
+                </p>
+                <a href="expenses.html" class="btn btn-primary" style="padding: 10px 24px;">
+                    Open Financial Ledger
+                </a>
+            </div>
+        </article>
+    </main>
+
+    <!-- Standard Footer -->
     <footer class="footer">
-        <div class="container" style="text-align: center;">
-            <p>&copy; 2026 SmartSpend. All rights reserved.</p>
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+            <p>&copy; 2026 SmartSpend Systems Inc. All rights reserved.</p>
+            <div style="display: flex; gap: 20px; font-size: 13px; color: var(--text-secondary);">
+                <span>Institutional Finance</span>
+                <span>Audit-Ready Records</span>
+                <span>Deterministic Analytics</span>
+            </div>
         </div>
     </footer>
 

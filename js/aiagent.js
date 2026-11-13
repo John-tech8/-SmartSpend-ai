@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (response.ok) {
                 appendMessage('ai', data.reply);
             } else {
-                appendMessage('ai', '⚠️ Error: ' + (data.reply || data.error || 'Failed to fetch response. Make sure the server is running.'));
+                appendMessage('ai', 'Error: ' + (data.reply || data.error || 'Failed to fetch response. Make sure the server is running.'));
             }
 
         } catch (error) {
@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (loadingBubble) {
                 loadingBubble.remove();
             }
-            appendMessage('ai', '⚠️ Server connection error. Make sure your local Node server is running.');
+            appendMessage('ai', 'Server connection error. Make sure your local Node server is running.');
         }
     });
 });

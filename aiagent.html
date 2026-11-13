@@ -4,102 +4,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SmartSpend AI Financial Advisor</title>
+    <title>SmartSpend – Institutional AI Financial Advisor</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Design System Stylesheets -->
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
-            background-color: var(--bg-color, #F8FAFD);
+            background-color: var(--bg-page);
             display: flex;
             flex-direction: column;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
+        }
+
+        .advisor-workspace {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-width: 920px;
+            width: 100%;
+            margin: 24px auto 32px auto;
+            padding: 0 16px;
+        }
+
+        .chat-card {
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-container);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 160px);
+            min-height: 540px;
             overflow: hidden;
         }
 
-        .chat-header {
-            background: #fff;
-            padding: 15px 20px;
+        .chat-card-header {
+            padding: 16px 24px;
+            background-color: var(--surface);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .advisor-meta {
             display: flex;
             align-items: center;
-            border-bottom: 1px solid var(--border-color, #E2E8F0);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            z-index: 10;
-        }
-
-        .back-btn {
-            text-decoration: none;
-            color: var(--primary-blue, #2B61FF);
-            font-weight: 600;
-            margin-right: 20px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .back-btn:hover {
-            opacity: 0.8;
-        }
-
-        .chat-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--text-main, #1A202C);
-            margin: 0;
-        }
-
-        .chat-container {
-            height: 70vh;
-            overflow-y: auto;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
             gap: 12px;
-            scroll-behavior: smooth;
         }
 
-        .chat-messages {
+        .advisor-avatar {
+            width: 36px;
+            height: 36px;
+            background-color: var(--color-light-green);
+            color: var(--color-primary-forest);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .advisor-status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--color-income);
+        }
+
+        .advisor-status-dot {
+            width: 6px;
+            height: 6px;
+            background-color: var(--color-income);
+            border-radius: 50%;
+        }
+
+        .chat-messages-scroll {
             flex: 1;
-            padding: 30px 20px;
+            padding: 24px;
             overflow-y: auto;
             scroll-behavior: smooth;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 16px;
+            background-color: var(--bg-page);
         }
 
         .message {
-            max-width: 70%;
-            padding: 12px 16px;
-            border-radius: 14px;
+            max-width: 78%;
+            padding: 14px 18px;
             font-size: 14px;
-            line-height: 1.5;
-            animation: fadeIn 0.3s ease forwards;
+            line-height: 1.6;
+            border-radius: var(--radius-card);
+            animation: fadeIn 0.2s ease forwards;
             position: relative;
         }
 
         .msg-ai {
             align-self: flex-start;
-            background: #f1f3f7;
-            color: #333;
+            background-color: var(--surface);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            border-bottom-left-radius: 2px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
         }
 
-        .msg-user {
-            align-self: flex-end;
-            background: #2f6df6;
-            color: white;
+        .msg-ai strong {
+            font-weight: 600;
+            color: var(--color-primary-forest);
         }
 
-        .msg-loading {
-            align-self: flex-start;
-            background-color: #F8FAFD;
-            color: #718096;
-            border: 1px solid #E2E8F0;
-            border-bottom-left-radius: 4px;
-            font-style: italic;
-        }
-
-        /* Markdown support inside AI response */
         .msg-ai p {
             margin-bottom: 10px;
         }
@@ -110,134 +134,179 @@
 
         .msg-ai ul,
         .msg-ai ol {
-            margin-left: 20px;
+            margin-left: 18px;
             margin-bottom: 10px;
         }
 
-        .msg-ai strong {
-            font-weight: 600;
-            color: #2B61FF;
+        .msg-user {
+            align-self: flex-end;
+            background-color: var(--color-primary-forest);
+            color: #FFFFFF;
+            border-bottom-right-radius: 2px;
         }
 
-        .chat-input-area {
-            padding: 20px;
-            background: #fff;
-            border-top: 1px solid var(--border-color, #E2E8F0);
-        }
-
-        .input-form {
-            display: flex;
-            gap: 15px;
-        }
-
-        .chat-input {
-            flex: 1;
-            padding: 16px 20px;
-            border: 2px solid #E2E8F0;
-            border-radius: 25px;
-            outline: none;
-            font-size: 15px;
-            font-family: inherit;
-            transition: all 0.3s ease;
-            background-color: #F8FAFD;
-        }
-
-        .chat-input:focus {
-            background-color: #fff;
-            border-color: #2B61FF;
-            box-shadow: 0 0 0 3px rgba(43, 97, 255, 0.1);
-        }
-
-        .send-btn {
-            background: linear-gradient(135deg, #2B61FF 0%, #1545CB 100%);
-            color: white;
-            border: none;
-            width: 55px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 16px;
-            transition: all 0.3s ease;
+        .msg-loading {
+            align-self: flex-start;
+            background-color: var(--surface);
+            color: var(--text-secondary);
+            border: 1px dashed var(--border);
+            border-bottom-left-radius: 2px;
+            font-size: 13px;
             display: flex;
             align-items: center;
-            justify-content: center;
+            gap: 8px;
         }
 
-        .send-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(43, 97, 255, 0.2);
+        .chat-input-bar {
+            padding: 16px 20px;
+            background-color: var(--surface);
+            border-top: 1px solid var(--border);
+        }
+
+        .chat-input-form {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .chat-text-input {
+            flex: 1;
+            height: 44px;
+            padding: 0 16px;
+            font-size: 14px;
+            font-family: inherit;
+            color: var(--text-primary);
+            background-color: var(--bg-page);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-input);
+            outline: none;
+            transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+        }
+
+        .chat-text-input:focus {
+            background-color: var(--surface);
+            border-color: var(--color-secondary-sage);
+            box-shadow: 0 0 0 3px rgba(82, 118, 93, 0.12);
+        }
+
+        .chat-send-btn {
+            height: 44px;
+            padding: 0 20px;
+            background-color: var(--color-primary-forest);
+            color: #FFFFFF;
+            border: none;
+            border-radius: var(--radius-btn);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color var(--transition-fast);
+        }
+
+        .chat-send-btn:hover {
+            background-color: #243b30;
         }
 
         @keyframes fadeIn {
             from {
                 opacity: 0;
-                transform: translateY(10px);
+                transform: translateY(6px);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
-            }
-        }
-
-        /* Responsive Mobile Layout */
-        @media (max-width: 768px) {
-            .chat-container {
-                border: none;
-                box-shadow: none;
-            }
-
-            .message {
-                max-width: 90%;
             }
         }
     </style>
 </head>
 
 <body>
-
-    <header class="chat-header" style="justify-content: space-between;">
-        <div style="display: flex; align-items: center;">
-            <a href="index.html" class="back-btn" data-i18n="nav.back">&larr; Back</a>
-            <h1 class="chat-title" data-i18n="nav.advisor">SmartSpend AI Financial Advisor</h1>
+    <!-- Standard Navigation -->
+    <header class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo"><span class="logo-mark"></span> SmartSpend</a>
+            <nav class="nav-links">
+                <select id="languageSelector" class="lang-select">
+                    <option value="en">English</option>
+                    <option value="hi">हिंदी (Hindi)</option>
+                    <option value="ta">தமிழ் (Tamil)</option>
+                </select>
+                <div class="dropdown">
+                    <a href="index.html#features" class="dropbtn" data-i18n="nav.features">Features <i class="fas fa-chevron-down" style="font-size: 10px; margin-left: 5px;"></i></a>
+                    <div class="dropdown-content">
+                        <a href="expenses.html">Expense Analysis</a>
+                        <a href="dashboard.html">Financial Health Score</a>
+                        <a href="goals.html">Goal Tracker</a>
+                        <a href="monthlyreport.html">Monthly Report</a>
+                    </div>
+                </div>
+                <a href="about.html" data-i18n="nav.about">About</a>
+                <a href="aiagent.html" class="active" data-i18n="nav.aiadvisor">AI Advisor</a>
+                <a href="login.html" data-i18n="nav.login">Login</a>
+                <a href="signup.html" class="btn btn-primary" data-i18n="nav.signup">Sign Up</a>
+            </nav>
         </div>
-        <select id="languageSelector" class="lang-select"
-            style="padding: 5px 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 14px; background-color: white;">
-            <option value="en">English</option>
-            <option value="hi">हिंदी (Hindi)</option>
-            <option value="ta">தமிழ் (Tamil)</option>
-        </select>
     </header>
 
-    <div class="chat-container">
-        <div class="chat-messages" id="chatArea">
-            <!-- Initial Greeting -->
-            <div class="message msg-ai">
-                Hi! I'm your SmartSpend AI Financial Advisor. I have context about your finances from the dashboard. How
-                can I help you today?
+    <!-- Advisor Chat Workspace -->
+    <main class="advisor-workspace">
+        <div class="chat-card">
+            <!-- Header bar -->
+            <div class="chat-card-header">
+                <div class="advisor-meta">
+                    <div class="advisor-avatar">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div>
+                        <div style="font-size: 15px; font-weight: 600; color: var(--text-primary);">
+                            SmartSpend Financial Advisor
+                        </div>
+                        <div class="advisor-status-badge">
+                            <span class="advisor-status-dot"></span> Telemetry Engine Connected
+                        </div>
+                    </div>
+                </div>
+                <a href="dashboard.html" class="btn btn-outline" style="font-size: 12px; padding: 6px 12px;">
+                    <i class="fas fa-chart-line" style="margin-right: 6px;"></i> Health Scorecard
+                </a>
+            </div>
+
+            <!-- Messages Scroll Area -->
+            <div class="chat-messages-scroll" id="chatArea">
+                <!-- Initial Welcome Message -->
+                <div class="message msg-ai">
+                    <p><strong>Institutional Financial Advisory</strong></p>
+                    <p>
+                        Welcome. I am your SmartSpend automated financial analyst. I evaluate your monthly cash inflows, category expenditures, and debt-to-savings ratios to deliver objective, deterministic recommendations.
+                    </p>
+                    <p style="font-size: 13px; color: var(--text-secondary); margin-top: 6px;">
+                        Try querying: <em>"How do I optimize my savings rate to reach 30%?"</em> or <em>"What is the benchmark ratio for discretionary spending?"</em>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Chat Input Area -->
+            <div class="chat-input-bar">
+                <form class="chat-input-form" id="chatForm">
+                    <input type="text" id="userInput" class="chat-text-input"
+                        placeholder="Inquire about budgeting ratios, milestone amortization, or expense reduction..." required autocomplete="off">
+                    <button type="submit" class="chat-send-btn">
+                        <span>Send</span>
+                        <i class="fas fa-paper-plane" style="font-size: 12px;"></i>
+                    </button>
+                </form>
             </div>
         </div>
-
-        <div class="chat-input-area">
-            <form class="input-form" id="chatForm">
-                <input type="text" id="userInput" class="chat-input"
-                    placeholder="Ask about budgeting, saving, or cutting expenses..." required autocomplete="off">
-                <button type="submit" class="send-btn">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="22" y1="2" x2="11" y2="13"></line>
-                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                    </svg>
-                </button>
-            </form>
-        </div>
-    </div>
+    </main>
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabaseClient.js"></script>
     <script src="js/i18n.js"></script>
     <script src="js/aiagent.js"></script>
+    <script src="js/app.js"></script>
 </body>
 
 </html>

@@ -419,13 +419,13 @@ async function renderDashboard({
 
         if (foodPct > 30) {
             aiWarning.style.display = 'block';
-            aiWarning.innerHTML = `<strong>⚠️ AI Note:</strong> Food & Groceries accounts for ${foodPct.toFixed(1)}% of your income (above the 30% threshold). Consider meal planning and home cooking to reduce this cost.`;
+            aiWarning.innerHTML = `<strong>Advisory:</strong> Food &amp; Groceries accounts for ${foodPct.toFixed(1)}% of your income (exceeding the 30% guideline). Consider meal planning and reduced dining to recover cash flow.`;
         } else if (shopPct > 15) {
             aiWarning.style.display = 'block';
-            aiWarning.innerHTML = `<strong>⚠️ AI Note:</strong> Shopping accounts for ${shopPct.toFixed(1)}% of your income. Try the 24-hour rule before non-essential purchases.`;
+            aiWarning.innerHTML = `<strong>Advisory:</strong> Discretionary shopping accounts for ${shopPct.toFixed(1)}% of income. Implementing a 24-hour review rule before discretionary purchases is recommended.`;
         } else if (emiPct > 43) {
             aiWarning.style.display = 'block';
-            aiWarning.innerHTML = `<strong>⚠️ AI Note:</strong> Your EMI payments are ${emiPct.toFixed(1)}% of income, which is a high debt burden. Consider refinancing or accelerating debt payoff.`;
+            aiWarning.innerHTML = `<strong>High Debt Notice:</strong> EMI payments represent ${emiPct.toFixed(1)}% of your monthly income. Prioritize debt restructuring or accelerated principal reduction.`;
         } else {
             aiWarning.style.display = 'none';
         }
@@ -555,8 +555,14 @@ async function renderDashboard({
             });
         } else {
             const bgColors = [
-                '#4F46E5', '#22C55E', '#38BDF8', '#F59E0B',
-                '#EC4899', '#8B5CF6', '#94A3B8', '#F97316'
+                '#182820', // Forest
+                '#52765D', // Sage
+                '#B65C4B', // Terracotta
+                '#A47B35', // Ochre
+                '#52749A', // Slate
+                '#367A53', // Deep Income Green
+                '#8E9990', // Neutral Sand
+                '#C4B9A7'  // Warm Wheat
             ];
 
             new Chart(ctx, {
@@ -566,23 +572,24 @@ async function renderDashboard({
                     datasets: [{
                         data: chartData,
                         backgroundColor: bgColors.slice(0, chartLabels.length),
-                        borderWidth: 2,
-                        borderColor: '#fff',
-                        hoverOffset: 12
+                        borderWidth: 1.5,
+                        borderColor: '#FFFFFF',
+                        hoverOffset: 6
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    animation: { animateScale: true, animateRotate: true, duration: 1200, easing: 'easeOutQuart' },
+                    animation: { animateScale: true, animateRotate: true, duration: 600, easing: 'easeOutQuart' },
                     plugins: {
                         legend: {
                             position: 'right',
-                            labels: { padding: 20, usePointStyle: true, font: { family: "'Inter', sans-serif", size: 13 } }
+                            labels: { padding: 14, usePointStyle: true, font: { family: "'Inter', sans-serif", size: 12 } }
                         },
                         tooltip: {
-                            backgroundColor: 'rgba(0,0,0,0.85)',
-                            padding: 15,
+                            backgroundColor: '#182820',
+                            padding: 12,
+                            bodyFont: { family: "'Inter', sans-serif", size: 13 },
                             callbacks: {
                                 label(context) {
                                     const val  = context.parsed;
@@ -592,7 +599,7 @@ async function renderDashboard({
                             }
                         }
                     },
-                    cutout: '65%'
+                    cutout: '72%'
                 }
             });
         }
@@ -616,15 +623,15 @@ async function renderDashboard({
                             expenseBreakdown['Food'] || 0,
                             expenseBreakdown['Shopping'] || 0
                         ],
-                        backgroundColor: '#4F46E5',
-                        borderRadius: 8,
+                        backgroundColor: '#182820',
+                        borderRadius: 4,
                         borderSkipped: false
                     },
                     {
                         label: 'Average Peer',
                         data: [15, 8000, 3000], // Representative averages
-                        backgroundColor: '#94A3B8',
-                        borderRadius: 8,
+                        backgroundColor: '#D1D7CE',
+                        borderRadius: 4,
                         borderSkipped: false
                     }
                 ]
@@ -634,15 +641,15 @@ async function renderDashboard({
                 maintainAspectRatio: false,
                 plugins: {
                     tooltip: {
-                        backgroundColor: 'rgba(0,0,0,0.85)',
-                        padding: 12,
-                        titleFont: { size: 14 },
-                        bodyFont: { size: 14 }
+                        backgroundColor: '#182820',
+                        padding: 10,
+                        titleFont: { family: "'Inter', sans-serif", size: 13 },
+                        bodyFont: { family: "'Inter', sans-serif", size: 13 }
                     },
-                    legend: { position: 'top' }
+                    legend: { position: 'top', labels: { font: { family: "'Inter', sans-serif", size: 12 } } }
                 },
                 scales: {
-                    y: { beginAtZero: true, grid: { color: '#f0f0f0' } },
+                    y: { beginAtZero: true, grid: { color: '#EDF0EA' } },
                     x: { grid: { display: false } }
                 }
             }
@@ -699,39 +706,39 @@ function generateImprovements({ grade, expenseBreakdown, savingsRate, totalExpen
 
     // 1. Savings rate suggestion
     if (sr < 0) {
-        improvements.push(`⚠️ You have a spending deficit of ${formatCurrency(Math.abs(monthlyIncome - totalExpenses))}. Immediately identify which categories can be reduced to bring expenses below your income.`);
+        improvements.push(`Deficit Alert: Monthly expenditures exceed income by ${formatCurrency(Math.abs(monthlyIncome - totalExpenses))}. Immediately reduce non-essential categories to re-establish balanced cash flow.`);
     } else if (sr < 10) {
-        improvements.push(`💰 Your savings rate is only ${sr.toFixed(1)}%. Try to cut ${formatCurrency(monthlyIncome * 0.05)} from your largest expense (${topCat || 'top category'}) to reach a 5% savings rate.`);
+        improvements.push(`Savings Rate: Current rate is ${sr.toFixed(1)}%. Trimming ${formatCurrency(monthlyIncome * 0.05)} from ${topCat || 'primary category'} will lift your rate toward the 5% tier.`);
     } else if (sr < 20) {
-        improvements.push(`📈 Your savings rate is ${sr.toFixed(1)}%. Aim for 20% by reducing ${topCat ? `${topCat} (₹${topAmt.toFixed(0)})` : 'your largest expense'} by 10–15%.`);
+        improvements.push(`Target Objective: Savings rate stands at ${sr.toFixed(1)}%. Reducing ${topCat ? `${topCat} (${formatCurrency(topAmt)})` : 'top categories'} by 10% will reach the recommended 20% milestone.`);
     } else {
-        improvements.push(`✅ Excellent savings rate of ${sr.toFixed(1)}%! Consider investing a portion of your savings into a SIP or fixed deposit to grow your wealth.`);
+        improvements.push(`Strong Discipline: Sustaining a healthy ${sr.toFixed(1)}% savings rate. Allocate surplus funds into structured emergency reserves or scheduled index funds.`);
     }
 
     // 2. Expense ratio suggestion
     if (expRatio > 90) {
-        improvements.push(`🚨 You're spending ${expRatio.toFixed(1)}% of your income. Create a strict monthly budget for each category and track spending weekly.`);
+        improvements.push(`Spending Ratio: You are committing ${expRatio.toFixed(1)}% of net income to current expenses. Strict departmental category ceilings are strongly recommended.`);
     } else if (expRatio > 70) {
-        improvements.push(`📊 Your expense ratio is ${expRatio.toFixed(1)}%. Review subscriptions, dining, and entertainment for quick wins to bring this below 70%.`);
+        improvements.push(`Operating Overhead: Operating ratio is ${expRatio.toFixed(1)}%. Review recurring subscriptions and dining expenses to compress overhead below 70%.`);
     } else if (topCat && topAmt > 0) {
         const topPct = monthlyIncome > 0 ? ((topAmt / monthlyIncome) * 100).toFixed(1) : 0;
-        improvements.push(`🔍 Your highest expense is ${topCat} at ${formatCurrency(topAmt)} (${topPct}% of income). Set a monthly cap for this category and track it actively.`);
+        improvements.push(`Primary Outflow: ${topCat} constitutes ${formatCurrency(topAmt)} (${topPct}% of income). Setting an explicit monthly cap will protect against spending drift.`);
     }
 
     // 3. Debt suggestion (if applicable)
     if (emiAmount > 0 && monthlyIncome > 0) {
         const emiPct = ((emiAmount / monthlyIncome) * 100).toFixed(1);
         if (emiPct > 43) {
-            improvements.push(`💳 Your debt payments are ${emiPct}% of income (above the 43% danger threshold). Prioritize paying off the highest-interest debt first to reduce this burden.`);
+            improvements.push(`Debt Burden: Debt servicing claims ${emiPct}% of income (above the 43% institutional risk ceiling). Prioritize accelerated principal repayment on highest-APR liabilities.`);
         } else if (emiPct > 20) {
-            improvements.push(`💳 Your EMI payments are ${emiPct}% of income. Avoid taking any new loans until this ratio drops below 20%.`);
+            improvements.push(`Debt Monitoring: EMI obligations equal ${emiPct}% of income. Refrain from taking on new installment obligations until ratio moderates.`);
         } else {
-            improvements.push(`💳 Your debt ratio is a healthy ${emiPct}%. Stay consistent with EMI payments to clear debt ahead of schedule and save on interest.`);
+            improvements.push(`Healthy Leverage: Debt ratio is ${emiPct}%. Continue consistent payments to retire obligations ahead of maturity.`);
         }
     } else {
         // No debt — give a savings/investment tip
         if (improvements.length < 3) {
-            improvements.push(`🏦 You have no recorded EMI/debt — great! Channel the money you save into an emergency fund (target: 3–6 months of expenses).`);
+            improvements.push(`Reserve Building: With zero debt service obligations, direct monthly surplus toward establishing 3 to 6 months of essential living reserves.`);
         }
     }
 
@@ -753,8 +760,8 @@ function renderReportCard(report) {
 
     if (reportGradeEl) {
         reportGradeEl.textContent = grade;
-        const gradeColors = { A: '#4cd964', B: '#34a853', C: '#ffcc00', D: '#ff9500', F: '#ff3b30' };
-        reportGradeEl.style.background = gradeColors[grade] || '#ff3b30';
+        const gradeColors = { A: '#182820', B: '#367A53', C: '#52765D', D: '#A47B35', F: '#B65C4B' };
+        reportGradeEl.style.background = gradeColors[grade] || '#182820';
     }
     if (reportScoreEl) reportScoreEl.textContent = `${score} / 100`;
 

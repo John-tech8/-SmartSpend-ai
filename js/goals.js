@@ -72,28 +72,27 @@ document.addEventListener('DOMContentLoaded', async () => {
             const targetDateStr = new Date(goal.target_date).toLocaleDateString();
 
             const goalEl = document.createElement('div');
-            goalEl.className = 'card';
-            goalEl.style.padding = '20px';
+            goalEl.className = 'goal-receipt-card';
 
             goalEl.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                    <h3 style="font-size: 18px; margin: 0;">${goal.name}</h3>
-                    <span style="font-size: 14px; color: ${isCompleted ? '#4cd964' : '#ffcc00'}; font-weight: 600;">
-                        ${isCompleted ? 'Completed' : 'In Progress'}
+                <div class="goal-receipt-header">
+                    <h3>${goal.name}</h3>
+                    <span class="badge ${isCompleted ? 'badge-income' : 'badge-neutral'}">
+                        ${isCompleted ? 'Target Achieved' : `${percentage}% Funded`}
                     </span>
                 </div>
-                <div style="margin-bottom: 5px; font-size: 14px; color: #4A5568;">
-                    <strong>Target:</strong> ${formatINR(goal.target_amount)} by ${targetDateStr}
+                <div style="display: flex; justify-content: space-between; font-size: 13px; color: var(--text-secondary); margin-bottom: 6px;">
+                    <span>Target: <strong>${formatINR(goal.target_amount)}</strong></span>
+                    <span>Target Date: ${targetDateStr}</span>
                 </div>
-                <div style="margin-bottom: 15px; font-size: 14px; color: #4A5568;">
-                    <strong>Saved:</strong> ${formatINR(goal.current_amount)}
+                <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">
+                    Accumulated: <strong style="color: var(--primary-forest);">${formatINR(goal.current_amount)}</strong>
                 </div>
-                <div style="width: 100%; background: #E2E8F0; border-radius: 8px; height: 12px; margin-bottom: 15px; overflow: hidden;">
-                    <div style="width: ${percentage}%; background: ${isCompleted ? '#4cd964' : '#2B61FF'}; height: 100%; border-radius: 8px; transition: width 0.3s;"></div>
+                <div class="progress-bar-bg" style="height: 6px; margin-bottom: 14px;">
+                    <div class="progress-bar-fill" style="width: ${percentage}%; background-color: ${isCompleted ? 'var(--color-income)' : 'var(--secondary-sage)'};"></div>
                 </div>
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span style="font-size: 14px; font-weight: 600;">${percentage}% Complete</span>
-                    ${!isCompleted ? `<button class="add-funds-btn" data-id="${goal.id}" style="padding: 6px 12px; background: #2B61FF; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px;">Add Funds</button>` : ''}
+                <div style="display: flex; justify-content: flex-end; align-items: center;">
+                    ${!isCompleted ? `<button class="btn btn-outline btn-sm add-funds-btn" data-id="${goal.id}">Contribute Funds</button>` : ''}
                 </div>
             `;
             savedGoalsList.appendChild(goalEl);

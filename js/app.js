@@ -85,20 +85,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Set dynamic AI Insight message based on the numbers
             if (savings < 0) {
-                resInsight.innerHTML = `⚠️ <strong>Warning:</strong> You are spending more than you earn! Look closely at your <em>${category}</em> expenses to cut back immediately.`;
-                resInsight.style.backgroundColor = "rgba(255, 59, 48, 0.2)";
-                resInsight.style.color = "#ffb3b0";
-                resInsight.style.borderLeft = "4px solid #ff3b30";
+                resInsight.innerHTML = `<strong>Deficit Alert:</strong> Current monthly expenditures exceed total income. Evaluate disbursements in <em>${category}</em> for immediate balance reduction.`;
+                resInsight.style.backgroundColor = "var(--color-light-green)";
+                resInsight.style.color = "var(--color-expense)";
+                resInsight.style.borderLeft = "3px solid var(--color-expense)";
             } else if (savings >= goal) {
-                resInsight.innerHTML = `🌟 <strong>Great Job!</strong> You are hitting your savings goal of ${formatMoney(goal)}! Your <em>${category}</em> spending is well managed.`;
-                resInsight.style.backgroundColor = "rgba(76, 217, 100, 0.2)";
-                resInsight.style.color = "#caffcc";
-                resInsight.style.borderLeft = "4px solid #4cd964";
+                resInsight.innerHTML = `<strong>Target Maintained:</strong> Monthly retained savings meet the required capital target of ${formatMoney(goal)}. Expenditure across <em>${category}</em> is within calibrated thresholds.`;
+                resInsight.style.backgroundColor = "var(--color-light-green)";
+                resInsight.style.color = "var(--color-income)";
+                resInsight.style.borderLeft = "3px solid var(--color-income)";
             } else {
-                resInsight.innerHTML = `💡 <strong>Good progress.</strong> You are saving money, but falling short of your goal. Try reducing your <em>${category}</em> costs to reach ${formatMoney(goal)}.`;
-                resInsight.style.backgroundColor = "rgba(255, 204, 0, 0.2)";
-                resInsight.style.color = "#fff3cd";
-                resInsight.style.borderLeft = "4px solid #ffcc00";
+                resInsight.innerHTML = `<strong>Capital Growth Variance:</strong> Retained savings remain positive but below target goal of ${formatMoney(goal)}. Rebalance <em>${category}</em> allocations to close variance.`;
+                resInsight.style.backgroundColor = "#FDF9F3";
+                resInsight.style.color = "var(--color-warning)";
+                resInsight.style.borderLeft = "3px solid var(--color-warning)";
             }
 
             // Save data to localStorage for the AI Advisor context

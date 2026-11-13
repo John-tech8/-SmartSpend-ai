@@ -73,29 +73,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(amount);
     };
 
-    // Modern Fintech Colors Mapping
+    // Editorial Finance Palette Mapping
     const colorMap = {
-        'Food': '#36A2EB',
-        'Transport': '#FFCE56',
-        'Shopping': '#4BC0C0',
-        'Entertainment': '#9966FF',
-        'Rent': '#FF6384',
-        'EMI': '#FF9F40',
-        'Bills': '#FF9F40', // fallback alias
-        'Misc': '#C9CBCF',
-        'Others': '#C9CBCF' // fallback alias
+        'Food': '#52765D',
+        'Transport': '#52749A',
+        'Shopping': '#A47B35',
+        'Entertainment': '#B65C4B',
+        'Rent': '#182820',
+        'EMI': '#8E9990',
+        'Bills': '#367A53',
+        'Misc': '#C4B9A7',
+        'Others': '#C4B9A7'
     };
 
-    const chartLabels = Object.keys(categoryTotals);
-    const chartData = Object.values(categoryTotals);
-    const bgColors = chartLabels.map(label => colorMap[label] || '#2B61FF'); // Default blue if unknown
+    const fallbackPalette = ['#182820', '#52765D', '#B65C4B', '#A47B35', '#52749A', '#367A53', '#8E9990', '#C4B9A7'];
+
+    // Sort categories by amount descending
+    const sortedCategories = Object.keys(categoryTotals).sort((a, b) => categoryTotals[b] - categoryTotals[a]);
+    const chartData = sortedCategories.map(cat => categoryTotals[cat]);
+    const bgColors = sortedCategories.map((label, i) => colorMap[label] || fallbackPalette[i % fallbackPalette.length]);
 
     // ---- RENDER SUMMARY TABLE ----
     const tableBody = document.getElementById('summaryTableBody');
     tableBody.innerHTML = '';
-
-    // Sort categories by amount descending
-    const sortedCategories = chartLabels.sort((a, b) => categoryTotals[b] - categoryTotals[a]);
 
     sortedCategories.forEach((category, index) => {
         const amount = categoryTotals[category];
@@ -105,13 +105,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td>
-                <div style="display: flex; align-items: center;">
-                    <span class="category-bullet" style="background-color: ${color}"></span>
-                    <span style="font-weight: 500;">${category}</span>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="category-bullet" style="background-color: ${color}; width: 10px; height: 10px; border-radius: 50%; display: inline-block;"></span>
+                    <span style="font-weight: 500; color: var(--text-primary);">${category}</span>
                 </div>
             </td>
-            <td style="text-align: right; font-weight: 500;">${formatCurrency(amount)}</td>
-            <td style="text-align: right; color: #666;">${percentage}%</td>
+            <td style="text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--text-primary);">${formatCurrency(amount)}</td>
+            <td style="text-align: right; color: var(--text-secondary); font-variant-numeric: tabular-nums;">${percentage}%</td>
         `;
         tableBody.appendChild(tr);
     });
@@ -119,43 +119,43 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ---- RENDER PIE CHART ----
     const ctx = document.getElementById('monthlyChart').getContext('2d');
 
-    // Create a glossy gradient for each category based on its base hex color
-    const chartBgColors = bgColors.map(hexColor => {
-        const g = ctx.createLinearGradient(0, 0, 0, 400);
-        g.addColorStop(0, hexColor);
-        g.addColorStop(1, '#020617'); // Fade to dark background
-        return g;
-    });
-
     new Chart(ctx, {
         type: 'doughnut',
         data: {
             labels: sortedCategories,
             datasets: [{
-                data: sortedCategories.map(cat => categoryTotals[cat]),
-                backgroundColor: chartBgColors,
-                borderWidth: 0,
-                hoverOffset: 15
+                data: chartData,
+                backgroundColor: bgColors,
+                borderWidth: 2,
+                borderColor: '#FFFFFF',
+                hoverOffset: 6
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            animation: { animateScale: true, animateRotate: true, duration: 1500, easing: 'easeOutQuart' },
+            animation: { animateScale: true, animateRotate: true, duration: 600, easing: 'easeOutQuart' },
             plugins: {
                 legend: {
-                    position: 'right',
+                    position: 'bottom',
                     labels: {
-                        padding: 20,
+                        padding: 16,
                         usePointStyle: true,
-                        font: { family: "'Poppins', sans-serif", size: 14 }
+                        pointStyle: 'circle',
+                        boxWidth: 8,
+                        boxHeight: 8,
+                        color: '#69746B',
+                        font: { family: "'Inter', sans-serif", size: 12, weight: 500 }
                     }
                 },
                 tooltip: {
-                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                    padding: 15,
-                    titleFont: { size: 14, family: "'Poppins', sans-serif" },
-                    bodyFont: { size: 14, weight: 'bold', family: "'Poppins', sans-serif" },
+                    backgroundColor: '#182820',
+                    titleColor: '#FFFFFF',
+                    bodyColor: '#E7EEE7',
+                    padding: 12,
+                    cornerRadius: 8,
+                    titleFont: { size: 12, family: "'Inter', sans-serif", weight: 600 },
+                    bodyFont: { size: 12, family: "'Inter', sans-serif" },
                     callbacks: {
                         label: function (context) {
                             let label = context.label || '';
@@ -170,9 +170,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                     }
                 }
             },
-            cutout: '65%', // Thin modern ring
+            cutout: '72%',
             layout: {
-                padding: 20
+                padding: 12
             }
         }
     });

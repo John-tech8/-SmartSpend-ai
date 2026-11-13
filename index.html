@@ -4,57 +4,228 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SmartSpend – AI Financial Advisor</title>
+    <title>SmartSpend – Institutional Personal Finance & Advisory</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Design System Stylesheets -->
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/animations.css">
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .nav-btn {
-            padding: 8px 16px;
-            border-radius: 8px;
+        .hero-banner {
+            padding: 72px 0 64px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 12px;
+            background-color: var(--color-light-green);
+            color: var(--color-primary-forest);
+            border-radius: var(--radius-sm);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .hero-eyebrow::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            background-color: var(--color-income);
+            border-radius: 50%;
+        }
+
+        .hero-title-main {
+            font-size: 44px;
+            font-weight: 700;
+            line-height: 1.15;
+            letter-spacing: -0.03em;
+            color: var(--text-primary);
+            max-width: 820px;
+            margin-bottom: 20px;
+        }
+
+        .hero-subtitle-main {
+            font-size: 17px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+            max-width: 640px;
+            margin-bottom: 32px;
+        }
+
+        .hero-actions-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 48px;
+            flex-wrap: wrap;
+        }
+
+        .hero-preview-wrapper {
+            width: 100%;
+            max-width: 580px;
+            margin: 0 auto;
+        }
+
+        .index-solvency-card {
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-container);
+            box-shadow: var(--shadow-md);
+            padding: 24px;
+            text-align: left;
+            position: relative;
+        }
+
+        .index-solvency-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 14px;
+            margin-bottom: 16px;
+        }
+
+        .index-solvency-title {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+        }
+
+        .index-solvency-body {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .feature-grid-editorial {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            margin-top: 32px;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title-main {
+                font-size: 32px;
+            }
+            .feature-grid-editorial {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .feature-card-clean {
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-card);
+            padding: 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
             text-decoration: none;
-            color: #333;
-            font-weight: 500;
-            transition: all 0.3s ease;
+            color: inherit;
+            transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
         }
 
-        .nav-btn.primary {
-            background: #2f6df6;
-            color: white;
+        .feature-card-clean:hover {
+            border-color: var(--color-secondary-sage);
+            box-shadow: var(--shadow-sm);
         }
 
-        .nav-btn.primary:hover {
-            background: #1e4ed8;
+        .feature-icon-badge {
+            width: 40px;
+            height: 40px;
+            background-color: var(--color-light-green);
+            color: var(--color-primary-forest);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            margin-bottom: 4px;
         }
 
-        button:hover,
-        .btn:hover,
-        .nav-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
+        .feature-heading {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
         }
 
-        .lang-select {
-            padding: 5px 10px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
+        .feature-copy {
             font-size: 14px;
-            background-color: white;
+            line-height: 1.55;
+            color: var(--text-secondary);
+        }
+
+        .feature-link-hint {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--color-secondary-sage);
+            margin-top: auto;
+            padding-top: 8px;
+        }
+
+        .cta-editorial-panel {
+            background-color: var(--color-primary-forest);
+            color: #FFFFFF;
+            border-radius: var(--radius-container);
+            padding: 56px 40px;
+            text-align: center;
+            margin: 64px 0;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .cta-editorial-title {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 12px;
+            color: #FFFFFF;
+        }
+
+        .cta-editorial-desc {
+            font-size: 15px;
+            color: #C4D1C7;
+            max-width: 540px;
+            margin: 0 auto 28px auto;
+            line-height: 1.6;
         }
     </style>
 </head>
 
 <body>
-    <!-- Navigation -->
+    <!-- Standard Navigation -->
     <header class="navbar">
         <div class="container">
-            <a href="#" class="logo"><i class="fas fa-chart-line" style="margin-right: 8px;"></i>SmartSpend</a>
-            <nav class="nav-links" style="display: flex; align-items: center; gap: 15px;">
+            <a href="index.html" class="logo"><span class="logo-mark"></span> SmartSpend</a>
+            <nav class="nav-links">
+                <select id="languageSelector" class="lang-select">
+                    <option value="en">English</option>
+                    <option value="hi">हिंदी (Hindi)</option>
+                    <option value="ta">தமிழ் (Tamil)</option>
+                </select>
                 <div class="dropdown">
-                    <a href="#features" class="dropbtn" data-i18n="nav.features">Features <i class="fas fa-chevron-down"
-                            style="font-size: 10px; margin-left: 5px;"></i></a>
+                    <a href="index.html#features" class="dropbtn" data-i18n="nav.features">Features <i class="fas fa-chevron-down" style="font-size: 10px; margin-left: 5px;"></i></a>
                     <div class="dropdown-content">
                         <a href="expenses.html">Expense Analysis</a>
                         <a href="dashboard.html">Financial Health Score</a>
@@ -63,194 +234,207 @@
                     </div>
                 </div>
                 <a href="about.html" data-i18n="nav.about">About</a>
-                <a href="aiagent.html" data-i18n="nav.advisor">AI Advisor</a>
-                <a href="login.html" class="nav-btn" data-i18n="nav.login">Login</a>
-                <a href="signup.html" class="nav-btn primary" data-i18n="nav.signup">Sign Up</a>
-                <select id="languageSelector" class="lang-select">
-                    <option value="en">English</option>
-                    <option value="hi">हिंदी (Hindi)</option>
-                    <option value="ta">தமிழ் (Tamil)</option>
-                </select>
+                <a href="aiagent.html" data-i18n="nav.aiadvisor">AI Advisor</a>
+                <a href="login.html" data-i18n="nav.login">Login</a>
+                <a href="signup.html" class="btn btn-primary" data-i18n="nav.signup">Sign Up</a>
             </nav>
         </div>
     </header>
 
-    <!-- Hero Section -->
-    <section id="hero" class="hero"
-        style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
-        <div class="container hero-content" style="text-align: center; max-width: 800px;">
-            <h1 class="hero-title" data-i18n="hero.title">SmartSpend – AI Financial Advisor</h1>
-            <p class="hero-tagline" data-i18n="hero.tagline">AI Financial Coach for First-Time Earners</p>
-            <div class="hero-actions">
-                <a href="#" id="startQuizBtn" class="btn btn-primary btn-large">Start Analysis</a>
+    <!-- Main Container -->
+    <main class="container">
+        <!-- Hero Section -->
+        <section class="hero-banner">
+            <div class="hero-eyebrow">
+                Institutional Financial Telemetry
             </div>
-        </div>
-        <div class="hero-graphics">
-            <!-- Placeholder for fintech UI mockup / dashboard graphic -->
-            <div class="glass-card mockup-card animate-on-scroll" id="indexHealthCard">
-                <div class="mockup-header" data-i18n="feature.health.title">Financial Health</div>
-                <div class="mockup-score" id="indexHealthScore">Loading...</div>
-                <div id="indexHealthAction" style="margin-top: 15px;"></div>
+            <h1 class="hero-title-main" data-i18n="hero.title">
+                Master Your Cash Flow With Systematic Precision
+            </h1>
+            <p class="hero-subtitle-main" data-i18n="hero.tagline">
+                Deterministic expense tracking, real-time solvency health scoring, and algorithmic milestone planning designed for disciplined wealth generation.
+            </p>
+            <div class="hero-actions-row">
+                <button type="button" id="startQuizBtn" class="btn btn-primary" style="padding: 12px 24px; font-size: 14px;">
+                    <i class="fas fa-tasks" style="margin-right: 8px;"></i> Complete Financial Assessment
+                </button>
+                <a href="expenses.html" class="btn btn-outline" style="padding: 12px 24px; font-size: 14px;">
+                    <i class="fas fa-table" style="margin-right: 8px;"></i> Launch Expense Ledger
+                </a>
             </div>
-        </div>
-    </section>
 
-    <!-- Features Section -->
-    <section id="features" class="features">
-        <div class="container">
-            <h2 class="section-title" data-i18n="features.title">Everything You Need to Master Your Money</h2>
-            <div class="feature-grid">
-
-                <!-- Feature 1 -->
-                <a href="expenses.html" style="text-decoration: none; color: inherit; display: block;">
-                    <div class="feature-card animate-on-scroll">
-                        <i class="fas fa-wallet fa-2x" style="color: #2f6df6; margin-bottom: 15px; display: block;"></i>
-                        <h3 class="feature-title" data-i18n="feature.expense.title">Expense Analysis</h3>
-                        <p class="feature-desc" data-i18n="feature.expense.desc">Automatically categorize and track your
-                            spending habits to see exactly
-                            where
-                            your money goes.</p>
+            <!-- Live Solvency Telemetry Card -->
+            <div class="hero-preview-wrapper">
+                <div class="index-solvency-card" id="indexHealthCard">
+                    <div class="index-solvency-header">
+                        <span class="index-solvency-title">Portfolio Solvency Telemetry</span>
+                        <span style="font-size: 12px; color: var(--text-secondary); font-weight: 500;">Real-Time Status</span>
                     </div>
-                </a>
-
-                <!-- Feature 2 -->
-                <a href="dashboard.html" style="text-decoration: none; color: inherit; display: block;">
-                    <div class="feature-card animate-on-scroll">
-                        <i class="fas fa-heartbeat fa-2x"
-                            style="color: #2f6df6; margin-bottom: 15px; display: block;"></i>
-                        <h3 class="feature-title" data-i18n="feature.health.title">Financial Health Score</h3>
-                        <p class="feature-desc" data-i18n="feature.health.desc">Get a real-time health score based on
-                            your savings rate, debt, and
-                            spending
-                            patterns.</p>
+                    <div class="index-solvency-body">
+                        <div>
+                            <div style="font-size: 11px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 4px; font-weight: 600;">Current Index Score</div>
+                            <div id="indexHealthScore">Loading...</div>
+                        </div>
+                        <div id="indexHealthAction"></div>
                     </div>
-                </a>
-
-                <!-- Feature 3 -->
-                <a href="aiagent.html" style="text-decoration: none; color: inherit; display: block;">
-                    <div class="feature-card animate-on-scroll">
-                        <i class="fas fa-robot fa-2x" style="color: #2f6df6; margin-bottom: 15px; display: block;"></i>
-                        <h3 class="feature-title" data-i18n="feature.ai.title">AI Financial Advice</h3>
-                        <p class="feature-desc" data-i18n="feature.ai.desc">Receive personalized, actionable advice from
-                            your smart AI coach to
-                            improve
-                            your finances.</p>
-                    </div>
-                </a>
-
-                <!-- Feature 4 -->
-                <a href="goals.html" style="text-decoration: none; color: inherit; display: block;">
-                    <div class="feature-card animate-on-scroll">
-                        <i class="fas fa-bullseye fa-2x"
-                            style="color: #2f6df6; margin-bottom: 15px; display: block;"></i>
-                        <h3 class="feature-title" data-i18n="feature.goal.title">Goal-based Savings Tracker</h3>
-                        <p class="feature-desc" data-i18n="feature.goal.desc">Set milestones and track your progress
-                            towards a new car, emergency
-                            fund, or
-                            vacation.</p>
-                    </div>
-                </a>
-
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
 
+        <!-- Features Section -->
+        <section id="features" style="padding: 32px 0 64px 0;">
+            <div style="text-align: center; max-width: 620px; margin: 0 auto 36px auto;">
+                <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--color-secondary-sage); margin-bottom: 8px;">System Architecture</div>
+                <h2 style="font-size: 26px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em;">Comprehensive Financial Modules</h2>
+                <p style="font-size: 14px; color: var(--text-secondary); margin-top: 8px;">Everything required to measure, diagnose, and optimize personal capital allocation.</p>
+            </div>
 
+            <div class="feature-grid-editorial">
+                <!-- Feature 1: Expense Analysis -->
+                <a href="expenses.html" class="feature-card-clean">
+                    <div class="feature-icon-badge">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <h3 class="feature-heading" data-i18n="feature.expense.title">Expense Telemetry & Analysis</h3>
+                    <p class="feature-copy" data-i18n="feature.expense.desc">
+                        Systematically categorize monthly disbursements, calculate precise burn rates, and measure category percentages with zero floating errors.
+                    </p>
+                    <span class="feature-link-hint">Open Ledger <i class="fas fa-arrow-right"></i></span>
+                </a>
 
-    <!-- Call to Action -->
-    <section class="cta-section" style="padding: 60px 0; text-align: center;">
-        <div class="container cta-box">
-            <h2 style="margin-bottom: 15px; font-size: 32px; color: #ffffff;">Ready to take control of your financial
-                future?</h2>
-            <p style="margin-bottom: 30px; font-size: 18px; color: #ffffff;">Join thousands of first-time earners
-                building
-                wealth with SmartSpend.</p>
-            <a href="expenses.html" class="btn btn-primary"
-                style="padding: 12px 30px; font-size: 16px; background-color: #4a90e2; color: white; text-decoration: none; border-radius: 8px; font-weight: 600;">Get
-                Started Now</a>
-        </div>
-    </section>
+                <!-- Feature 2: Financial Health Score -->
+                <a href="dashboard.html" class="feature-card-clean">
+                    <div class="feature-icon-badge">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3 class="feature-heading" data-i18n="feature.health.title">Financial Health Solvency Rating</h3>
+                    <p class="feature-copy" data-i18n="feature.health.desc">
+                        Evaluate financial resilience across multi-factor metrics: savings rate efficiency, discretionary expenditure discipline, and benchmark peer percentiles.
+                    </p>
+                    <span class="feature-link-hint">View Scorecard <i class="fas fa-arrow-right"></i></span>
+                </a>
 
-    <!-- Footer -->
+                <!-- Feature 3: Goal Milestone Tracker -->
+                <a href="goals.html" class="feature-card-clean">
+                    <div class="feature-icon-badge">
+                        <i class="fas fa-bullseye"></i>
+                    </div>
+                    <h3 class="feature-heading" data-i18n="feature.goal.title">Deterministic Milestone Tracker</h3>
+                    <p class="feature-copy" data-i18n="feature.goal.desc">
+                        Define capital accumulation milestones with automated completion date forecasting, progress amortizations, and priority status tags.
+                    </p>
+                    <span class="feature-link-hint">Set Milestones <i class="fas fa-arrow-right"></i></span>
+                </a>
+
+                <!-- Feature 4: Monthly Executive Report -->
+                <a href="monthlyreport.html" class="feature-card-clean">
+                    <div class="feature-icon-badge">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                    </div>
+                    <h3 class="feature-heading">Monthly Executive Statements</h3>
+                    <p class="feature-copy">
+                        Generate audit-grade statement summaries featuring clean category distribution charts, tabular allocation ledgers, and printable financial records.
+                    </p>
+                    <span class="feature-link-hint">Generate Statement <i class="fas fa-arrow-right"></i></span>
+                </a>
+            </div>
+        </section>
+
+        <!-- Institutional Call to Action -->
+        <section class="cta-editorial-panel">
+            <h2 class="cta-editorial-title">Ready for Institutional-Grade Financial Control?</h2>
+            <p class="cta-editorial-desc">
+                Deploy SmartSpend to replace guesswork with deterministic financial planning, structured habit coaching, and verified solvency scores.
+            </p>
+            <a href="signup.html" class="btn btn-primary" style="background-color: var(--color-light-green); color: var(--color-primary-forest); border: none; padding: 12px 28px; font-weight: 600;">
+                Create Free Account
+            </a>
+        </section>
+    </main>
+
+    <!-- Standard Footer -->
     <footer class="footer">
-        <div class="container">
-            <p>&copy; 2026 SmartSpend. All rights reserved.</p>
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+            <p>&copy; 2026 SmartSpend Systems Inc. All rights reserved.</p>
+            <div style="display: flex; gap: 20px; font-size: 13px; color: var(--text-secondary);">
+                <span>Institutional Finance</span>
+                <span>Audit-Ready Records</span>
+                <span>Deterministic Analytics</span>
+            </div>
         </div>
     </footer>
 
-    <!-- Financial Quiz Modal (Hidden by Default) -->
+    <!-- Financial Assessment Quiz Modal -->
     <div id="quizModal"
-        style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
-        <div class="glass-card animate-on-scroll"
-            style="background: white; width: 90%; max-width: 600px; padding: 40px; position: relative; max-height: 90vh; overflow-y: auto;">
+        style="display: none; position: fixed; inset: 0; background: rgba(24, 40, 32, 0.45); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(2px); padding: 20px;">
+        <div class="auth-card"
+            style="background: var(--surface); width: 100%; max-width: 580px; padding: 36px; position: relative; max-height: 90vh; overflow-y: auto; margin: 0; box-shadow: var(--shadow-lg);">
             <button id="closeQuizBtn"
-                style="position: absolute; right: 20px; top: 20px; background: none; border: none; font-size: 24px; cursor: pointer; color: #666;"><i
-                    class="fas fa-times"></i></button>
+                style="position: absolute; right: 20px; top: 20px; background: none; border: none; font-size: 18px; cursor: pointer; color: var(--text-secondary);">
+                <i class="fas fa-times"></i>
+            </button>
 
             <!-- Quiz Question Container -->
             <div id="quizQuestionContainer">
-                <div
-                    style="font-size: 14px; color: #2B61FF; font-weight: 600; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px;">
-                    Financial Analysis Quiz</div>
+                <div style="font-size: 11px; color: var(--color-secondary-sage); font-weight: 700; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.08em;">
+                    Financial Telemetry Assessment
+                </div>
                 <h2 id="quizQuestionText"
-                    style="font-size: 24px; color: #1a1a1a; margin-bottom: 30px; line-height: 1.4;">Loading question...
+                    style="font-size: 20px; font-weight: 700; color: var(--text-primary); margin-bottom: 24px; line-height: 1.4;">
+                    Loading question...
                 </h2>
-                <div id="quizOptionsContainer" style="display: flex; flex-direction: column; gap: 15px;">
+                <div id="quizOptionsContainer" style="display: flex; flex-direction: column; gap: 10px;">
                     <!-- Options populated by JS -->
                 </div>
                 <!-- Progress indicator -->
-                <div style="margin-top: 30px; display: flex; align-items: center; justify-content: space-between;">
-                    <span id="quizProgressText" style="color: #666; font-size: 14px;">Question 1 of 5</span>
-                    <div
-                        style="flex: 1; margin-left: 15px; background: #eee; height: 6px; border-radius: 3px; overflow: hidden;">
+                <div style="margin-top: 24px; display: flex; align-items: center; justify-content: space-between;">
+                    <span id="quizProgressText" style="color: var(--text-secondary); font-size: 13px; font-weight: 500;">Question 1 of 5</span>
+                    <div style="flex: 1; margin-left: 16px; background: var(--color-light-green); height: 6px; border-radius: 3px; overflow: hidden;">
                         <div id="quizProgressBar"
-                            style="width: 20%; background: #2f6df6; height: 100%; transition: width 0.3s ease;"></div>
+                            style="width: 20%; background: var(--color-secondary-sage); height: 100%; transition: width 0.25s ease;"></div>
                     </div>
                 </div>
             </div>
 
             <!-- Quiz Result Container -->
             <div id="quizResultContainer" style="display: none;">
-                <div style="text-align: center; margin-bottom: 30px;">
-                    <div
-                        style="width: 80px; height: 80px; background: #EBF1FF; color: #2B61FF; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; margin: 0 auto 20px;">
+                <div style="text-align: center; margin-bottom: 24px;">
+                    <div style="width: 56px; height: 56px; background: var(--color-light-green); color: var(--color-primary-forest); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; margin: 0 auto 16px;">
                         <i id="quizResultIcon" class="fas fa-magic"></i>
                     </div>
-                    <div
-                        style="font-size: 14px; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">
-                        Your Financial Stage</div>
-                    <h2 id="quizStageTitle" style="font-size: 32px; color: #1a1a1a; margin-bottom: 10px;">Analyzer</h2>
+                    <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; font-weight: 600;">
+                        Diagnosed Spending Archetype
+                    </div>
+                    <h2 id="quizStageTitle" style="font-size: 24px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">Analyzer</h2>
                 </div>
 
-                <div style="background: #F8FAFD; border-radius: 12px; padding: 25px; margin-bottom: 25px;">
-                    <h4 style="color: #4A5568; margin-bottom: 15px; font-weight: 600; font-size: 16px;"><i
-                            class="fas fa-check-circle" style="color: #38A169; margin-right: 8px;"></i>Why you're in
-                        this stage:</h4>
-                    <ul id="quizReasonsList"
-                        style="list-style-type: none; padding: 0; color: #4A5568; font-size: 15px;">
+                <div style="background: var(--bg-page); border: 1px solid var(--border); border-radius: var(--radius-card); padding: 20px; margin-bottom: 16px;">
+                    <h4 style="color: var(--text-primary); margin-bottom: 10px; font-weight: 600; font-size: 14px;">
+                        <i class="fas fa-check-circle" style="color: var(--color-income); margin-right: 8px;"></i>Habit Breakdown:
+                    </h4>
+                    <ul id="quizReasonsList" style="list-style-type: none; padding: 0; color: var(--text-secondary); font-size: 13px; line-height: 1.6;">
                         <!-- JS populated -->
                     </ul>
                 </div>
 
-                <div style="background: #FFF5F5; border-radius: 12px; padding: 25px; margin-bottom: 30px;">
-                    <h4 style="color: #C53030; margin-bottom: 15px; font-weight: 600; font-size: 16px;"><i
-                            class="fas fa-arrow-up" style="color: #E53E3E; margin-right: 8px;"></i>Suggestions for
-                        improvement:</h4>
-                    <ul id="quizSuggestionsList"
-                        style="list-style-type: none; padding: 0; color: #4A5568; font-size: 15px;">
+                <div style="background: #FDF9F3; border: 1px solid #EFE4D2; border-radius: var(--radius-card); padding: 20px; margin-bottom: 24px;">
+                    <h4 style="color: #795720; margin-bottom: 10px; font-weight: 600; font-size: 14px;">
+                        <i class="fas fa-lightbulb" style="color: var(--color-warning); margin-right: 8px;"></i>Action Plan:
+                    </h4>
+                    <ul id="quizSuggestionsList" style="list-style-type: none; padding: 0; color: #795720; font-size: 13px; line-height: 1.6;">
                         <!-- JS populated -->
                     </ul>
                 </div>
 
                 <div style="text-align: center;">
-                    <p id="quizGoodMessage"
-                        style="color: #38A169; font-weight: 500; margin-bottom: 20px; display: none;"><i
-                            class="fas fa-star" style="margin-right: 5px;"></i>You are ready to go!</p>
-                    <a href="expenses.html" class="btn btn-primary btn-large" style="width: 100%;">Continue to
-                        Expenses</a>
+                    <p id="quizGoodMessage" style="color: var(--color-income); font-weight: 600; margin-bottom: 16px; display: none; font-size: 14px;">
+                        <i class="fas fa-check" style="margin-right: 5px;"></i>Healthy financial baseline detected.
+                    </p>
+                    <a href="expenses.html" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px;">
+                        Proceed to Expense Ledger
+                    </a>
                 </div>
             </div>
-
         </div>
     </div>
 
