@@ -17,7 +17,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         if (window.initSupabase) {
             supabase = await window.initSupabase();
-            userId = window.getUserId();
+            userId   = window.getUserId();
+        }
+        if (window.requireAuth && supabase) {
+            const authUser = await window.requireAuth();
+            if (!authUser) return; // requireAuth redirects to login.html
         }
     } catch (e) {
         console.error("Supabase init error:", e);
@@ -27,9 +31,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         userId = localStorage.getItem('smartspend_user_id') || 'guest';
     }
 
-    const loadingEl = document.getElementById('dashboardLoading');
-    const emptyEl = document.getElementById('emptyState');
-    const contentEl = document.getElementById('dashboardContent');
+    // Personalize welcome heading with authenticated user name
+    const welcomeEl = document.getElementById('dashboardWelcomeHeading');
+    if (welcomeEl) {
+        const u = window.getCurrentUser ? window.getCurrentUser() : null;
+        const name = u?.user_metadata?.full_name || localStorage.getItem('smartspend_user_name');
+        if (name) {
+            welcomeEl.textContent = `Welcome back, ${name.split(' ')[0]}!`;
+        }
+    }
 
     // Chart instances
     let categoryChartInstance = null;
@@ -390,6 +400,87 @@ document.addEventListener('DOMContentLoaded', async () => {
                 lowPill.innerHTML = `<strong>Lowest:</strong> ${categoriesData.lowestCategory.name} (${formatINR(categoriesData.lowestCategory.amount)})`;
                 pillsEl.appendChild(lowPill);
             }
+        });
+    }
+
+    // ── Monthly Report Card ──────────────────────────────────────────────────
+
+    if (supabase && userId && monthStr) {
+        await loadMonthlyReportCard({
+            supabase,
+            userId,
+            monthStr,
+            monthName,
+            normalizedScore,
+            grade,
+            expenseBreakdown,
+            savingsRate,
+            totalExpenses,
+            monthlyIncome
+        });
+    } else {
+        // Offline mode: render report from current calculations
+        renderReportCard({
+            health_score: normalizedScore,
+            improvements: JSON.stringify(generateImprovements({
+                grade, expenseBreakdown, savingsRate, totalExpenses, monthlyIncome
+            }))
+        });
+        const reportMonthEl = document.getElementById('reportMonthStr');
+        if (reportMonthEl) reportMonthEl.textContent = monthName || '';
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// IMPROVEMENTS GENERATOR
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Generates data-driven top-3 improvement suggestions based on actual financial data.
+ * Never returns generic advice unrelated to the user's actual numbers.
+ */
+function generateImprovements({ grade, expenseBreakdown, savingsRate, totalExpenses, monthlyIncome }) {
+    const improvements = [];
+
+    // Calculate which category is highest
+    const catEntries = Object.entries(expenseBreakdown).filter(([, v]) => v > 0);
+    catEntries.sort(([, a], [, b]) => b - a);
+    const topCat    = catEntries[0]?.[0]  || null;
+    const topAmt    = catEntries[0]?.[1]  || 0;
+    const emiAmount = expenseBreakdown['Emi'] || expenseBreakdown['EMI'] || 0;
+    const sr        = savingsRate ?? 0;
+    const expRatio  = monthlyIncome > 0 ? (totalExpenses / monthlyIncome) * 100 : 0;
+
+    // 1. Savings rate suggestion
+    if (sr < 0) {
+        improvements.push(`Deficit Alert: Monthly expenditures exceed income by ${formatCurrency(Math.abs(monthlyIncome - totalExpenses))}. Immediately reduce non-essential categories to re-establish balanced cash flow.`);
+    } else if (sr < 10) {
+        improvements.push(`Savings Rate: Current rate is ${sr.toFixed(1)}%. Trimming ${formatCurrency(monthlyIncome * 0.05)} from ${topCat || 'primary category'} will lift your rate toward the 5% tier.`);
+    } else if (sr < 20) {
+        improvements.push(`Target Objective: Savings rate stands at ${sr.toFixed(1)}%. Reducing ${topCat ? `${topCat} (${formatCurrency(topAmt)})` : 'top categories'} by 10% will reach the recommended 20% milestone.`);
+    } else {
+        improvements.push(`Strong Discipline: Sustaining a healthy ${sr.toFixed(1)}% savings rate. Allocate surplus funds into structured emergency reserves or scheduled index funds.`);
+    }
+
+    // 2. Expense ratio suggestion
+    if (expRatio > 90) {
+        improvements.push(`Spending Ratio: You are committing ${expRatio.toFixed(1)}% of net income to current expenses. Strict departmental category ceilings are strongly recommended.`);
+    } else if (expRatio > 70) {
+        improvements.push(`Operating Overhead: Operating ratio is ${expRatio.toFixed(1)}%. Review recurring subscriptions and dining expenses to compress overhead below 70%.`);
+    } else if (topCat && topAmt > 0) {
+        const topPct = monthlyIncome > 0 ? ((topAmt / monthlyIncome) * 100).toFixed(1) : 0;
+        improvements.push(`Primary Outflow: ${topCat} constitutes ${formatCurrency(topAmt)} (${topPct}% of income). Setting an explicit monthly cap will protect against spending drift.`);
+    }
+
+    // 3. Debt suggestion (if applicable)
+    if (emiAmount > 0 && monthlyIncome > 0) {
+        const emiPct = ((emiAmount / monthlyIncome) * 100).toFixed(1);
+        if (emiPct > 43) {
+            improvements.push(`Debt Burden: Debt servicing claims ${emiPct}% of income (above the 43% institutional risk ceiling). Prioritize accelerated principal repayment on highest-APR liabilities.`);
+        } else if (emiPct > 20) {
+            improvements.push(`Debt Monitoring: EMI obligations equal ${emiPct}% of income. Refrain from taking on new installment obligations until ratio moderates.`);
+        } else {
+            improvements.push(`Healthy Leverage: Debt ratio is ${emiPct}%. Continue consistent payments to retire obligations ahead of maturity.`);
         }
     }
 
@@ -505,6 +596,75 @@ document.addEventListener('DOMContentLoaded', async () => {
                 });
             }
         }
+    }
+}
+
+async function loadMonthlyReportCard({
+    supabase, userId, monthStr, monthName,
+    normalizedScore, grade,
+    expenseBreakdown, savingsRate, totalExpenses, monthlyIncome
+}) {
+    const reportMonthEl = document.getElementById('reportMonthStr');
+    if (reportMonthEl) reportMonthEl.textContent = monthName;
+
+    // Fetch all reports for the user
+    const { data: existingReports } = await supabase
+        .from('reports')
+        .select('*')
+        .eq('user_id', userId)
+        .order('month', { ascending: false });
+
+    let currentReport = existingReports?.find(r => r.month === monthStr);
+
+    // Generate or update the current month's report
+    if (!currentReport) {
+        const improvements = generateImprovements({
+            grade, expenseBreakdown, savingsRate, totalExpenses, monthlyIncome
+        });
+
+        const newReport = {
+            user_id:      userId,
+            month:        monthStr,
+            health_score: normalizedScore,
+            grade:        grade,
+            improvements: JSON.stringify(improvements)
+        };
+
+        const { data: inserted, error: insertErr } = await supabase
+            .from('reports')
+            .insert([newReport])
+            .select();
+
+        if (!insertErr && inserted?.length > 0) {
+            currentReport = inserted[0];
+            if (existingReports) existingReports.unshift(currentReport);
+        } else {
+            // Render from current calculations even if save failed
+            currentReport = newReport;
+        }
+    } else {
+        // Update the existing report with recalculated values
+        const improvements = generateImprovements({
+            grade, expenseBreakdown, savingsRate, totalExpenses, monthlyIncome
+        });
+
+        await supabase
+            .from('reports')
+            .update({
+                health_score: normalizedScore,
+                grade:        grade,
+                improvements: JSON.stringify(improvements)
+            })
+            .eq('id', currentReport.id);
+
+        // Use freshly calculated data for rendering
+        currentReport = {
+            ...currentReport,
+            health_score: normalizedScore,
+            grade,
+            improvements: JSON.stringify(improvements)
+        };
+    }
 
         // 2. Recurring Subscriptions
         const recList = document.getElementById('recurringExpensesList');

@@ -4,271 +4,234 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SmartSpend – Goal Tracker</title>
-    <!-- Use existing styles if applicable, but fully self-contained as requested -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Savings Milestones – SmartSpend</title>
+    <meta name="description" content="Goal-based milestone planner and progress tracking with SmartSpend.">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Base Styling */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
+        .goals-container {
+            max-width: 1140px;
+            margin: 32px auto 64px;
+            padding: 0 32px;
         }
 
-        body {
-            background-color: #0F172A;
-            color: #F8FAFC;
-            padding: 40px 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+        .page-header {
+            margin-bottom: 28px;
         }
 
-        .tracker-container {
-            width: 100%;
-            max-width: 500px;
-        }
-
-        .title {
-            text-align: center;
-            font-size: 28px;
+        .page-header h2 {
+            font-size: 26px;
             font-weight: 700;
-            margin-bottom: 30px;
-            color: #ffffff;
+            letter-spacing: -0.02em;
+            color: var(--primary-forest);
+            margin-bottom: 4px;
         }
 
-        .card {
-            background: #1E293B;
-            padding: 35px;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.3);
-            border: 1px solid #334155;
-        }
-
-        .form-group {
-            margin-bottom: 24px;
-            position: relative;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
+        .page-header p {
+            color: var(--text-secondary);
             font-size: 14px;
-            color: #E2E8F0;
         }
 
-        .input-wrapper {
-            position: relative;
+        .goals-layout {
+            display: grid;
+            grid-template-columns: 440px 1fr;
+            gap: 28px;
+            align-items: start;
+        }
+
+        .goal-receipt-card {
+            background: var(--surface-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .goal-receipt-header {
             display: flex;
+            justify-content: space-between;
             align-items: center;
+            margin-bottom: 10px;
         }
 
-        .input-prefix {
-            position: absolute;
-            left: 15px;
-            color: #A0AEC0;
-            font-weight: 500;
-            pointer-events: none;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 14px 15px;
-            background: #0F172A;
-            border: 2px solid #334155;
-            border-radius: 12px;
-            font-size: 16px;
-            color: #F8FAFC;
-            outline: none;
-            transition: all 0.3s ease;
-        }
-
-        /* Padding variations for prefix */
-        .has-prefix {
-            padding-left: 35px;
-        }
-
-        .form-control:focus {
-            background: #1E293B;
-            border-color: #2B61FF;
-            box-shadow: 0 0 0 4px rgba(43, 97, 255, 0.2);
-        }
-
-        .form-control::placeholder {
-            color: #A0AEC0;
-        }
-
-        .error-message {
-            color: #E53E3E;
-            font-size: 12px;
-            margin-top: 6px;
-            display: none;
-            font-weight: 500;
-        }
-
-        .btn-primary {
-            width: 100%;
-            padding: 16px;
-            margin-top: 10px;
-            background: linear-gradient(135deg, #2B61FF 0%, #1545CB 100%);
-            color: white;
-            border: none;
-            border-radius: 12px;
+        .goal-receipt-header h3 {
             font-size: 16px;
             font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(43, 97, 255, 0.3);
+            color: var(--primary-forest);
+            margin: 0;
         }
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(43, 97, 255, 0.4);
-        }
-
-        /* Result Card Styles */
-        .result-card {
-            margin-top: 30px;
-            background: linear-gradient(135deg, #2B61FF 0%, #1545CB 100%);
-            border-radius: 16px;
-            padding: 25px 30px;
-            color: white;
-            box-shadow: 0 15px 30px rgba(43, 97, 255, 0.2);
+        .result-summary-box {
             display: none;
-            animation: fadeIn 0.4s ease forwards;
+            background: var(--light-green);
+            border: 1px solid rgba(82, 118, 93, 0.25);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            margin-top: 24px;
         }
 
-        .result-card h3 {
-            font-size: 18px;
+        .result-summary-box h3 {
+            font-size: 14px;
             font-weight: 600;
-            margin-bottom: 20px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--primary-forest);
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(82, 118, 93, 0.2);
         }
 
         .result-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
-            font-size: 15px;
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: var(--text-secondary);
         }
 
         .result-row:last-child {
             margin-bottom: 0;
-            margin-top: 20px;
+            margin-top: 14px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(82, 118, 93, 0.2);
             font-weight: 600;
-            font-size: 18px;
-            color: #E2E8F0;
+            color: var(--primary-forest);
+            font-size: 14px;
         }
 
         .result-value {
             font-weight: 600;
+            color: var(--primary-forest);
+            font-variant-numeric: tabular-nums;
         }
 
-        .time-value {
-            color: #48BB78;
-            /* Green tint for success feeling */
-            background: #F0FFF4;
-            padding: 4px 12px;
-            border-radius: 8px;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
+        @media (max-width: 900px) {
+            .goals-layout {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 
 <body>
-
-    <div class="tracker-container">
-        <h2 class="title">Goal-Based Savings Planner</h2>
-
-        <div class="card">
-            <form id="goalForm">
-
-                <!-- 1. Goal Name -->
-                <div class="form-group">
-                    <label for="goalName">Goal Name</label>
-                    <input type="text" id="goalName" class="form-control" placeholder="e.g. Laptop" required>
-                </div>
-
-                <!-- 2. Goal Cost -->
-                <div class="form-group">
-                    <label for="goalCost">Goal Cost (₹)</label>
-                    <div class="input-wrapper">
-                        <span class="input-prefix">₹</span>
-                        <input type="number" id="goalCost" class="form-control has-prefix" placeholder="30000" min="1"
-                            step="0.01" required>
+    <!-- Standard Navigation -->
+    <header class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo"><span class="logo-mark"></span> SmartSpend</a>
+            <nav class="nav-links">
+                <select id="languageSelector" class="lang-select" aria-label="Select Language">
+                    <option value="en">English</option>
+                    <option value="hi">हिंदी (Hindi)</option>
+                    <option value="ta">தமிழ் (Tamil)</option>
+                </select>
+                <div class="dropdown">
+                    <a href="index.html#features" class="dropbtn" data-i18n="nav.features">Features <i class="fas fa-chevron-down" style="font-size: 10px; margin-left: 4px;"></i></a>
+                    <div class="dropdown-content">
+                        <a href="expenses.html">Expense Analysis</a>
+                        <a href="dashboard.html">Financial Health Score</a>
+                        <a href="goals.html">Goal Tracker</a>
+                        <a href="monthlyreport.html">Monthly Report</a>
                     </div>
                 </div>
+                <a href="dashboard.html" data-i18n="nav.dashboard">Dashboard</a>
+                <a href="expenses.html" data-i18n="nav.expenses">Expenses</a>
+                <a href="goals.html" class="active" data-i18n="nav.goals">Goals</a>
+                <a href="aiagent.html" data-i18n="nav.aiadvisor">AI Advisor</a>
+            </nav>
+        </div>
+    </header>
 
-                <!-- 3. Monthly Saving Amount -->
-                <div class="form-group">
-                    <label for="monthlySaving">Monthly Saving Amount (₹)</label>
-                    <div class="input-wrapper">
-                        <span class="input-prefix">₹</span>
-                        <input type="number" id="monthlySaving" class="form-control has-prefix" placeholder="5000"
-                            min="1" step="0.01">
-                    </div>
-                    <div class="error-message" id="errMonthly">Must be greater than 0</div>
-                </div>
-
-                <!-- 4. Months to Achieve Goal -->
-                <div class="form-group">
-                    <label for="goalMonths">Months to Achieve Goal</label>
-                    <input type="number" id="goalMonths" class="form-control" placeholder="6" min="1" max="120"
-                        step="1">
-                    <div class="error-message" id="errMonths">Months must be between 1 and 120</div>
-                </div>
-
-                <button type="submit" class="btn-primary">Add Goal</button>
-            </form>
+    <div class="goals-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h2>Savings Goals &amp; Capital Milestones</h2>
+            <p>Model forward accumulation schedules and track progress toward designated capital targets.</p>
         </div>
 
-        <!-- Dashboard Result Card -->
-        <div class="result-card" id="resultCard">
-            <h3>Goal Summary</h3>
-            <div class="result-row">
-                <span>Goal:</span>
-                <span class="result-value" id="resName">-</span>
+        <div class="goals-layout">
+            <!-- Left Column: Goal Creation Form -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>New Milestone Calculator</h3>
+                </div>
+
+                <form id="goalForm" novalidate autocomplete="off">
+                    <div class="form-group">
+                        <label for="goalName">Milestone Identifier</label>
+                        <input type="text" id="goalName" class="form-control" placeholder="e.g. Emergency Liquidity Reserve" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="goalCost">Target Capital Amount</label>
+                        <div class="input-prefix-wrapper">
+                            <span class="input-prefix">₹</span>
+                            <input type="number" id="goalCost" class="form-control" placeholder="50000" min="1" step="0.01" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="monthlySaving">Monthly Capital Contribution</label>
+                        <div class="input-prefix-wrapper">
+                            <span class="input-prefix">₹</span>
+                            <input type="number" id="monthlySaving" class="form-control" placeholder="5000" min="1" step="0.01">
+                        </div>
+                        <div class="field-error" id="errMonthly">Monthly contribution must exceed zero.</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="goalMonths">Target Accumulation Horizon (Months)</label>
+                        <input type="number" id="goalMonths" class="form-control" placeholder="10" min="1" max="120" step="1">
+                        <div class="field-error" id="errMonths">Horizon must span between 1 and 120 months.</div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
+                        Commit Goal Milestone
+                    </button>
+                </form>
+
+                <!-- Live Projection Result Box -->
+                <div class="result-summary-box" id="resultCard">
+                    <h3>Projection Schedule</h3>
+                    <div class="result-row">
+                        <span>Milestone:</span>
+                        <span class="result-value" id="resName">—</span>
+                    </div>
+                    <div class="result-row">
+                        <span>Target Amount:</span>
+                        <span class="result-value" id="resCost">₹0</span>
+                    </div>
+                    <div class="result-row">
+                        <span>Monthly Contribution:</span>
+                        <span class="result-value" id="resSaving">₹0</span>
+                    </div>
+                    <div class="result-row">
+                        <span>Estimated Horizon:</span>
+                        <span class="result-value" id="resTime">0 months</span>
+                    </div>
+                </div>
             </div>
-            <div class="result-row">
-                <span>Cost:</span>
-                <span class="result-value" id="resCost">₹0</span>
-            </div>
-            <div class="result-row">
-                <span>Monthly Saving:</span>
-                <span class="result-value" id="resSaving">₹0</span>
-            </div>
-            <div class="result-row">
-                <span>Time Needed:</span>
-                <span class="result-value time-value" id="resTime">0 months</span>
+
+            <!-- Right Column: Active Goals Ledger -->
+            <div>
+                <div class="card" style="margin-bottom: 20px;">
+                    <div class="card-header" style="margin-bottom: 16px;">
+                        <h3>Active Capital Milestones</h3>
+                    </div>
+                    <div id="savedGoalsList">
+                        <!-- Populated dynamically by goals.js -->
+                        <p style="color: var(--text-secondary); font-size: 13px;">Loading active goals...</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Saved Goals Section -->
-    <div class="tracker-container" style="margin-top: 40px;">
-        <h2 class="title" style="font-size: 24px;">Your Active Goals</h2>
-        <div id="savedGoalsList" style="display: flex; flex-direction: column; gap: 20px;">
-            <!-- Goal cards will be listed here -->
-        </div>
-    </div>
-
-    <!-- JavaScript Logic -->
+    <!-- Initialization Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabaseClient.js"></script>
     <script src="js/goals.js"></script>

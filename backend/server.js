@@ -15,13 +15,28 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Serve static frontend assets from root and frontend folder
-app.use(express.static(path.join(__dirname, "..")));
-app.use(express.static(path.join(__dirname, "../frontend")));
+// Block access to sensitive files
+app.use((req, res, next) => {
+    const blocked = [/\.env/, /\.git/, /package\.json/, /package-lock\.json/, /node_modules/];
+    if (blocked.some(rx => rx.test(req.path))) {
+        return res.status(403).send("Access Denied");
+    }
+    next();
+});
 
-// Health / test route
-app.get("/health", (req, res) => {
-    res.json({ status: "ok", service: "SmartSpend Mini Buddy Backend", timestamp: new Date() });
+// Serve frontend static files from project root
+app.use(express.static(path.join(__dirname, ".."), {
+    dotfiles: "ignore",
+    index: "index.html"
+}));
+
+// Health check endpoint
+app.get("/api/health", (req, res) => {
+    res.json({
+        status: "ok",
+        supabaseConfigured: !!(process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY),
+        aiConfigured: !!process.env.GROQ_API_KEY
+    });
 });
 
 // Root route

@@ -3,25 +3,309 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mini Buddy - SmartSpend AI Financial Assistant</title>
+    <title>SmartSpend – Institutional AI Financial Advisor</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Design System Stylesheets -->
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <meta http-equiv="refresh" content="2; url=index.html?open_chat=true">
+    <style>
+        body {
+            background-color: var(--bg-page);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .advisor-workspace {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-width: 920px;
+            width: 100%;
+            margin: 24px auto 32px auto;
+            padding: 0 16px;
+        }
+
+        .chat-card {
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-container);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 160px);
+            min-height: 540px;
+            overflow: hidden;
+        }
+
+        .chat-card-header {
+            padding: 16px 24px;
+            background-color: var(--surface);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .advisor-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .advisor-avatar {
+            width: 36px;
+            height: 36px;
+            background-color: var(--color-light-green);
+            color: var(--color-primary-forest);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .advisor-status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--color-income);
+        }
+
+        .advisor-status-dot {
+            width: 6px;
+            height: 6px;
+            background-color: var(--color-income);
+            border-radius: 50%;
+        }
+
+        .chat-messages-scroll {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            background-color: var(--bg-page);
+        }
+
+        .message {
+            max-width: 78%;
+            padding: 14px 18px;
+            font-size: 14px;
+            line-height: 1.6;
+            border-radius: var(--radius-card);
+            animation: fadeIn 0.2s ease forwards;
+            position: relative;
+        }
+
+        .msg-ai {
+            align-self: flex-start;
+            background-color: var(--surface);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            border-bottom-left-radius: 2px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+
+        .msg-ai strong {
+            font-weight: 600;
+            color: var(--color-primary-forest);
+        }
+
+        .msg-ai p {
+            margin-bottom: 10px;
+        }
+
+        .msg-ai p:last-child {
+            margin-bottom: 0;
+        }
+
+        .msg-ai ul,
+        .msg-ai ol {
+            margin-left: 18px;
+            margin-bottom: 10px;
+        }
+
+        .msg-user {
+            align-self: flex-end;
+            background-color: var(--color-primary-forest);
+            color: #FFFFFF;
+            border-bottom-right-radius: 2px;
+        }
+
+        .msg-loading {
+            align-self: flex-start;
+            background-color: var(--surface);
+            color: var(--text-secondary);
+            border: 1px dashed var(--border);
+            border-bottom-left-radius: 2px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chat-input-bar {
+            padding: 16px 20px;
+            background-color: var(--surface);
+            border-top: 1px solid var(--border);
+        }
+
+        .chat-input-form {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .chat-text-input {
+            flex: 1;
+            height: 44px;
+            padding: 0 16px;
+            font-size: 14px;
+            font-family: inherit;
+            color: var(--text-primary);
+            background-color: var(--bg-page);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-input);
+            outline: none;
+            transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+        }
+
+        .chat-text-input:focus {
+            background-color: var(--surface);
+            border-color: var(--color-secondary-sage);
+            box-shadow: 0 0 0 3px rgba(82, 118, 93, 0.12);
+        }
+
+        .chat-send-btn {
+            height: 44px;
+            padding: 0 20px;
+            background-color: var(--color-primary-forest);
+            color: #FFFFFF;
+            border: none;
+            border-radius: var(--radius-btn);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color var(--transition-fast);
+        }
+
+        .chat-send-btn:hover {
+            background-color: #243b30;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
 </head>
-<body style="display: flex; align-items: center; justify-content: center; min-height: 100vh; background: #F8FAFD; font-family: inherit;">
-    <div style="text-align: center; max-width: 500px; padding: 40px; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08);">
-        <div style="font-size: 54px; margin-bottom: 20px;">🤖</div>
-        <h1 style="font-size: 24px; color: #1E293B; margin-bottom: 12px;">Mini Buddy is here!</h1>
-        <p style="color: #64748B; font-size: 15px; line-height: 1.6; margin-bottom: 25px;">
-            The AI Advisor has evolved into <strong>Mini Buddy</strong>, your floating personal financial assistant available everywhere across SmartSpend!
-        </p>
-        <a href="index.html?open_chat=true" class="btn btn-primary" style="display: inline-block; padding: 12px 28px; text-decoration: none;">
-            Chat with Mini Buddy Now &rarr;
-        </a>
-    </div>
-    <script src="js/speechService.js"></script>
+
+<body>
+    <!-- Standard Navigation -->
+    <header class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo"><span class="logo-mark"></span> SmartSpend</a>
+            <nav class="nav-links">
+                <select id="languageSelector" class="lang-select">
+                    <option value="en">English</option>
+                    <option value="hi">हिंदी (Hindi)</option>
+                    <option value="ta">தமிழ் (Tamil)</option>
+                </select>
+                <div class="dropdown">
+                    <a href="index.html#features" class="dropbtn" data-i18n="nav.features">Features <i class="fas fa-chevron-down" style="font-size: 10px; margin-left: 5px;"></i></a>
+                    <div class="dropdown-content">
+                        <a href="expenses.html">Expense Analysis</a>
+                        <a href="dashboard.html">Financial Health Score</a>
+                        <a href="goals.html">Goal Tracker</a>
+                        <a href="monthlyreport.html">Monthly Report</a>
+                    </div>
+                </div>
+                <a href="about.html" data-i18n="nav.about">About</a>
+                <a href="aiagent.html" class="active" data-i18n="nav.aiadvisor">AI Advisor</a>
+                <a href="login.html" data-i18n="nav.login">Login</a>
+                <a href="signup.html" class="btn btn-primary" data-i18n="nav.signup">Sign Up</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Advisor Chat Workspace -->
+    <main class="advisor-workspace">
+        <div class="chat-card">
+            <!-- Header bar -->
+            <div class="chat-card-header">
+                <div class="advisor-meta">
+                    <div class="advisor-avatar">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div>
+                        <div style="font-size: 15px; font-weight: 600; color: var(--text-primary);">
+                            SmartSpend Financial Advisor
+                        </div>
+                        <div class="advisor-status-badge">
+                            <span class="advisor-status-dot"></span> Telemetry Engine Connected
+                        </div>
+                    </div>
+                </div>
+                <a href="dashboard.html" class="btn btn-outline" style="font-size: 12px; padding: 6px 12px;">
+                    <i class="fas fa-chart-line" style="margin-right: 6px;"></i> Health Scorecard
+                </a>
+            </div>
+
+            <!-- Messages Scroll Area -->
+            <div class="chat-messages-scroll" id="chatArea">
+                <!-- Initial Welcome Message -->
+                <div class="message msg-ai">
+                    <p><strong>Institutional Financial Advisory</strong></p>
+                    <p>
+                        Welcome. I am your SmartSpend automated financial analyst. I evaluate your monthly cash inflows, category expenditures, and debt-to-savings ratios to deliver objective, deterministic recommendations.
+                    </p>
+                    <p style="font-size: 13px; color: var(--text-secondary); margin-top: 6px;">
+                        Try querying: <em>"How do I optimize my savings rate to reach 30%?"</em> or <em>"What is the benchmark ratio for discretionary spending?"</em>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Chat Input Area -->
+            <div class="chat-input-bar">
+                <form class="chat-input-form" id="chatForm">
+                    <input type="text" id="userInput" class="chat-text-input"
+                        placeholder="Inquire about budgeting ratios, milestone amortization, or expense reduction..." required autocomplete="off">
+                    <button type="submit" class="chat-send-btn">
+                        <span>Send</span>
+                        <i class="fas fa-paper-plane" style="font-size: 12px;"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabaseClient.js"></script>
     <script src="js/i18n.js"></script>
-    <script src="js/miniBuddy.js"></script>
+    <script src="js/aiagent.js"></script>
+    <script src="js/app.js"></script>
 </body>
+
 </html>

@@ -4,131 +4,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SmartSpend – Monthly Progress Report</title>
+    <title>Monthly Statement &amp; Report – SmartSpend</title>
+    <meta name="description" content="Monthly institutional statement, category expenditure distributions, and cash flow reports.">
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/animations.css">
-    <!-- Chart.js for Pie Chart -->
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            background-color: var(--bg-color, #f4f6fb);
-        }
-
         .report-container {
-            max-width: 1000px;
-            margin: 40px auto;
-            padding: 0 20px;
+            max-width: 1040px;
+            margin: 32px auto 64px;
+            padding: 0 32px;
         }
 
         .page-header {
-            margin-bottom: 30px;
-            text-align: center;
+            margin-bottom: 28px;
+            text-align: left;
         }
 
         .page-header h2 {
-            font-size: 32px;
-            color: #ffffff;
-            margin-bottom: 5px;
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--primary-forest);
+            margin-bottom: 4px;
         }
 
         .page-header p {
-            color: #94a3b8;
-            font-size: 16px;
+            color: var(--text-secondary);
+            font-size: 14px;
         }
 
-        /* Glassmorphism Card Style */
-        .report-card {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        .statement-card {
+            background: var(--surface-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: 36px;
+            box-shadow: var(--shadow-sm);
             display: flex;
             flex-direction: column;
-            gap: 40px;
+            gap: 36px;
+        }
+
+        .statement-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-subtle);
+            padding-bottom: 16px;
+        }
+
+        .statement-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--primary-forest);
+            margin: 0;
         }
 
         .chart-wrapper {
             position: relative;
-            height: 350px;
+            height: 320px;
             display: flex;
             justify-content: center;
             width: 100%;
         }
 
-        .summary-table-container {
-            width: 100%;
-            overflow-x: auto;
-        }
-
-        .summary-table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-        }
-
-        .summary-table th {
-            padding: 15px;
-            font-weight: 600;
-            color: #94a3b8;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
-            text-transform: uppercase;
-            font-size: 14px;
-            letter-spacing: 0.5px;
-        }
-
-        .summary-table td {
-            padding: 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            color: #ffffff;
-        }
-
-        .summary-table tr:hover {
-            background-color: rgba(43, 97, 255, 0.02);
-            transition: background-color 0.2s;
-        }
-
         .category-bullet {
             display: inline-block;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
+            width: 8px;
+            height: 8px;
+            border-radius: var(--radius-full);
             margin-right: 10px;
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            display: none;
+            flex-shrink: 0;
         }
 
         @media (max-width: 768px) {
-            .report-card {
+            .statement-card {
                 padding: 20px;
+                gap: 24px;
+            }
+            .report-container {
+                padding: 0 20px;
             }
         }
     </style>
 </head>
 
 <body>
-    <!-- Navigation -->
+    <!-- Standard Navigation -->
     <header class="navbar">
         <div class="container">
-            <a href="index.html" class="logo">SmartSpend</a>
-            <nav class="nav-links" style="display: flex; align-items: center; gap: 15px;">
-                <select id="languageSelector" class="lang-select"
-                    style="padding: 5px 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 14px; background-color: white;">
+            <a href="index.html" class="logo"><span class="logo-mark"></span> SmartSpend</a>
+            <nav class="nav-links">
+                <select id="languageSelector" class="lang-select" aria-label="Select Language">
                     <option value="en">English</option>
                     <option value="hi">हिंदी (Hindi)</option>
                     <option value="ta">தமிழ் (Tamil)</option>
                 </select>
                 <div class="dropdown">
-                    <a href="index.html#features" class="dropbtn active" data-i18n="nav.features">Features <i
-                            class="fas fa-chevron-down" style="font-size: 10px; margin-left: 5px;"></i></a>
+                    <a href="index.html#features" class="dropbtn" data-i18n="nav.features">Features <i class="fas fa-chevron-down" style="font-size: 10px; margin-left: 4px;"></i></a>
                     <div class="dropdown-content">
                         <a href="expenses.html">Expense Analysis</a>
                         <a href="dashboard.html">Financial Health Score</a>
@@ -139,59 +115,72 @@
                 <a href="dashboard.html" data-i18n="nav.dashboard">Dashboard</a>
                 <a href="expenses.html" data-i18n="nav.expenses">Expenses</a>
                 <a href="goals.html" data-i18n="nav.goals">Goals</a>
-                <div class="user-profile">JD</div>
+                <a href="monthlyreport.html" class="active" data-i18n="nav.reports">Reports</a>
             </nav>
         </div>
     </header>
 
     <div class="report-container">
+        <!-- Page Header -->
         <div class="page-header">
-            <h2>Monthly Spending Report</h2>
-            <p id="reportMonthSubtitle">Loading data for current month...</p>
+            <h2>Monthly Expense Statement</h2>
+            <p id="reportMonthSubtitle">Institutional breakdown and categorical distribution.</p>
         </div>
 
-        <div id="loadingState" style="text-align: center; padding: 100px;">
-            <i class="fas fa-spinner fa-spin fa-3x" style="color: #2f6df6; margin-bottom: 20px;"></i>
-            <h3>Analyzing your monthly spending...</h3>
+        <!-- Loading State -->
+        <div id="loadingState" style="text-align: center; padding: 60px 20px;">
+            <i class="fas fa-circle-notch fa-spin fa-2x" style="color: var(--secondary-sage); margin-bottom: 12px;"></i>
+            <p style="color: var(--text-secondary); font-size: 14px;">Generating monthly statement...</p>
         </div>
 
-        <!-- Empty State UI -->
-        <div class="report-card empty-state" id="emptyState">
-            <i class="fas fa-chart-pie fa-4x" style="color: #ccc; margin-bottom: 20px;"></i>
-            <h3>No expense data available for this month.</h3>
-            <p style="color: #666; margin-bottom: 25px;">Track your expenses to see your visual spending distribution.
-            </p>
-            <a href="expenses.html" class="btn btn-primary"
-                style="display: inline-block; padding: 12px 30px; font-size: 16px; border-radius: 8px;">Add Expenses</a>
+        <!-- Empty State -->
+        <div id="emptyState" class="card" style="display: none; text-align: center; padding: 64px 20px; max-width: 580px; margin: 40px auto;">
+            <div style="width: 52px; height: 52px; border-radius: var(--radius-md); background: var(--bg-page); color: var(--text-secondary); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 20px;">
+                <i class="fas fa-file-invoice"></i>
+            </div>
+            <h3 style="font-size: 18px; font-weight: 600; color: var(--primary-forest); margin-bottom: 8px;">No ledger entries found</h3>
+            <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 24px;">Please record monthly expenses first to generate your statement.</p>
+            <a href="expenses.html" class="btn btn-primary">Go to Expense Ledger</a>
         </div>
 
-        <!-- Populated Data UI -->
-        <div class="report-card" id="reportContent" style="display: none;">
-            <!-- Category Chart Row -->
+        <!-- Report Content -->
+        <div id="reportContent" class="statement-card" style="display: none;">
+            <div class="statement-header">
+                <h3>Categorical Allocation</h3>
+                <button type="button" onclick="window.print()" class="btn btn-outline btn-sm">
+                    <i class="fas fa-print" style="margin-right: 6px;"></i> Print Statement
+                </button>
+            </div>
+
+            <!-- Chart Section -->
             <div class="chart-wrapper">
                 <canvas id="monthlyChart"></canvas>
             </div>
 
-            <!-- Summary Table Row -->
-            <div class="summary-table-container">
-                <table class="summary-table">
-                    <thead>
-                        <tr>
-                            <th>Category</th>
-                            <th style="text-align: right;">Amount</th>
-                            <th style="text-align: right;">Percentage</th>
-                        </tr>
-                    </thead>
-                    <tbody id="summaryTableBody">
-                        <!-- Populated by JS -->
-                    </tbody>
-                </table>
+            <!-- Table Section -->
+            <div>
+                <h3 style="font-size: 15px; font-weight: 600; color: var(--primary-forest); margin-bottom: 14px;">
+                    Departmental Allocation Ledger
+                </h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th class="text-right">Expenditure</th>
+                                <th class="text-right">Share of Outflows</th>
+                            </tr>
+                        </thead>
+                        <tbody id="summaryTableBody">
+                            <!-- Populated dynamically by monthlyreport.js -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-
     </div>
 
-    <!-- Scripts -->
+    <!-- Initialization Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabaseClient.js"></script>
     <script src="js/i18n.js"></script>
