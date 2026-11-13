@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Mini Buddy System Instructions | SmartSpend</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .admin-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .admin-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            border: 1px solid #E2E8F0;
+            margin-bottom: 30px;
+        }
+
+        .admin-card h2 {
+            font-size: 20px;
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #1A202C;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .auth-gate {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 40px 30px;
+            max-width: 450px;
+            margin: 80px auto;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            border: 1px solid #E2E8F0;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #4A5568;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid #E2E8F0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus {
+            border-color: #2B61FF;
+        }
+
+        .prompt-textarea {
+            width: 100%;
+            min-height: 380px;
+            padding: 15px;
+            border: 1.5px solid #CBD5E1;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13.5px;
+            line-height: 1.6;
+            color: #1E293B;
+            resize: vertical;
+            box-sizing: border-box;
+            background: #F8FAFD;
+        }
+
+        .prompt-textarea:focus {
+            border-color: #2B61FF;
+            background: #ffffff;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .alert-box {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            font-size: 14px;
+        }
+
+        .alert-box.success {
+            background-color: #DEF7EC;
+            color: #03543F;
+            border: 1px solid #BCF0DA;
+            display: block;
+        }
+
+        .alert-box.error {
+            background-color: #FDE8E8;
+            color: #9B1C1C;
+            border: 1px solid #F8B4B4;
+            display: block;
+        }
+
+        .meta-tag {
+            font-size: 12px;
+            color: #64748B;
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Standard Navigation -->
+    <header class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo"><i class="fas fa-chart-line"></i> SmartSpend</a>
+            <nav class="nav-links">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="expenses.html">Expenses</a>
+                <a href="goals.html">Goals</a>
+                <a href="monthlyreport.html">Monthly Report</a>
+                <a href="admin-instructions.html" class="active" style="color: #2B61FF; font-weight: 700;">Admin: Mini Buddy</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Admin Authorization Gate (shown when unauthenticated) -->
+    <div id="adminAuthGate" class="auth-gate">
+        <div style="font-size: 40px; margin-bottom: 15px;">🔐</div>
+        <h2>Admin Authentication</h2>
+        <p style="color: #64748B; font-size: 14px; margin-bottom: 25px;">Enter the administrator secret key to configure Mini Buddy's system instructions and behavioral boundaries.</p>
+
+        <div id="gateAlert" class="alert-box"></div>
+
+        <form id="adminAuthForm">
+            <div class="form-group">
+                <label for="adminKeyInput">Administrator Secret Key</label>
+                <input type="password" id="adminKeyInput" class="form-input" placeholder="Enter ADMIN_SECRET" required autocomplete="current-password">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px;">Authorize Access</button>
+        </form>
+    </div>
+
+    <!-- Main Admin Workspace (shown when authenticated) -->
+    <main id="adminMainWorkspace" class="admin-container" style="display: none;">
+        <div class="admin-header">
+            <div>
+                <h1 style="margin: 0; font-size: 26px; color: #0F172A;">Mini Buddy System Instructions</h1>
+                <p style="margin: 5px 0 0; color: #64748B;">Configure and govern Mini Buddy's AI system prompt, persona boundaries, and scope restrictions.</p>
+            </div>
+            <button id="adminLogoutBtn" class="btn" style="background: #F1F5F9; color: #475569; border: 1px solid #CBD5E1;">
+                <i class="fas fa-lock"></i> Lock Admin
+            </button>
+        </div>
+
+        <div id="adminStatusAlert" class="alert-box"></div>
+
+        <div class="admin-card">
+            <h2><i class="fas fa-robot" style="color: #2B61FF;"></i> Active Instruction Prompt</h2>
+            <p style="font-size: 13.5px; color: #64748B; line-height: 1.5; margin-bottom: 15px;">
+                These instructions are dynamically loaded by the backend and prepended to every xAI Grok request. They enforce the 10 core personal finance guidelines and the strict non-finance refusal policy.
+            </p>
+
+            <form id="adminPromptForm">
+                <div class="form-group">
+                    <label for="instructionTitle">Instruction Title</label>
+                    <input type="text" id="instructionTitle" class="form-input" value="Default Financial Coach Instructions" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="systemPromptArea">System Instructions (Markdown Supported)</label>
+                    <textarea id="systemPromptArea" class="prompt-textarea" required spellcheck="false"></textarea>
+                    <div class="meta-tag">
+                        <span id="charCount">0 characters</span>
+                        <span id="lastUpdated">Last updated: Loading...</span>
+                        <span id="updatedBy">Updated by: system</span>
+                    </div>
+                </div>
+
+                <div class="btn-row">
+                    <button type="button" id="resetDefaultBtn" class="btn" style="background: #F8FAFC; color: #DC2626; border: 1px solid #FCA5A5;">
+                        <i class="fas fa-undo"></i> Reset to Default
+                    </button>
+                    <button type="submit" id="savePromptBtn" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save Active Instructions
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="admin-card">
+            <h2><i class="fas fa-shield-alt" style="color: #10B981;"></i> Enforcement Guidelines Checklist</h2>
+            <ul style="color: #475569; font-size: 14px; line-height: 1.8; margin: 0; padding-left: 20px;">
+                <li><strong>Identity:</strong> Friendly, approachable financial buddy named Mini Buddy 🤖.</li>
+                <li><strong>Scope:</strong> Personal finance, budgeting, savings, expenses, goals, and financial literacy only.</li>
+                <li><strong>Refusal Policy:</strong> Refuse all unrelated topics (programming, politics, gaming, trivia, etc.) with standard decline text.</li>
+                <li><strong>Data Integrity:</strong> Never invent financial figures or claim access to confidential bank data.</li>
+                <li><strong>Language:</strong> Follows active user-selected application language dynamically.</li>
+            </ul>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="js/adminInstructions.js"></script>
+    <script src="js/speechService.js"></script>
+    <script src="js/i18n.js"></script>
+    <script src="js/miniBuddy.js"></script>
+</body>
+
+</html>

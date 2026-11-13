@@ -1,8 +1,13 @@
 const express = require("express");
 const cors = require("cors");
-const Groq = require("groq-sdk");
 const path = require("path");
 require("dotenv").config({ path: path.join(__dirname, "../.env") });
+
+const chatRoutes = require("./routes/chat");
+const conversationRoutes = require("./routes/conversations");
+const adminRoutes = require("./routes/admin");
+const analyticsRoutes = require("./routes/analytics");
+const scoreRoutes = require("./routes/score");
 
 const app = express();
 
@@ -34,59 +39,45 @@ app.get("/api/health", (req, res) => {
     });
 });
 
-// Chat endpoint
-app.post("/api/chat", async (req, res) => {
-    try {
-        const userMessage = req.body.message;
-        const lang = req.body.language || 'en';
-        const apiKey = process.env.GROQ_API_KEY;
-
-        if (!apiKey) {
-            return res.status(500).json({ reply: "Missing GROQ_API_KEY environment variable. Add it to .env" });
+// Root route
+app.get("/", (req, res) => {
+    // If index.html exists, serve it, otherwise status message
+    res.sendFile(path.join(__dirname, "../index.html"), (err) => {
+        if (err) {
+            res.send("SmartSpend AI Backend is running 🚀");
         }
+    });
+});
 
-        const groq = new Groq({ apiKey });
+// Mini Buddy Chat & Conversations routes
+app.use("/api/chat", chatRoutes);
+app.use("/api/conversations", conversationRoutes);
+app.use("/api/admin", adminRoutes);
 
-        // Define language instruction
-        let langInstruction = "Please reply in English.";
-        if (lang === 'hi') langInstruction = "Please reply strictly in Hindi (हिंदी).";
-        if (lang === 'ta') langInstruction = "Please reply strictly in Tamil (தமிழ்).";
+// Intelligent Expense Analysis & Financial Health Score routes
+app.use("/api/analytics", analyticsRoutes);
+app.use("/api/financial-health", scoreRoutes);
 
-        const response = await groq.chat.completions.create({
-            model: "llama-3.3-70b-versatile",
-            messages: [
-                {
-                    role: "system",
-                    content: `You are a helpful financial advisor AI for a budgeting web app called SmartSpend. ${langInstruction}`
-                },
-                {
-                    role: "user",
-                    content: userMessage
-                }
-            ]
-        });
+// Config endpoint for frontend Supabase initialization
+app.get("/api/config", (req, res) => {
+    res.json({
+        supabaseUrl: process.env.SUPABASE_URL || "",
+        supabaseKey: process.env.SUPABASE_ANON_KEY || ""
+    });
+});
 
-        const reply = response.choices?.[0]?.message?.content || "AI could not respond.";
-
-        res.json({ reply });
-
-    } catch (error) {
-        console.error("Error:", error);
-        res.status(500).json({ reply: "Something went wrong with the AI." });
-    }
+// 404 handler for unknown API routes
+app.use("/api", (req, res) => {
+    res.status(404).json({ error: "API route not found" });
 });
 
 // Port
 const PORT = process.env.PORT || 5000;
 
-// Config endpoint for frontend Supabase initialization
-app.get("/api/config", (req, res) => {
-    res.json({
-        supabaseUrl: process.env.SUPABASE_URL,
-        supabaseKey: process.env.SUPABASE_ANON_KEY
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`SmartSpend server running on port ${PORT}`);
     });
-});
+}
 
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+module.exports = app;

@@ -177,16 +177,76 @@
             font-size: 14px;
         }
 
-        .summary-item:last-child {
-            border-bottom: none;
+        .recurring-badge {
+            background: rgba(139, 92, 246, 0.15);
+            color: #C084FC;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
         }
 
         .summary-item .label {
             color: var(--text-secondary);
         }
 
-        .summary-item .amount {
+        .ai-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, #4F46E5, #06B6D4);
+            color: #ffffff;
+            font-size: 12px;
             font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 12px;
+        }
+
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-top: 14px;
+        }
+
+        .insight-tile {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .insight-tile h5 {
+            margin: 0 0 8px 0;
+            font-size: 13.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .insight-tile ul {
+            margin: 0;
+            padding-left: 18px;
+            font-size: 13px;
+            color: #CBD5E1;
+            line-height: 1.6;
+        }
+
+        /* History Table */
+        .history-panel {
+            grid-column: span 12;
+        }
+
+        @media (max-width: 992px) {
+            .kpi-card { grid-column: span 4; }
+            .chart-box, .behaviour-box { grid-column: span 12; }
+            .insights-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 600px) {
+            .kpi-card { grid-column: span 6; }
+            .health-hero-card { padding: 20px; }
+            .health-gauge-box { flex-direction: column; text-align: center; }
             color: var(--primary-forest);
             font-variant-numeric: tabular-nums;
         }
@@ -258,6 +318,10 @@
     <!-- Standard Navigation -->
     <header class="navbar">
         <div class="container">
+            <a href="index.html" class="logo"><i class="fas fa-chart-line" style="margin-right: 8px;"></i>SmartSpend</a>
+            <nav class="nav-links" style="display: flex; align-items: center; gap: 15px;">
+                <select id="languageSelector" class="lang-select"
+                    style="padding: 5px 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 14px; background-color: white;">
             <a href="index.html" class="logo"><span class="logo-mark"></span> SmartSpend</a>
             <nav class="nav-links">
                 <select id="languageSelector" class="lang-select" aria-label="Select Language">
@@ -331,6 +395,7 @@
                                 <div class="progress-bar-fill" id="savingsRateBar"></div>
                             </div>
                         </div>
+                        <div class="comp-bar-bg"><div class="comp-bar-fill" id="compBudgetMgmtBar"></div></div>
                     </div>
 
                     <!-- Metric: Expense-to-Income Ratio -->
@@ -377,6 +442,9 @@
                 </div>
                 <div class="chart-wrapper">
                     <canvas id="expenseChart"></canvas>
+                </div>
+                <div id="categorySummaryPills" style="margin-top: 15px; display: flex; gap: 8px; flex-wrap: wrap; font-size: 12px;">
+                    <!-- Top & Lowest category pill -->
                 </div>
             </div>
 

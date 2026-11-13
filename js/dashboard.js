@@ -1,108 +1,19 @@
+// js/dashboard.js
 /**
- * SmartSpend – Financial Health Score Dashboard
- *
- * Uses ES module imports from calculator.js for all shared financial logic.
- * Fetches ONLY current-month data (filtered by created_at range).
- * Uses calculateWeightedHealthScore for a real 3-component score.
- * Uses getGrade as the SINGLE source-of-truth for all grading.
+ * SmartSpend Dashboard Logic
+ * Integrates Feature 1 (Intelligent Expense Analysis)
+ * and Feature 2 (Financial Health Score Calculation)
+ * using actual Supabase PostgreSQL transactions.
  */
-
-import {
-    formatCurrency,
-    calculateTotalExpenses,
-    calculateSavings,
-    calculateSavingsRate,
-    calculateExpenseRatio,
-    calculateDebtToIncomeRatio,
-    calculateWeightedHealthScore,
-    getGrade
-} from './calculator.js';
-
-// ─────────────────────────────────────────────────────────────────────────────
-// HELPERS
-// ─────────────────────────────────────────────────────────────────────────────
-
-/**
- * Returns { startDate: 'YYYY-MM-01', endDate: 'YYYY-MM-DD' } for the current month.
- */
-function getCurrentMonthRange() {
-    const now   = new Date();
-    const year  = now.getFullYear();
-    const month = now.getMonth() + 1;
-    const lastDay = new Date(year, month, 0).getDate();
-    return {
-        startDate: `${year}-${String(month).padStart(2, '0')}-01`,
-        endDate:   `${year}-${String(month).padStart(2, '0')}-${lastDay}`,
-        monthStr:  `${year}-${String(month).padStart(2, '0')}`,
-        monthName: now.toLocaleString('default', { month: 'long', year: 'numeric' })
-    };
-}
-
-/**
- * Returns human-readable month name from YYYY-MM string.
- */
-function getMonthName(monthStr) {
-    try {
-        const [year, month] = monthStr.split('-').map(Number);
-        return new Date(year, month - 1, 1).toLocaleString('default', { month: 'long', year: 'numeric' });
-    } catch { return monthStr; }
-}
-
-/**
- * Shows/hides the three main UI states: loading, empty, content.
- */
-function showState(loadingEl, emptyEl, contentEl, state) {
-    if (loadingEl) loadingEl.style.display = state === 'loading' ? 'block' : 'none';
-    if (emptyEl)   emptyEl.style.display   = state === 'empty'   ? 'block' : 'none';
-    if (contentEl) contentEl.style.display = state === 'content' ? 'grid'  : 'none';
-}
-
-/**
- * Sets a progress bar width, clamped to 0–100%.
- * Optionally applies warning/danger colour classes.
- */
-function setProgressBar(barId, pct, colorClass) {
-    const bar = document.getElementById(barId);
-    if (!bar) return;
-    bar.style.width = Math.max(0, Math.min(100, pct)) + '%';
-    bar.className = 'progress-bar-fill';
-    if (colorClass) bar.classList.add(colorClass);
-}
-
-/**
- * Returns a colour class based on a value being good/warning/danger.
- * @param {number} value
- * @param {number} goodThreshold   - value <= this is good (green)
- * @param {number} warningThreshold - value <= this is warning (yellow), else danger (red)
- * @param {boolean} invert - if true, higher is better (for savings rate)
- */
-function getColorClass(value, goodThreshold, warningThreshold, invert = false) {
-    if (invert) {
-        if (value >= goodThreshold)    return '';           // green (default bar color)
-        if (value >= warningThreshold) return 'warning';
-        return 'danger';
-    } else {
-        if (value <= goodThreshold)    return '';
-        if (value <= warningThreshold) return 'warning';
-        return 'danger';
-    }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// MAIN
-// ─────────────────────────────────────────────────────────────────────────────
 
 document.addEventListener('DOMContentLoaded', async () => {
+    // Determine API Base URL
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const apiBase = isLocal ? '' : (window.SMARTSPEND_API_URL || 'https://smartspend-ai-1-q37g.onrender.com');
 
-    const loadingEl = document.getElementById('dashboardLoading');
-    const emptyEl   = document.getElementById('emptyState');
-    const contentEl = document.getElementById('dashboardContent');
-
-    showState(loadingEl, emptyEl, contentEl, 'loading');
-
-    // ── Supabase Init & Auth Guard ───────────────────────────────────────────
     let supabase = null;
-    let userId   = null;
+    let userId = null;
+
     try {
         if (window.initSupabase) {
             supabase = await window.initSupabase();
@@ -113,7 +24,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!authUser) return; // requireAuth redirects to login.html
         }
     } catch (e) {
-        console.error('Supabase init failed', e);
+        console.error("Supabase init error:", e);
+    }
+
+    if (!userId) {
+        userId = localStorage.getItem('smartspend_user_id') || 'guest';
     }
 
     // Personalize welcome heading with authenticated user name
@@ -126,532 +41,364 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // ── No Supabase: Try localStorage fallback ───────────────────────────────
-    if (!supabase || !userId) {
-        const localIncome   = parseFloat(localStorage.getItem('smartspend_income')) || 0;
-        const localExpenses = JSON.parse(localStorage.getItem('smartspend_latest_expenses') || '{}');
-        const localMonth    = localStorage.getItem('smartspend_month');
-        const { monthStr }  = getCurrentMonthRange();
+    // Chart instances
+    let categoryChartInstance = null;
+    let trendChartInstance = null;
 
-        if (!localIncome || localMonth !== monthStr) {
-            showState(loadingEl, emptyEl, contentEl, 'empty');
-            return;
+    // Active Filter State
+    let currentRange = 'current_month';
+    let customStartDate = null;
+    let customEndDate = null;
+
+    // Currency Formatter
+    const formatINR = (val) => {
+        return new Intl.NumberFormat('en-IN', {
+            style: 'currency',
+            currency: 'INR',
+            maximumFractionDigits: 0
+        }).format(val || 0);
+    };
+
+    /**
+     * API Request Helper with Authentication Header
+     */
+    async function apiFetch(endpoint) {
+        const url = `${apiBase}${endpoint}`;
+        const headers = {
+            'Content-Type': 'application/json',
+            'x-user-id': userId
+        };
+
+        if (supabase) {
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session?.access_token) {
+                    headers['Authorization'] = `Bearer ${session.access_token}`;
+                }
+            } catch (e) {}
         }
 
-        const totalExp = calculateTotalExpenses(localExpenses);
-        renderDashboard({
-            monthlyIncome:    localIncome,
-            totalExpenses:    totalExp,
-            expenseBreakdown: localExpenses,
-            expenseHistory:   [],
-            monthlyDebt:      parseFloat(localStorage.getItem('smartspend_outstanding_debt')) || null,
-            monthName:        getMonthName(monthStr)
+        const res = await fetch(url, { headers });
+        if (!res.ok) {
+            const errBody = await res.json().catch(() => ({}));
+            throw new Error(errBody.error || `Request failed with status ${res.status}`);
+        }
+        return await res.json();
+    }
+
+    /**
+     * Initialize Date Filters
+     */
+    function setupFilterToolbar() {
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const customBox = document.getElementById('customDateBox');
+        const applyBtn = document.getElementById('applyCustomDateBtn');
+        const startInput = document.getElementById('customStartInput');
+        const endInput = document.getElementById('customEndInput');
+
+        // Set default custom dates (last 30 days)
+        const now = new Date();
+        const thirtyDaysAgo = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
+        startInput.value = thirtyDaysAgo.toISOString().slice(0, 10);
+        endInput.value = now.toISOString().slice(0, 10);
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const range = btn.dataset.range;
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                if (range === 'custom') {
+                    customBox.style.display = 'inline-flex';
+                } else {
+                    customBox.style.display = 'none';
+                    currentRange = range;
+                    loadExpenseAnalysis();
+                }
+            });
         });
-        return;
-    }
 
-    // ── Fetch Current Month Data from Supabase ───────────────────────────────
-    const { startDate, endDate, monthStr, monthName } = getCurrentMonthRange();
-    const endDateTime = endDate + 'T23:59:59';
-
-    const [incomeResult, expenseResult] = await Promise.all([
-        supabase
-            .from('incomes')
-            .select('*')
-            .eq('user_id', userId)
-            .gte('created_at', startDate)
-            .lte('created_at', endDateTime),
-        supabase
-            .from('expenses')
-            .select('*')
-            .eq('user_id', userId)
-            .gte('created_at', startDate)
-            .lte('created_at', endDateTime)
-            .order('created_at', { ascending: false })
-    ]);
-
-    // Handle fetch errors
-    if (incomeResult.error || expenseResult.error) {
-        console.error('Data fetch error', incomeResult.error, expenseResult.error);
-        showState(loadingEl, emptyEl, contentEl, 'empty');
-        const subtitle = document.getElementById('dashboardSubtitle');
-        if (subtitle) subtitle.textContent = 'Could not load your data. Please check your connection.';
-        return;
-    }
-
-    const incomeData  = incomeResult.data  || [];
-    const expenseData = expenseResult.data || [];
-
-    // No data for current month
-    if (incomeData.length === 0) {
-        showState(loadingEl, emptyEl, contentEl, 'empty');
-        return;
-    }
-
-    // ── Process Raw Data ─────────────────────────────────────────────────────
-
-    // Sum all income records for the month
-    const monthlyIncome = incomeData.reduce((sum, r) => sum + Number(r.amount), 0);
-
-    // Get outstanding debt from income record if stored there
-    let monthlyDebt = null;
-    const incomeWithDebt = incomeData.find(r =>
-        r.outstanding_debt !== null && r.outstanding_debt !== undefined
-    );
-    if (incomeWithDebt) {
-        monthlyDebt = Number(incomeWithDebt.outstanding_debt);
-    }
-
-    // Aggregate expenses by category
-    const expenseBreakdown = {};
-    expenseData.forEach(exp => {
-        const amount = Number(exp.amount);
-        if (isFinite(amount) && amount >= 0) {
-            expenseBreakdown[exp.category] = (expenseBreakdown[exp.category] || 0) + amount;
+        if (applyBtn) {
+            applyBtn.addEventListener('click', () => {
+                if (startInput.value && endInput.value) {
+                    currentRange = 'custom';
+                    customStartDate = startInput.value;
+                    customEndDate = endInput.value;
+                    loadExpenseAnalysis();
+                }
+            });
         }
-    });
+    }
 
-    const totalExpenses = calculateTotalExpenses(expenseBreakdown);
+    /**
+     * FEATURE 2: Render Financial Health Score (Section B)
+     */
+    async function loadFinancialHealthScore() {
+        try {
+            const result = await apiFetch('/api/financial-health/score');
+            const data = result.data;
 
-    // If we have income data but zero expenses, still render (Test 5)
-    renderDashboard({
-        monthlyIncome,
-        totalExpenses,
-        expenseBreakdown,
-        expenseHistory: expenseData,
-        monthlyDebt,
-        monthName,
-        monthStr,
-        supabase,
-        userId
-    });
-});
+            if (!data) return;
 
-// ─────────────────────────────────────────────────────────────────────────────
-// RENDER
-// ─────────────────────────────────────────────────────────────────────────────
+            // 1. Update Gauge & Classification
+            const score = Math.round(data.score || 0);
+            const scoreEl = document.getElementById('healthScoreDisplay');
+            const classEl = document.getElementById('healthClassification');
+            const circlePath = document.getElementById('scoreCirclePath');
+            const completenessEl = document.getElementById('healthDataCompleteness');
 
-async function renderDashboard({
-    monthlyIncome,
-    totalExpenses,
-    expenseBreakdown,
-    expenseHistory,
-    monthlyDebt,
-    monthName,
-    monthStr,
-    supabase,
-    userId
-}) {
-    const loadingEl = document.getElementById('dashboardLoading');
-    const emptyEl   = document.getElementById('emptyState');
-    const contentEl = document.getElementById('dashboardContent');
+            scoreEl.textContent = score;
+            classEl.textContent = data.classification || 'Calculating...';
 
-    showState(loadingEl, emptyEl, contentEl, 'content');
+            if (completenessEl) {
+                completenessEl.textContent = `Confidence: ${data.dataCompleteness || 'Medium'}`;
+            }
 
-    // ── Core Calculations ────────────────────────────────────────────────────
+            // Classification Colors
+            let strokeColor = '#22C55E';
+            let classBg = 'rgba(34, 197, 94, 0.2)';
+            let classColor = '#4ADE80';
 
-    // Savings = income – expenses (can be negative for deficits)
-    const savings     = calculateSavings(monthlyIncome, totalExpenses) ?? (monthlyIncome - totalExpenses);
-    // Savings rate (can be negative for deficits; null when income = 0)
-    const savingsRate = calculateSavingsRate(monthlyIncome, totalExpenses);
-    // Expense-to-income ratio
-    const expRatio    = calculateExpenseRatio(monthlyIncome, totalExpenses);
-    // Debt-to-income ratio (EMI from expenses + optional extra debt)
-    const emiAmount   = expenseBreakdown['Emi'] || expenseBreakdown['EMI'] || 0;
-    const totalDebt   = monthlyDebt !== null ? emiAmount + monthlyDebt : (emiAmount > 0 ? emiAmount : null);
-    const debtRatio   = totalDebt !== null ? calculateDebtToIncomeRatio(monthlyIncome, totalDebt) : null;
+            if (score >= 90) {
+                strokeColor = '#22C55E';
+                classBg = 'rgba(34, 197, 94, 0.2)';
+                classColor = '#4ADE80';
+            } else if (score >= 75) {
+                strokeColor = '#38BDF8';
+                classBg = 'rgba(56, 189, 248, 0.2)';
+                classColor = '#38BDF8';
+            } else if (score >= 60) {
+                strokeColor = '#818CF8';
+                classBg = 'rgba(129, 140, 248, 0.2)';
+                classColor = '#A5B4FC';
+            } else if (score >= 40) {
+                strokeColor = '#FBBF24';
+                classBg = 'rgba(251, 191, 36, 0.2)';
+                classColor = '#FCD34D';
+            } else {
+                strokeColor = '#F87171';
+                classBg = 'rgba(248, 113, 113, 0.2)';
+                classColor = '#FCA5A5';
+            }
 
-    // Financial Health Score (3-component weighted model)
-    const scoreResult = calculateWeightedHealthScore({
-        income:        monthlyIncome,
-        totalExpenses: totalExpenses,
-        monthlyDebt:   totalDebt  // null if no debt info available
-    });
+            classEl.style.backgroundColor = classBg;
+            classEl.style.color = classColor;
+            circlePath.style.stroke = strokeColor;
 
-    const { normalizedScore, grade, gradeLabel, components, isPartial, insufficientData } = scoreResult;
+            // Animate SVG circle progress
+            setTimeout(() => {
+                circlePath.setAttribute('stroke-dasharray', `${score}, 100`);
+            }, 100);
 
-    // ── Render Health Score Card ─────────────────────────────────────────────
+            // 2. Component-Wise Breakdown Bars
+            const comps = data.components || {};
 
-    const scoreEl   = document.getElementById('healthScoreDisplay');
-    const gradeEl   = document.getElementById('healthGradeDisplay');
-    const msgEl     = document.getElementById('healthMessageDisplay');
-    const partialEl = document.getElementById('scorePartialNote');
+            const updateCompUI = (key, ptsId, barId, maxPts) => {
+                const comp = comps[key];
+                const ptsEl = document.getElementById(ptsId);
+                const barEl = document.getElementById(barId);
+                if (!ptsEl || !barEl) return;
 
-    if (scoreEl)  scoreEl.textContent  = insufficientData ? '—' : normalizedScore;
-    if (gradeEl)  gradeEl.textContent  = insufficientData ? '—' : `${grade} · ${gradeLabel}`;
-    if (msgEl) {
-        if (insufficientData) {
-            msgEl.textContent = 'No income data found. Add your income and expenses to calculate your score.';
-        } else {
-            const messages = {
-                A: `Excellent! You have a highly sustainable financial profile. Keep maintaining this discipline.`,
-                B: `Good job! Your finances are in solid shape. A few optimizations could push you to Excellent.`,
-                C: `Average. You're managing, but there's room to significantly improve your savings rate.`,
-                D: `Poor. Your expenses are consuming most of your income. Focus on reducing your largest categories.`,
-                F: `Critical. Immediate action needed — your expenses are unsustainably high relative to your income.`
+                if (comp && comp.available) {
+                    ptsEl.textContent = `${comp.earnedPoints} / ${comp.maxPoints} pts`;
+                    const pct = Math.min(100, (comp.earnedPoints / comp.maxPoints) * 100);
+                    barEl.style.width = `${pct}%`;
+                    barEl.style.backgroundColor = pct >= 80 ? '#22C55E' : pct >= 50 ? '#38BDF8' : '#F87171';
+                } else {
+                    ptsEl.textContent = `Unavailable (Excluded)`;
+                    barEl.style.width = '0%';
+                }
             };
-            msgEl.textContent = messages[grade] || 'Analyzing your data...';
-        }
-    }
 
-    if (partialEl) {
-        if (isPartial && !insufficientData) {
-            partialEl.textContent = '* Score based on available components. Add EMI data for a complete score.';
-            partialEl.style.display = 'block';
-        } else {
-            partialEl.style.display = 'none';
-        }
-    }
+            updateCompUI('savingsRate', 'compSavingsRatePts', 'compSavingsRateBar', 30);
+            updateCompUI('expenseManagement', 'compExpenseMgmtPts', 'compExpenseMgmtBar', 25);
+            updateCompUI('budgetManagement', 'compBudgetMgmtPts', 'compBudgetMgmtBar', 20);
+            updateCompUI('financialConsistency', 'compConsistencyPts', 'compConsistencyBar', 15);
+            updateCompUI('savingsGoalProgress', 'compGoalProgressPts', 'compGoalProgressBar', 10);
 
-    // ── Render Metric Cards ──────────────────────────────────────────────────
-
-    // 1. Savings Rate
-    const srDisplay = document.getElementById('savingsRateDisplay');
-    const srSub     = document.getElementById('savingsRateSub');
-    const srBar     = document.getElementById('savingsRateBar');
-
-    if (srDisplay) {
-        if (savingsRate === null) {
-            srDisplay.textContent = 'N/A';
-            if (srSub) srSub.textContent = 'No income data';
-        } else {
-            srDisplay.textContent = savingsRate.toFixed(1) + '%';
-            if (srSub) {
-                if (savingsRate < 0)        srSub.textContent = `Deficit of ${formatCurrency(Math.abs(savings))}`;
-                else if (savingsRate < 10)  srSub.textContent = 'Below target (aim for ≥20%)';
-                else if (savingsRate < 20)  srSub.textContent = 'Getting closer to target';
-                else                        srSub.textContent = 'At or above recommended target';
-            }
-            if (srBar) {
-                const pct      = Math.min(Math.max(savingsRate, 0), 100);
-                const colorCls = getColorClass(savingsRate, 20, 10, true);
-                setProgressBar('savingsRateBar', pct, colorCls);
-            }
-        }
-    }
-
-    // 2. Expense-to-Income Ratio
-    const erDisplay = document.getElementById('expenseRatioDisplay');
-    const erSub     = document.getElementById('expenseRatioSub');
-
-    if (erDisplay) {
-        if (expRatio === null) {
-            erDisplay.textContent = 'N/A';
-            if (erSub) erSub.textContent = 'No income data';
-        } else {
-            erDisplay.textContent = expRatio.toFixed(1) + '%';
-            if (erSub) {
-                if (expRatio > 100)      erSub.textContent = 'Over 100% — severe deficit';
-                else if (expRatio > 90)  erSub.textContent = 'Very high — critical risk';
-                else if (expRatio > 80)  erSub.textContent = 'High — reduce expenses';
-                else if (expRatio > 70)  erSub.textContent = 'Moderate — watch closely';
-                else if (expRatio > 50)  erSub.textContent = 'Acceptable — room to improve';
-                else                     erSub.textContent = 'Excellent — ≤50% of income';
-            }
-            const erColorCls = getColorClass(expRatio, 50, 80, false);
-            setProgressBar('expenseRatioBar', expRatio > 100 ? 100 : expRatio, erColorCls);
-        }
-    }
-
-    // 3. Debt-to-Income Ratio
-    const drDisplay = document.getElementById('debtRatioDisplay');
-    const drSub     = document.getElementById('debtRatioSub');
-
-    if (drDisplay) {
-        if (debtRatio === null) {
-            drDisplay.textContent = 'N/A';
-            if (drSub) drSub.textContent = 'No EMI/debt data entered';
-        } else {
-            drDisplay.textContent = debtRatio.toFixed(1) + '%';
-            if (drSub) {
-                if (debtRatio === 0)        drSub.textContent = 'No debt — perfect score';
-                else if (debtRatio <= 15)   drSub.textContent = 'Low debt — healthy';
-                else if (debtRatio <= 30)   drSub.textContent = 'Manageable — watch closely';
-                else if (debtRatio <= 43)   drSub.textContent = 'High — consider reducing debt';
-                else                        drSub.textContent = 'Very high — critical risk';
-            }
-            const drColorCls = getColorClass(debtRatio, 15, 43, false);
-            setProgressBar('debtRatioBar', Math.min(debtRatio, 100), drColorCls);
-        }
-    }
-
-    // ── Render Monthly Income in dashboard header ─────────────────────────────
-    const incomeDisplay  = document.getElementById('incomeDisplay');
-    const balanceDisplay = document.getElementById('balanceDisplay');
-    if (incomeDisplay)  incomeDisplay.textContent  = formatCurrency(monthlyIncome);
-    if (balanceDisplay) balanceDisplay.textContent = formatCurrency(savings);
-
-    // ── Render Savings Summary List ──────────────────────────────────────────
-
-    const sumIncomeEl   = document.getElementById('sumIncome');
-    const sumExpensesEl = document.getElementById('sumExpenses');
-    const sumSavingsEl  = document.getElementById('sumSavings');
-    const topExpenseEl  = document.getElementById('topExpense');
-    const bottomExpEl   = document.getElementById('bottomExpense');
-
-    if (sumIncomeEl)   sumIncomeEl.textContent   = formatCurrency(monthlyIncome);
-    if (sumExpensesEl) sumExpensesEl.textContent  = '-' + formatCurrency(totalExpenses);
-
-    if (sumSavingsEl) {
-        sumSavingsEl.textContent = (savings >= 0 ? '+' : '') + formatCurrency(savings);
-        sumSavingsEl.className   = savings >= 0 ? 'amount positive-text' : 'amount negative-text';
-    }
-
-    // Top & Bottom Expense Categories
-    const catEntries = Object.entries(expenseBreakdown).filter(([, v]) => v > 0);
-    if (catEntries.length > 0) {
-        catEntries.sort(([, a], [, b]) => b - a);
-        const [topCat, topAmt]       = catEntries[0];
-        const [botCat, botAmt]       = catEntries[catEntries.length - 1];
-        if (topExpenseEl) topExpenseEl.textContent = `${topCat} (${formatCurrency(topAmt)})`;
-        if (bottomExpEl)  bottomExpEl.textContent  = `${botCat} (${formatCurrency(botAmt)})`;
-    } else {
-        if (topExpenseEl) topExpenseEl.textContent = 'No expenses';
-        if (bottomExpEl)  bottomExpEl.textContent  = 'No expenses';
-    }
-
-    // ── Dynamic AI Warning Alert ─────────────────────────────────────────────
-    const aiWarning = document.getElementById('aiWarningAlert');
-    if (aiWarning && monthlyIncome > 0 && totalExpenses > 0) {
-        const foodPct  = ((expenseBreakdown['Food'] || 0) / monthlyIncome) * 100;
-        const shopPct  = ((expenseBreakdown['Shopping'] || 0) / monthlyIncome) * 100;
-        const emiPct   = (emiAmount / monthlyIncome) * 100;
-
-        if (foodPct > 30) {
-            aiWarning.style.display = 'block';
-            aiWarning.innerHTML = `<strong>Advisory:</strong> Food &amp; Groceries accounts for ${foodPct.toFixed(1)}% of your income (exceeding the 30% guideline). Consider meal planning and reduced dining to recover cash flow.`;
-        } else if (shopPct > 15) {
-            aiWarning.style.display = 'block';
-            aiWarning.innerHTML = `<strong>Advisory:</strong> Discretionary shopping accounts for ${shopPct.toFixed(1)}% of income. Implementing a 24-hour review rule before discretionary purchases is recommended.`;
-        } else if (emiPct > 43) {
-            aiWarning.style.display = 'block';
-            aiWarning.innerHTML = `<strong>High Debt Notice:</strong> EMI payments represent ${emiPct.toFixed(1)}% of your monthly income. Prioritize debt restructuring or accelerated principal reduction.`;
-        } else {
-            aiWarning.style.display = 'none';
-        }
-    } else if (aiWarning) {
-        aiWarning.style.display = 'none';
-    }
-
-    // ── Render Score Breakdown Section ───────────────────────────────────────
-
-    const breakdownContainer = document.getElementById('scoreBreakdownItems');
-    const breakdownNote      = document.getElementById('scoreBreakdownNote');
-
-    if (breakdownNote) {
-        breakdownNote.textContent = isPartial
-            ? `Partial score (${scoreResult.maxPossibleScore || 75}/100 components available)`
-            : 'Full 3-component score';
-    }
-
-    if (breakdownContainer) {
-        breakdownContainer.innerHTML = '';
-
-        const compRows = [
-            {
-                label:     'Savings Rate',
-                component: components.savingsRate,
-                detail:    components.savingsRate.rate !== null
-                    ? `${components.savingsRate.rate.toFixed(1)}% savings rate`
-                    : 'Not available'
-            },
-            {
-                label:     'Expense-to-Income Ratio',
-                component: components.expenseRatio,
-                detail:    components.expenseRatio.ratio !== null
-                    ? `${components.expenseRatio.ratio.toFixed(1)}% of income spent`
-                    : 'Not available'
-            },
-            {
-                label:     'Debt-to-Income Ratio',
-                component: components.debtRatio,
-                detail:    components.debtRatio.ratio !== null
-                    ? `${components.debtRatio.ratio.toFixed(1)}% of income on debt`
-                    : 'No EMI/debt data — enter in Expenses page'
-            }
-        ];
-
-        compRows.forEach(({ label, component, detail }) => {
-            const pct = component.available
-                ? Math.round((component.points / component.maxPoints) * 100)
-                : 0;
-
-            const row = document.createElement('div');
-            row.className = 'breakdown-item';
-            row.innerHTML = `
-                <div class="breakdown-label">
-                    ${label}
-                    <div class="breakdown-unavailable">${detail}</div>
-                </div>
-                <div class="breakdown-bar">
-                    <div class="breakdown-bar-fill" style="width: ${pct}%"></div>
-                </div>
-                <div class="breakdown-pts">
-                    ${component.available
-                        ? `${component.points} / ${component.maxPoints} pts`
-                        : '<span style="color:#999;font-weight:normal;font-size:12px;">Not scored</span>'}
-                </div>
-            `;
-            breakdownContainer.appendChild(row);
-        });
-    }
-
-    // ── Render Expense History Table ─────────────────────────────────────────
-
-    const historyTbody = document.getElementById('expenseHistoryTableBody');
-    if (historyTbody) {
-        historyTbody.innerHTML = '';
-
-        if (expenseHistory.length === 0) {
-            historyTbody.innerHTML = `
-                <tr>
-                    <td colspan="4" style="text-align:center; padding: 25px; color: #94a3b8;">
-                        No expense records for this month yet.
-                        <a href="expenses.html" style="color: #2a5298; margin-left: 8px;">Add expenses →</a>
-                    </td>
-                </tr>`;
-        } else {
-            expenseHistory.forEach(exp => {
-                const amount  = Number(exp.amount);
-                const pct     = totalExpenses > 0 ? ((amount / totalExpenses) * 100).toFixed(1) : '—';
-                const dateStr = exp.date || (exp.created_at ? exp.created_at.slice(0, 10) : 'N/A');
-                const tr      = document.createElement('tr');
-                tr.innerHTML  = `
-                    <td style="padding: 12px; border-bottom: 1px solid #f0f0f0; color: #555;">${dateStr}</td>
-                    <td style="padding: 12px; border-bottom: 1px solid #f0f0f0;">${exp.category}</td>
-                    <td style="padding: 12px; border-bottom: 1px solid #f0f0f0; text-align: right; font-weight: 500;">${formatCurrency(amount)}</td>
-                    <td style="padding: 12px; border-bottom: 1px solid #f0f0f0; text-align: right; color: #666;">${pct}%</td>
-                `;
-                historyTbody.appendChild(tr);
-            });
-        }
-    }
-
-    // ── Pie Chart (Expense Breakdown) ────────────────────────────────────────
-
-    const expChartEl = document.getElementById('expenseChart');
-    if (expChartEl) {
-        const ctx         = expChartEl.getContext('2d');
-        const chartLabels = Object.keys(expenseBreakdown).filter(k => expenseBreakdown[k] > 0);
-        const chartData   = chartLabels.map(k => expenseBreakdown[k]);
-
-        if (chartLabels.length === 0) {
-            // Show a placeholder "no expenses" chart
-            new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['No Expenses'],
-                    datasets: [{ data: [1], backgroundColor: ['#e2e8f0'], borderWidth: 0 }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: { enabled: false }
-                    },
-                    cutout: '70%'
+            // 3. Score Recommendations List
+            const recListEl = document.getElementById('scoreRecommendationsList');
+            if (recListEl) {
+                recListEl.innerHTML = '';
+                const recs = data.recommendations || [];
+                if (recs.length === 0) {
+                    recListEl.innerHTML = '<p style="color: #94A3B8; margin: 0; font-size: 13px;">No critical weaknesses identified. Excellent financial control!</p>';
+                } else {
+                    recs.forEach(rec => {
+                        const item = document.createElement('div');
+                        item.className = 'rec-item';
+                        item.innerHTML = `
+                            <i class="fas fa-check-circle"></i>
+                            <div class="rec-body">
+                                <h5>${rec.component}: ${rec.suggestion}</h5>
+                                <p><strong>Why it matters:</strong> ${rec.whyItMatters}</p>
+                            </div>
+                        `;
+                        recListEl.appendChild(item);
+                    });
                 }
-            });
-        } else {
-            const bgColors = [
-                '#182820', // Forest
-                '#52765D', // Sage
-                '#B65C4B', // Terracotta
-                '#A47B35', // Ochre
-                '#52749A', // Slate
-                '#367A53', // Deep Income Green
-                '#8E9990', // Neutral Sand
-                '#C4B9A7'  // Warm Wheat
-            ];
-
-            new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: chartLabels,
-                    datasets: [{
-                        data: chartData,
-                        backgroundColor: bgColors.slice(0, chartLabels.length),
-                        borderWidth: 1.5,
-                        borderColor: '#FFFFFF',
-                        hoverOffset: 6
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    animation: { animateScale: true, animateRotate: true, duration: 600, easing: 'easeOutQuart' },
-                    plugins: {
-                        legend: {
-                            position: 'right',
-                            labels: { padding: 14, usePointStyle: true, font: { family: "'Inter', sans-serif", size: 12 } }
-                        },
-                        tooltip: {
-                            backgroundColor: '#182820',
-                            padding: 12,
-                            bodyFont: { family: "'Inter', sans-serif", size: 13 },
-                            callbacks: {
-                                label(context) {
-                                    const val  = context.parsed;
-                                    const pct  = totalExpenses > 0 ? ((val / totalExpenses) * 100).toFixed(1) : 0;
-                                    return ` ${context.label}: ${formatCurrency(val)} (${pct}%)`;
-                                }
-                            }
-                        }
-                    },
-                    cutout: '72%'
-                }
-            });
+            }
+        } catch (err) {
+            console.error("Error loading financial health score:", err);
         }
     }
 
-    // ── Bar Chart (Peer Comparison) ──────────────────────────────────────────
+    /**
+     * FEATURE 1: Render Intelligent Expense Analysis (Section A)
+     */
+    async function loadExpenseAnalysis() {
+        try {
+            let queryStr = `?range=${currentRange}`;
+            if (currentRange === 'custom' && customStartDate && customEndDate) {
+                queryStr += `&startDate=${customStartDate}&endDate=${customEndDate}`;
+            }
 
-    const peerChartEl = document.getElementById('peerChart');
-    if (peerChartEl) {
-        const peerCtx = peerChartEl.getContext('2d');
+            // Concurrent API requests
+            const [overviewRes, categoryRes, comparisonRes, behaviourRes, aiRes] = await Promise.all([
+                apiFetch(`/api/analytics/overview${queryStr}`),
+                apiFetch(`/api/analytics/categories${queryStr}`),
+                apiFetch('/api/analytics/monthly-comparison'),
+                apiFetch('/api/analytics/behaviour'),
+                apiFetch('/api/analytics/ai-insights')
+            ]);
 
-        new Chart(peerCtx, {
-            type: 'bar',
+            const overview = overviewRes.data;
+            const categories = categoryRes.data;
+            const comparison = comparisonRes.data;
+            const behaviour = behaviourRes.data;
+            const aiData = aiRes.data;
+
+            // If completely empty, show empty state
+            if (overview.transactionCount === 0 && overview.totalIncome === 0) {
+                if (loadingEl) loadingEl.style.display = 'none';
+                if (emptyEl) emptyEl.style.display = 'block';
+                if (contentEl) contentEl.style.display = 'none';
+                return;
+            }
+
+            if (loadingEl) loadingEl.style.display = 'none';
+            if (emptyEl) emptyEl.style.display = 'none';
+            if (contentEl) contentEl.style.display = 'grid';
+
+            // 1. Overview KPIs
+            document.getElementById('kpiIncome').textContent = formatINR(overview.totalIncome);
+            document.getElementById('kpiExpenses').textContent = formatINR(overview.totalExpenses);
+            document.getElementById('kpiExpenseSub').textContent = `${overview.transactionCount} transactions`;
+
+            const savingsEl = document.getElementById('kpiSavings');
+            savingsEl.textContent = (overview.netSavings >= 0 ? '+' : '') + formatINR(overview.netSavings);
+            savingsEl.className = `kpi-value ${overview.netSavings >= 0 ? 'positive-val' : 'negative-val'}`;
+            document.getElementById('kpiSavingsRate').textContent = `Savings Rate: ${overview.savingsRate}%`;
+
+            document.getElementById('kpiDailySpend').textContent = formatINR(overview.avgDailySpending);
+
+            const topCat = overview.highestCategory;
+            document.getElementById('kpiTopCategory').textContent = topCat.name;
+            document.getElementById('kpiTopCategorySub').textContent = topCat.amount > 0
+                ? `${formatINR(topCat.amount)} (${topCat.percentage}%)`
+                : 'No expenses';
+
+            document.getElementById('kpiTxnCount').textContent = overview.transactionCount;
+
+            // 2. Category Doughnut Chart
+            renderCategoryChart(categories);
+
+            // 3. Trends & Comparison Chart
+            renderTrendChart(overview.trends, comparison);
+
+            // 4. Behaviour & Anomalies
+            renderBehaviourSection(behaviour);
+
+            // 5. AI Insights (Gemini)
+            renderAIInsights(aiData);
+
+            // 6. Recent Transaction History
+            renderTransactionHistory(overview.period);
+
+        } catch (err) {
+            console.error("Error loading expense analysis:", err);
+            if (loadingEl) loadingEl.style.display = 'none';
+            if (emptyEl) emptyEl.style.display = 'block';
+        }
+    }
+
+    /**
+     * Render Category Doughnut Chart with Chart.js
+     */
+    function renderCategoryChart(categoriesData) {
+        const ctx = document.getElementById('expenseChart').getContext('2d');
+        const badgeEl = document.getElementById('categoryRangeBadge');
+        const pillsEl = document.getElementById('categorySummaryPills');
+
+        if (badgeEl) {
+            badgeEl.textContent = categoriesData.period.range.replace('_', ' ').toUpperCase();
+        }
+
+        const cats = categoriesData.categories || [];
+        const labels = cats.map(c => c.name);
+        const data = cats.map(c => c.amount);
+
+        const palette = ['#4F46E5', '#06B6D4', '#22C55E', '#F59E0B', '#EC4899', '#8B5CF6', '#64748B'];
+
+        if (categoryChartInstance) {
+            categoryChartInstance.destroy();
+        }
+
+        categoryChartInstance = new Chart(ctx, {
+            type: 'doughnut',
             data: {
-                labels: ['Savings Rate (%)', 'Food/Groceries (₹)', 'Shopping (₹)'],
-                datasets: [
-                    {
-                        label: 'You',
-                        data: [
-                            savingsRate !== null ? Math.max(savingsRate, 0).toFixed(1) : 0,
-                            expenseBreakdown['Food'] || 0,
-                            expenseBreakdown['Shopping'] || 0
-                        ],
-                        backgroundColor: '#182820',
-                        borderRadius: 4,
-                        borderSkipped: false
-                    },
-                    {
-                        label: 'Average Peer',
-                        data: [15, 8000, 3000], // Representative averages
-                        backgroundColor: '#D1D7CE',
-                        borderRadius: 4,
-                        borderSkipped: false
-                    }
-                ]
+                labels,
+                datasets: [{
+                    data,
+                    backgroundColor: palette.slice(0, labels.length),
+                    borderWidth: 2,
+                    borderColor: '#1E293B',
+                    hoverOffset: 8
+                }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    tooltip: {
-                        backgroundColor: '#182820',
-                        padding: 10,
-                        titleFont: { family: "'Inter', sans-serif", size: 13 },
-                        bodyFont: { family: "'Inter', sans-serif", size: 13 }
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            color: '#CBD5E1',
+                            font: { family: "'Poppins', sans-serif", size: 12 },
+                            usePointStyle: true,
+                            padding: 14
+                        }
                     },
-                    legend: { position: 'top', labels: { font: { family: "'Inter', sans-serif", size: 12 } } }
+                    tooltip: {
+                        callbacks: {
+                            label: function (ctx) {
+                                const val = ctx.parsed || 0;
+                                const pct = categoriesData.totalExpenses > 0
+                                    ? ((val / categoriesData.totalExpenses) * 100).toFixed(1)
+                                    : 0;
+                                return ` ${ctx.label}: ${formatINR(val)} (${pct}%)`;
+                            }
+                        }
+                    }
                 },
-                scales: {
-                    y: { beginAtZero: true, grid: { color: '#EDF0EA' } },
-                    x: { grid: { display: false } }
-                }
+                cutout: '68%'
+            }
+        });
+
+        // Summary pills below chart
+        if (pillsEl) {
+            pillsEl.innerHTML = '';
+            if (categoriesData.highestCategory && categoriesData.highestCategory.amount > 0) {
+                const highPill = document.createElement('span');
+                highPill.style.cssText = 'background: rgba(245, 158, 11, 0.15); color: #FCD34D; padding: 3px 10px; border-radius: 6px;';
+                highPill.innerHTML = `<strong>Highest:</strong> ${categoriesData.highestCategory.name} (${formatINR(categoriesData.highestCategory.amount)})`;
+                pillsEl.appendChild(highPill);
+            }
+            if (categoriesData.lowestCategory && categoriesData.lowestCategory.amount > 0 && categoriesData.categories.length > 1) {
+                const lowPill = document.createElement('span');
+                lowPill.style.cssText = 'background: rgba(34, 197, 94, 0.15); color: #4ADE80; padding: 3px 10px; border-radius: 6px;';
+                lowPill.innerHTML = `<strong>Lowest:</strong> ${categoriesData.lowestCategory.name} (${formatINR(categoriesData.lowestCategory.amount)})`;
+                pillsEl.appendChild(lowPill);
             }
         });
     }
@@ -735,56 +482,119 @@ function generateImprovements({ grade, expenseBreakdown, savingsRate, totalExpen
         } else {
             improvements.push(`Healthy Leverage: Debt ratio is ${emiPct}%. Continue consistent payments to retire obligations ahead of maturity.`);
         }
-    } else {
-        // No debt — give a savings/investment tip
-        if (improvements.length < 3) {
-            improvements.push(`Reserve Building: With zero debt service obligations, direct monthly surplus toward establishing 3 to 6 months of essential living reserves.`);
+    }
+
+    /**
+     * Render Spending Trends Line/Bar Chart
+     */
+    function renderTrendChart(trends, comparison) {
+        const ctx = document.getElementById('trendChart').getContext('2d');
+        const bannerEl = document.getElementById('monthlyComparisonBanner');
+
+        // Banner text for Month-over-Month comparison
+        if (bannerEl && comparison) {
+            const chg = comparison.changes;
+            const isIncrease = chg.expenseChangePct > 0;
+            const arrow = isIncrease ? '↑' : '↓';
+            const color = isIncrease ? '#F87171' : '#4ADE80';
+
+            bannerEl.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                    <span><strong>MoM Comparison:</strong> Expenses changed by <span style="color: ${color}; font-weight: 700;">${arrow} ${Math.abs(chg.expenseChangePct)}%</span> (${chg.spendingTrend})</span>
+                    <span>Savings Shift: <strong style="color: ${chg.savingsDifference >= 0 ? '#4ADE80' : '#F87171'};">${chg.savingsDifference >= 0 ? '+' : ''}${formatINR(chg.savingsDifference)}</strong></span>
+                </div>
+            `;
         }
-    }
 
-    return improvements.slice(0, 3);
-}
+        if (!trends || trends.length === 0) return;
 
-// ─────────────────────────────────────────────────────────────────────────────
-// REPORT CARD
-// ─────────────────────────────────────────────────────────────────────────────
+        const labels = trends.map(t => t.label);
+        const incomeData = trends.map(t => t.income);
+        const expenseData = trends.map(t => t.expenses);
+        const savingsData = trends.map(t => t.savings);
 
-function renderReportCard(report) {
-    if (!report) return;
+        if (trendChartInstance) {
+            trendChartInstance.destroy();
+        }
 
-    const score = Number(report.health_score) || 0;
-    const { grade } = getGrade(score); // Single source of truth for grading
-
-    const reportGradeEl = document.getElementById('reportGrade');
-    const reportScoreEl = document.getElementById('reportScore');
-
-    if (reportGradeEl) {
-        reportGradeEl.textContent = grade;
-        const gradeColors = { A: '#182820', B: '#367A53', C: '#52765D', D: '#A47B35', F: '#B65C4B' };
-        reportGradeEl.style.background = gradeColors[grade] || '#182820';
-    }
-    if (reportScoreEl) reportScoreEl.textContent = `${score} / 100`;
-
-    const listArea = document.getElementById('reportImprovements');
-    if (listArea) {
-        listArea.innerHTML = '';
-        try {
-            const improvArr = typeof report.improvements === 'string'
-                ? JSON.parse(report.improvements)
-                : report.improvements;
-
-            if (Array.isArray(improvArr) && improvArr.length > 0) {
-                improvArr.forEach(imp => {
-                    const li = document.createElement('li');
-                    li.style.cssText = 'margin-bottom: 10px; color: #e2e8f0; font-size: 14px; line-height: 1.5;';
-                    li.textContent = imp;
-                    listArea.appendChild(li);
-                });
-            } else {
-                listArea.innerHTML = '<li style="color:#94a3b8;">No recommendations yet. Add more expense data.</li>';
+        trendChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [
+                    {
+                        label: 'Income',
+                        data: incomeData,
+                        backgroundColor: 'rgba(34, 197, 94, 0.7)',
+                        borderRadius: 6
+                    },
+                    {
+                        label: 'Expenses',
+                        data: expenseData,
+                        backgroundColor: 'rgba(239, 68, 68, 0.7)',
+                        borderRadius: 6
+                    },
+                    {
+                        type: 'line',
+                        label: 'Net Savings',
+                        data: savingsData,
+                        borderColor: '#38BDF8',
+                        backgroundColor: '#38BDF8',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        pointRadius: 4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: { color: '#CBD5E1', font: { family: "'Poppins', sans-serif", size: 11 } }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: (ctx) => ` ${ctx.dataset.label}: ${formatINR(ctx.parsed.y)}`
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#94A3B8' }
+                    },
+                    y: {
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                        ticks: {
+                            color: '#94A3B8',
+                            callback: (val) => '₹' + (val >= 1000 ? (val / 1000) + 'k' : val)
+                        }
+                    }
+                }
             }
-        } catch {
-            listArea.innerHTML = '<li style="color:#94a3b8;">Could not load recommendations.</li>';
+        });
+    }
+
+    /**
+     * Render Spending Behaviour & Anomalies
+     */
+    function renderBehaviourSection(behaviour) {
+        // 1. Unusual Spikes
+        const unusualList = document.getElementById('unusualExpensesList');
+        if (unusualList) {
+            unusualList.innerHTML = '';
+            if (!behaviour.unusualExpenses || behaviour.unusualExpenses.length === 0) {
+                unusualList.innerHTML = '<li style="color: #4ADE80;">✓ No statistical spending surges detected.</li>';
+            } else {
+                behaviour.unusualExpenses.forEach(e => {
+                    const li = document.createElement('li');
+                    li.style.marginBottom = '6px';
+                    li.innerHTML = `<strong>${e.category}:</strong> ${formatINR(e.amount)} on ${e.date || 'N/A'}`;
+                    unusualList.appendChild(li);
+                });
+            }
         }
     }
 }
@@ -856,33 +666,116 @@ async function loadMonthlyReportCard({
         };
     }
 
-    if (currentReport) renderReportCard(currentReport);
-
-    // Render past report navigation buttons
-    const pastReportsList = document.getElementById('pastReportsList');
-    if (pastReportsList && existingReports?.length > 0) {
-        pastReportsList.innerHTML = '';
-
-        existingReports.forEach(rep => {
-            const btn = document.createElement('button');
-            btn.className = rep.month === monthStr ? 'btn btn-primary' : 'btn btn-outline';
-            btn.style.cssText = 'padding: 6px 15px; font-size: 12px; border-radius: 20px; white-space: nowrap;';
-            btn.textContent = getMonthName(rep.month);
-
-            btn.addEventListener('click', () => {
-                Array.from(pastReportsList.children).forEach(c => {
-                    c.className = 'btn btn-outline';
-                    c.style.padding = '6px 15px';
-                    c.style.fontSize = '12px';
-                    c.style.borderRadius = '20px';
+        // 2. Recurring Subscriptions
+        const recList = document.getElementById('recurringExpensesList');
+        if (recList) {
+            recList.innerHTML = '';
+            if (!behaviour.recurringExpenses || behaviour.recurringExpenses.length === 0) {
+                recList.innerHTML = '<li style="color: #94A3B8;">No regular recurring commitments identified yet.</li>';
+            } else {
+                behaviour.recurringExpenses.forEach(r => {
+                    const li = document.createElement('li');
+                    li.style.marginBottom = '6px';
+                    li.innerHTML = `<strong>${r.category}:</strong> ~${formatINR(r.estimatedAmount)} (${r.frequency})`;
+                    recList.appendChild(li);
                 });
-                btn.className = 'btn btn-primary';
-                btn.style.cssText = 'padding: 6px 15px; font-size: 12px; border-radius: 20px; white-space: nowrap;';
-                if (reportMonthEl) reportMonthEl.textContent = getMonthName(rep.month);
-                renderReportCard(rep);
-            });
+            }
+        }
 
-            pastReportsList.appendChild(btn);
-        });
+        // 3. Discretionary / Potential Savings
+        const discList = document.getElementById('discretionaryList');
+        if (discList) {
+            discList.innerHTML = '';
+            if (!behaviour.potentialUnnecessary || behaviour.potentialUnnecessary.length === 0) {
+                discList.innerHTML = '<li style="color: #4ADE80;">✓ Discretionary spending is well within balanced ratios.</li>';
+            } else {
+                behaviour.potentialUnnecessary.forEach(p => {
+                    const li = document.createElement('li');
+                    li.style.marginBottom = '6px';
+                    li.innerHTML = `<strong>${p.category}:</strong> ${p.reason}`;
+                    discList.appendChild(li);
+                });
+            }
+        }
     }
-}
+
+    /**
+     * Render Gemini AI Insights
+     */
+    function renderAIInsights(aiData) {
+        if (!aiData || !aiData.insights) return;
+        const ins = aiData.insights;
+
+        // Source badge
+        const srcEl = document.getElementById('aiInsightsSource');
+        if (srcEl) {
+            srcEl.textContent = aiData.source === 'gemini'
+                ? 'Powered by Google Gemini 1.5'
+                : 'Deterministic Financial Engine';
+        }
+
+        // Summary text
+        const sumEl = document.getElementById('aiSummaryText');
+        if (sumEl && ins.summary) {
+            sumEl.textContent = ins.summary;
+        }
+
+        // Helper to populate lists
+        const fillList = (id, items) => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.innerHTML = '';
+            (items || []).forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                el.appendChild(li);
+            });
+        };
+
+        fillList('aiConcernsList', ins.concerns);
+        fillList('aiHabitsList', ins.positiveHabits);
+        fillList('aiImprovementsList', ins.improvements);
+        fillList('aiSuggestionsList', ins.reductionSuggestions);
+    }
+
+    /**
+     * Render Recent Expense History Table
+     */
+    async function renderTransactionHistory(period) {
+        const tbody = document.getElementById('expenseHistoryTableBody');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+
+        try {
+            const exps = await db.getExpenses(userId, period?.startDate, period?.endDate);
+            if (!exps || exps.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; padding: 20px; color: #94A3B8;">No transactions found in this period.</td></tr>';
+                return;
+            }
+
+            exps.slice(0, 15).forEach(e => {
+                const tr = document.createElement('tr');
+                tr.style.borderBottom = '1px solid rgba(255, 255, 255, 0.05)';
+                tr.innerHTML = `
+                    <td style="padding: 12px; color: #CBD5E1;">${e.date || 'N/A'}</td>
+                    <td style="padding: 12px; font-weight: 500; color: #ffffff;">${e.category || 'Others'}</td>
+                    <td style="padding: 12px; text-align: right; font-weight: 600; color: #F87171;">-${formatINR(e.amount)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        } catch (e) {
+            console.warn("Could not load transaction history table:", e);
+        }
+    }
+
+    // -------------------------------------------------------------
+    // INITIALIZATION RUN
+    // -------------------------------------------------------------
+    setupFilterToolbar();
+
+    // Load both interconnected features
+    await Promise.all([
+        loadFinancialHealthScore(),
+        loadExpenseAnalysis()
+    ]);
+});
