@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,13 +12,14 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
     <!-- Standard Navigation -->
     <header class="navbar">
         <div class="container">
-            <a href="index.html" class="logo"><i class="fas fa-chart-line"></i> SmartSpend</a>
+            <a href="index.html" class="logo"><span class="logo-mark"></span> SmartSpend</a>
             <nav class="nav-links">
-                <select id="languageSelector" class="lang-select" style="padding: 5px 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 14px; background-color: white; color: #1a1a1a;">
+                <select id="languageSelector" class="lang-select">
                     <option value="en">English</option>
                     <option value="hi">हिंदी (Hindi)</option>
                     <option value="ta">தமிழ் (Tamil)</option>
@@ -40,33 +42,87 @@
     </header>
 
     <div class="auth-wrapper">
-        <div class="auth-card glass-card animate-on-scroll ">
-            <h1 class="auth-title">Login</h1>
-            
-            <form id="loginForm">
+        <div class="auth-card">
+            <h1 class="auth-title">Welcome Back</h1>
+            <p style="color: var(--text-secondary); font-size: 14px; margin-top: -16px; margin-bottom: 24px; text-align: center;">Access your institutional financial dashboard</p>
+
+            <!-- Alert Container for Success / Error / Info Messages -->
+            <div id="authAlert" style="display: none;"></div>
+
+            <form id="loginForm" novalidate autocomplete="on">
+                <!-- Email Address -->
                 <div class="input-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" required placeholder="Enter your email">
+                    <label for="email"><i class="fas fa-envelope" style="margin-right: 6px;"></i> Email Address</label>
+                    <input type="email" id="email" required placeholder="name@example.com" autocomplete="email">
                 </div>
 
+                <!-- Password -->
                 <div class="input-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" required placeholder="Enter your password">
+                    <label for="password"><i class="fas fa-lock" style="margin-right: 6px;"></i> Password</label>
+                    <div class="password-field-wrapper">
+                        <input type="password" id="password" required placeholder="Enter your password"
+                            autocomplete="current-password">
+                        <button type="button" class="password-toggle-btn" id="togglePassword"
+                            title="Show/Hide Password" aria-label="Toggle password visibility">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary">Login</button>
+                <!-- Remember Me & Forgot Password -->
+                <div class="auth-options">
+                    <label class="remember-me">
+                        <input type="checkbox" id="rememberMe" checked>
+                        <span>Remember me</span>
+                    </label>
+                    <a href="#" class="forgot-password-link" id="forgotPasswordLink">Forgot password?</a>
+                </div>
+
+                <!-- Login Button -->
+                <button type="submit" class="btn btn-primary" id="loginSubmitBtn">
+                    <i class="fas fa-sign-in-alt" style="margin-right: 8px;"></i> Login
+                </button>
             </form>
 
             <div class="auth-link">
-                Don't have an account? <a href='signup.html'>Create Account</a>
+                Don't have an account? <a href="signup.html">Create Account</a>
             </div>
+        </div>
+    </div>
+
+    <!-- Forgot Password Modal -->
+    <div id="forgotPasswordModal"
+        style="display: none; position: fixed; inset: 0; background: rgba(24, 40, 32, 0.45); backdrop-filter: blur(2px); z-index: 2000; align-items: center; justify-content: center; padding: 20px;">
+        <div class="auth-card" style="max-width: 420px; position: relative; margin: 0; box-shadow: var(--shadow-lg);">
+            <button type="button" id="closeForgotModal"
+                style="position: absolute; top: 16px; right: 16px; background: none; border: none; color: var(--text-secondary); font-size: 18px; cursor: pointer;">
+                <i class="fas fa-times"></i>
+            </button>
+            <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 8px; color: var(--text-primary);">Reset Password</h2>
+            <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 20px; line-height: 1.5;">
+                Enter your registered email address and we'll send you a link to reset your password.
+            </p>
+
+            <div id="forgotAlert" style="display: none;"></div>
+
+            <form id="forgotPasswordForm" novalidate>
+                <div class="input-group">
+                    <label for="forgotEmail"><i class="fas fa-envelope" style="margin-right: 6px;"></i> Email Address</label>
+                    <input type="email" id="forgotEmail" required placeholder="name@example.com">
+                </div>
+                <button type="submit" class="btn btn-primary" style="margin-top: 10px;">
+                    <i class="fas fa-paper-plane" style="margin-right: 8px;"></i> Send Reset Link
+                </button>
+            </form>
         </div>
     </div>
 
     <!-- Initialization Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabaseClient.js"></script>
+    <script src="js/auth.js"></script>
     <script src="js/i18n.js"></script>
-    <script src="js/app.js"></script> <!-- Required for intersections observers -->
+    <script src="js/app.js"></script>
 </body>
+
 </html>
